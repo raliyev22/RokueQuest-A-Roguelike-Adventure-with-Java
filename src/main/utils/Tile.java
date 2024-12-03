@@ -33,9 +33,9 @@ public class Tile {
 				+ bottomSide + ", tileType=" + tileType + "]";
 	}
 
-	public boolean isInside(Pair<Integer, Integer> point) {
-		int xCoordinate = point.getKey();
-		int yCoordinate = point.getValue();
+	public boolean isInside(Pair<Float, Float> point) {
+		float xCoordinate = point.getKey();
+		float yCoordinate = point.getValue();
 		
 		return isInside(xCoordinate, yCoordinate);
 	}
