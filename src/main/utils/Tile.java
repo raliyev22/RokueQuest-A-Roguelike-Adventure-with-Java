@@ -39,8 +39,8 @@ public class Tile {
 		
 		return isInside(xCoordinate, yCoordinate);
 	}
-
-	public boolean isInside(int xCoordinate, int yCoordinate) {
+	
+	public boolean isInside(float xCoordinate, float yCoordinate) {
 		// Check if x is in range
 		if ((leftSide <= xCoordinate) || (rightSide >= xCoordinate))
 			return false;
