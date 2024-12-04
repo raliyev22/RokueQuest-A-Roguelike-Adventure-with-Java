@@ -67,7 +67,7 @@ public class Grid {
 	
 	@Override
 	public String toString() {
-		String str = "TileMap:\n[";
+		String str = "TileMap: [\n";
 		for (int i = 0; i < this.tileMap.size(); i++) {
 			char onTile = tileMap.get(i).tileType;
 			String add;
