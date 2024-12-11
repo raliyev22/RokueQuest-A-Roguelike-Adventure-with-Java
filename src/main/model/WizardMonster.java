@@ -11,4 +11,7 @@ public class WizardMonster extends Monster {
     public int getY(){
         return y;
     }
+    public char getType(){
+        return 'W';
+    }
 }

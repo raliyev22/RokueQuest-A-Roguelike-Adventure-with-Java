@@ -16,17 +16,13 @@ public class PlayModeViewGrid {
 
 
     public PlayModeViewGrid() {
-        player = new Hero(400,300, PLAYER_SIZE, PLAYER_IMAGE);
-        monsters = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            Monster monster = new Monster(200 + i*100, 200 + i*100, MONSTER_SIZE, MONSTER_IMAGE);
-            monsters.add(monster);
-        }
-        playModeGrid.changeTileWithIndex(2, 2, 'P');
-        playModeGrid.changeTileWithIndex(3, 3, 'M');
-        playModeGrid.changeTileWithIndex(4, 4, 'M');
-        playModeGrid.changeTileWithIndex(5, 5, 'M');
-        playModeGrid.changeTileWithIndex(6, 6, 'M');
+
+    }
+
+    public void createWizardMonster() {
+        Monster monster = new WizardMonster(1,1);
+        monsters.add(monster);
+        playModeGrid.changeTileWithIndex(monster.getX(),monster.getY(),monster.getType());
     }
     public String toString() {
         return playModeGrid.toString();
