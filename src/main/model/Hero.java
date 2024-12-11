@@ -4,6 +4,7 @@ import javafx.scene.image.Image;
 
 public class Hero {
     int posX, posY, size, remainingLives;
+    char type;
     Image img;
 
     public Hero(int posX, int posY, int size, Image img) {
@@ -31,5 +32,8 @@ public class Hero {
         return posY;
     }
 
+    public char getType() {
+        return 'H';
+    }
 
 }

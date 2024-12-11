@@ -4,16 +4,16 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -38,20 +38,21 @@ public class Main extends Application {
 
         Button exitButton = new Button("Exit");
         exitButton.setPrefWidth(200);
-
+        
+        
         // Button Actions
         startButton.setOnAction(e -> startNewGame(primaryStage));
         helpButton.setOnAction(e -> showHelp());
         exitButton.setOnAction(e -> primaryStage.close());
-
+        
         // Add elements to VBox
         mainMenu.getChildren().addAll(title, startButton, helpButton, exitButton);
-
+        
         // Background styling
         StackPane root = new StackPane();
         root.getChildren().add(mainMenu);
         root.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGRAY, CornerRadii.EMPTY, javafx.geometry.Insets.EMPTY)));
-
+        
         // Add a background image (Optional)
         Image backgroundImage = new Image("file:/Users/Raul/Desktop/Rokue.jpeg");
         ImageView backgroundView = new ImageView(backgroundImage);
@@ -59,7 +60,7 @@ public class Main extends Application {
         backgroundView.setFitHeight(400);
         backgroundView.setOpacity(0.3); // Dim the background for readability
         root.getChildren().add(0, backgroundView);
-
+        
         // Create Scene
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);

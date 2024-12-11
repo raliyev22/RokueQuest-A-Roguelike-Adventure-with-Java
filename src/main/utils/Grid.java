@@ -67,8 +67,8 @@ public class Grid {
 		return tileMap.get((row - 1) * columnNumber + column - 1);
 	}
 
-	public void changeTileWithIndex(int row, int column, char c) {
-		Tile currentTile = findTileWithIndex(row, column);
+	public void changeTileWithIndex(int xCoordinate, int yCoordinate, char c) {
+		Tile currentTile = findTileWithIndex(yCoordinate, xCoordinate);
         currentTile.tileType = c;
 	}
 	
@@ -81,7 +81,10 @@ public class Grid {
 				int index = i * this.columnNumber + j;
 				Tile printTile = tileMap.get(index);
 				char onTile = printTile.tileType;
-				String add = String.valueOf(index) + " " + onTile;
+				String add = "";
+				if (index < 10)
+				    add += "0";
+				add += String.valueOf(index) + " " + onTile;
 				str += add;
 				if (j < this.columnNumber - 1)
 					str+= ", ";
