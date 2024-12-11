@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 // This class creates tile-maps. Maybe it will have utility functions too
 public class Grid {
-	protected int rowNumber; // Number of rows
-	protected int columnNumber; // Number of columns
-	protected int tileWidth;
-	protected int tileHeight;
+	protected final int rowNumber; // Number of rows
+	protected final int columnNumber; // Number of columns
+	protected final int tileWidth;
+	protected final int tileHeight;
 	// We will create the tile map starting from bottom left
-	protected int bottomLeftXCoordinate;
-	protected int bottomLeftYCoordinate;
+	protected final int bottomLeftXCoordinate;
+	protected final int bottomLeftYCoordinate;
 	protected ArrayList<Tile> tileMap;
 	
 	public Grid(int rowNumber, int columnNumber, int tileWidth, int tileHeight, 

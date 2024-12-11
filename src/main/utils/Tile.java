@@ -42,11 +42,11 @@ public class Tile {
 	
 	public boolean isInside(float xCoordinate, float yCoordinate) {
 		// Check if x is in range
-		if ((leftSide <= xCoordinate) || (rightSide >= xCoordinate))
+		if ((leftSide < xCoordinate) || (rightSide >= xCoordinate))
 			return false;
 		
 		// Check if y is in range
-		if ((bottomSide <= yCoordinate) || (topSide >= yCoordinate))
+		if ((bottomSide < yCoordinate) || (topSide >= yCoordinate))
 			return false;
 		
 		return true;
