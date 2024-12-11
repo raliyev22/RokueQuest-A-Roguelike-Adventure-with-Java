@@ -44,7 +44,7 @@ public class Grid {
 		for (int index = 0; index < capacity; index++) {
 			Tile currentTile = new Tile(leftSide, rightSide, topSide, bottomSide);
 			tileMap.add(index, currentTile);
-			System.out.println(String.format("%d: %s\n", index, currentTile));
+			// System.out.println(String.format("%d: %s\n", index, currentTile));
 			
 			// Find the next positions of every side
 			// If we are at the end of the row, go up 1 and start from left
@@ -66,6 +66,12 @@ public class Grid {
 	public Tile findTileWithIndex(int row, int column) {
 		return tileMap.get((row - 1) * columnNumber + column - 1);
 	}
+
+	public void changeTileWithIndex(int row, int column, char c) {
+		Tile currentTile = findTileWithIndex(row, column);
+        currentTile.tileType = c;
+	}
+	
 	
 	@Override
 	public String toString() {
