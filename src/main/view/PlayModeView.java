@@ -74,16 +74,16 @@ public class PlayModeView extends Application{
                     System.out.println("ded");
                 }
                 if (upPressed){
-                    player.setY(player.getY() - 1);
+                    player.setY(player.getY() - 2);
                 }
                 if (downPressed){
-                    player.setY(player.getY() + 1);
+                    player.setY(player.getY() + 2);
                 }
                 if (leftPressed){
-                    player.setX(player.getX() - 1);
+                    player.setX(player.getX() - 2);
                 }
                 if (rightPressed){
-                    player.setX(player.getX() + 1);
+                    player.setX(player.getX() + 2);
                 }
             }
         };
