@@ -1,5 +1,5 @@
 package main.utils;
-
+		
 import java.util.ArrayList;
 
 // This class creates tile-maps. Maybe it will have utility functions too
@@ -13,10 +13,8 @@ public class Grid {
 	protected int bottomLeftYCoordinate;
 	protected ArrayList<Tile> tileMap;
 	
-	
-	
 	public Grid(int rowNumber, int columnNumber, int tileWidth, int tileHeight, 
-			int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
+	int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
 		super();
 		if ((rowNumber <= 0) || (columnNumber <= 0) || (tileWidth <= 0) || (tileHeight <= 0))
 			System.err.println("Non-positive number while creating tile map.");
@@ -27,29 +25,29 @@ public class Grid {
 		this.bottomLeftXCoordinate = bottomLeftXCoordinate;
 		this.bottomLeftYCoordinate = bottomLeftYCoordinate;
 		this.tileMap = createTileMap(rowNumber, columnNumber, 
-				tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+		tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
 	}
 	
 	// Creating a tile map using other variables
-	public ArrayList<Tile> createTileMap(int rowNumber, int columnNumber, 
-			int tileWidth, int tileHeight, 
-			int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
-
+	public static ArrayList<Tile> createTileMap(int rowNumber, int columnNumber, 
+	int tileWidth, int tileHeight, 
+	int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
+		
 		int capacity = rowNumber * columnNumber;
-		ArrayList<Tile> tileMap = new ArrayList<Tile>(capacity);
-
+		ArrayList<Tile> tileMap = new ArrayList<>(capacity);
+		
 		int leftSide = bottomLeftXCoordinate;
 		int bottomSide = bottomLeftYCoordinate;
 		int rightSide = leftSide + tileWidth;
 		int topSide = bottomSide + tileHeight; 
-
+		
 		for (int index = 0; index < capacity; index++) {
 			Tile currentTile = new Tile(leftSide, rightSide, topSide, bottomSide);
 			tileMap.add(index, currentTile);
 			System.out.println(String.format("%d: %s\n", index, currentTile));
 			
 			// Find the next positions of every side
-			// If we are at the end of the row, go down 1 and start from left
+			// If we are at the end of the row, go up 1 and start from left
 			if ((index + 1) % columnNumber == 0) {
 				leftSide = bottomLeftXCoordinate;
 				bottomSide = bottomSide + tileHeight;
@@ -65,28 +63,32 @@ public class Grid {
 		return tileMap;
 	}
 	
+	public Tile findTileWithIndex(int row, int column) {
+		return tileMap.get((row - 1) * columnNumber + column - 1);
+	}
+	
 	@Override
 	public String toString() {
-		String str = "TileMap: [\n";
-		for (int i = 0; i < this.tileMap.size(); i++) {
-			char onTile = tileMap.get(i).tileType;
-			String add;
-			if ((i + 1) % columnNumber == 0) {
-				if ((i + 1) == this.tileMap.size()) {
-					add = onTile + "]";
-				} else {
-					add = onTile + "\n";					
-				}
-			} else {
-				add = onTile + ", ";
+		String str = "TileMap:\n";
+		for (int i = this.rowNumber - 1; i >= 0; i--) {
+			for (int j = 0; j < this.columnNumber; j++) {
+				int index = i * this.columnNumber + j;
+				Tile printTile = tileMap.get(index);
+				char onTile = printTile.tileType;
+				String add = String.valueOf(index) + " " + onTile;
+				str += add;
+				if (j < this.columnNumber - 1)
+					str+= ", ";
 			}
-			str += add;
+			str += "\n";
 		}
 		return str;
 	}
-
+	
 	public static void main(String[] args) {
-		Grid myTileMap = new Grid(3, 5, 20, 10, 5, 15);
-		System.out.println(myTileMap);
-    }
+		Grid myGrid = new Grid(3, 5, 20, 10, 5, 15);
+		System.out.println(myGrid);
+		Tile mytile = myGrid.findTileWithIndex(1,1);
+		System.out.println(mytile);
+	}
 }
