@@ -4,6 +4,7 @@ public abstract class Monster {
     int x;
     int y;
     MonsterType type;
+    
     public int getX(){
         return x;
     }

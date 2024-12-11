@@ -23,13 +23,13 @@ public class PlayModeViewGrid {
         player = initializeHero(2, 4, 10, null);
         monsters = new ArrayList<>();
     }
-
+    
     public Hero initializeHero(int xCoordinate, int yCoordinate, int size, Image img) {
-        Hero hero = new Hero(xCoordinate, yCoordinate, size, null);
-        playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getType());
+        Hero hero = new Hero(xCoordinate, yCoordinate, null);
+        playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }
-
+    
     public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type) {
         Monster monster = null;
         switch (type) {
@@ -47,12 +47,28 @@ public class PlayModeViewGrid {
         playModeGrid.changeTileWithIndex(monster.getX(),monster.getY(),monster.getCharType());
         return monster;
     }
+    
+    public Grid updateGrid() {
+        playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+        for (Monster monster : monsters) {
+            playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
+        }
+        playModeGrid.changeTileWithIndex(player.getPosX(), player.getPosY(), player.getCharType());
+        return playModeGrid;
+    }
+
     public String toString() {
         return playModeGrid.toString();
     }
     public static void main(String[] args) {
         PlayModeViewGrid playGrid = new PlayModeViewGrid();
+        Hero player = playGrid.player;
         playGrid.createMonster(3, 5, MonsterType.ARCHER);
+        playGrid.createMonster(8, 8, MonsterType.ARCHER);
+        playGrid.createMonster(7, 6, MonsterType.ARCHER);
+        System.out.println(playGrid.toString());
+        player.move(Directions.NORTH);
+        playGrid.updateGrid();
         System.out.println(playGrid.toString());
     }
 }
