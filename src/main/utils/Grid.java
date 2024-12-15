@@ -177,8 +177,17 @@ public class Grid {
 		return dirs;
 	}
 
+	public Tile findNorthTile(Tile currentTile) { //TODO
+		if ((currentTile.location.equals(TileLocation.TOP_LEFT)) 
+		|| (currentTile.location.equals(TileLocation.TOP)) 
+		|| (currentTile.location.equals(TileLocation.TOP_RIGHT))) {
+			return null;
+		}
+
+		
+	}
 	// Finds the north, south, east, west tiles.
-	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) {
+	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) { //TODO
 		HashSet<Integer> adjacentTiles = new HashSet<>();
 		
 		return adjacentTiles;
