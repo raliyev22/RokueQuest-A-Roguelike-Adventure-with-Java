@@ -2,7 +2,9 @@ package main.utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import main.model.Directions;
 
 // This class creates tile-maps. Maybe it will have utility functions too
 public class Grid {
@@ -13,7 +15,7 @@ public class Grid {
 	// We will create the tile map starting from bottom left
 	protected final int bottomLeftXCoordinate;
 	protected final int bottomLeftYCoordinate;
-	protected ArrayList<Tile> tileMap;
+	protected List<Tile> tileMap;
 	
 	public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
 	int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
@@ -69,7 +71,7 @@ public class Grid {
 	}
 	
 	// Creating a tile map using other variables
-	private ArrayList<Tile> createTileMap(int rowLength, int columnLength, 
+	private List<Tile> createTileMap(int rowLength, int columnLength, 
 	int tileWidth, int tileHeight, int bottomLeftXCoordinate, int bottomLeftYCoordinate) {
 		
 		int capacity = rowLength * columnLength;
@@ -109,7 +111,7 @@ public class Grid {
 	// 03 04 05
 	// 00 01 02
 	public int tileIndex(int x, int y) {
-		return x * columnLength + y; // Uses 0 indexing
+		return y * rowLength + x; // Uses 0 indexing
 	}
 	
 	public Tile findTileWithIndex(int x, int y) {
@@ -121,6 +123,60 @@ public class Grid {
 		currentTile.changeTileType(c);
 	}
 	
+	// Return available directions of a tile, for example we cannot go left or down
+	// from the bottom left tile, so this function would return {NORTH, EAST}
+	public Set<Directions> availableDirections(int x, int y) {
+		HashSet<Directions> dirs = new HashSet<>();
+		Tile currentTile = findTileWithIndex(x, y);
+		
+		switch (currentTile.location) { // Have you seen a code that is this elegantly written?
+			case TileLocation.BOTTOM_LEFT -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.EAST);
+			}
+			case TileLocation.BOTTOM -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.WEST);
+				dirs.add(Directions.EAST);
+			}
+			case TileLocation.BOTTOM_RIGHT -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.WEST);
+			}
+			case TileLocation.LEFT -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.EAST);
+				dirs.add(Directions.SOUTH);
+			}
+			case TileLocation.INSIDE -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.WEST);
+				dirs.add(Directions.SOUTH);
+				dirs.add(Directions.EAST);
+			}
+			case TileLocation.RIGHT -> {
+				dirs.add(Directions.NORTH);
+				dirs.add(Directions.WEST);
+				dirs.add(Directions.SOUTH);
+			}
+			case TileLocation.TOP_LEFT -> {
+				dirs.add(Directions.SOUTH);
+				dirs.add(Directions.EAST);
+			}
+			case TileLocation.TOP -> {
+				dirs.add(Directions.EAST);
+				dirs.add(Directions.SOUTH);
+				dirs.add(Directions.WEST);
+			}
+			case TileLocation.TOP_RIGHT -> {
+				dirs.add(Directions.SOUTH);
+				dirs.add(Directions.WEST);
+			}
+			default -> throw new AssertionError();
+		}
+		return dirs;
+	}
+
 	// Finds the north, south, east, west tiles.
 	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) {
 		HashSet<Integer> adjacentTiles = new HashSet<>();
@@ -142,7 +198,7 @@ public class Grid {
 				add += String.valueOf(index) + " " + onTile;
 				str += add;
 				if (j < this.rowLength - 1)
-				str+= ", ";
+					str+= ", ";
 			}
 			str += "\n";
 		}
@@ -152,7 +208,7 @@ public class Grid {
 	public static void main(String[] args) {
 		Grid myGrid = new Grid(3, 5, 20, 10, 5, 15);
 		System.out.println(myGrid);
-		
+
 		Tile mytile0 = myGrid.findTileWithIndex(1,1);
 		System.out.println(mytile0);
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
