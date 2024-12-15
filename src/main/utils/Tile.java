@@ -9,21 +9,23 @@ public class Tile {
 	protected int topSide;
 	protected int bottomSide;
 	protected char tileType; // E = empty, M = monster, H = hero etc.
+	protected TileLocation location;
 
 	// Normal constructor
-	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, char tileType) {
+	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, char tileType, TileLocation location) {
 		super();
 		this.leftSide = leftSide;
 		this.rightSide = rightSide;
 		this.topSide = topSide;
 		this.bottomSide = bottomSide;
 		this.tileType = tileType;
+		this.location = location;
 	}
 
 	//Constructor without specifying tileType
-	public Tile(int leftSide, int rightSide, int topSide, int bottomSide) {
+	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, TileLocation location) {
 		// Using this() function to call above constructor. If we change above, this changes too.
-		this(leftSide, rightSide, topSide, bottomSide, 'E');
+		this(leftSide, rightSide, topSide, bottomSide, 'E', location);
 	}
 
 	// toString Method
