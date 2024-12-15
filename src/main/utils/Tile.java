@@ -29,8 +29,8 @@ public class Tile {
 	// toString Method
 	@Override
 	public String toString() {
-		return "Tile [leftSide=" + leftSide + ", rightSide=" + rightSide + ", topSide=" + topSide + ", bottomSide="
-				+ bottomSide + ", tileType=" + tileType + "]";
+		return "Tile [leftSide=" + leftSide + ", rightSide=" + rightSide + ", bottomSide="
+		+ bottomSide + ", topSide=" + topSide + ", tileType=" + tileType + "]";
 	}
 
 	public boolean isInside(Pair<Float, Float> point) {
@@ -38,6 +38,10 @@ public class Tile {
 		float yCoordinate = point.getValue();
 		
 		return isInside(xCoordinate, yCoordinate);
+	}
+
+	public void changeTileType(char c) {
+		this.tileType = c;
 	}
 	
 	public boolean isInside(float xCoordinate, float yCoordinate) {

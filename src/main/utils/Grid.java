@@ -63,15 +63,19 @@ public class Grid {
 		return tileMap;
 	}
 	
-	public Tile findTileWithIndex(int row, int column) {
-		return tileMap.get((row - 1) * columnNumber + column - 1);
+	// Uses 0 indexing
+	public int tileIndex(int row, int column) {
+		return row * columnNumber + column;
 	}
 
-	public void changeTileWithIndex(int xCoordinate, int yCoordinate, char c) {
-		Tile currentTile = findTileWithIndex(yCoordinate, xCoordinate);
-        currentTile.tileType = c;
+	public Tile findTileWithIndex(int row, int column) {
+		return tileMap.get(tileIndex(row, column));
 	}
-	
+
+	public void changeTileWithIndex(int row, int column, char c) {
+		Tile currentTile = findTileWithIndex(row, column);
+        currentTile.changeTileType(c);
+	}
 	
 	@Override
 	public String toString() {
@@ -97,7 +101,13 @@ public class Grid {
 	public static void main(String[] args) {
 		Grid myGrid = new Grid(3, 5, 20, 10, 5, 15);
 		System.out.println(myGrid);
-		Tile mytile = myGrid.findTileWithIndex(1,1);
-		System.out.println(mytile);
+		Tile mytile1 = myGrid.findTileWithIndex(1,4);
+		Tile mytile2 = myGrid.findTileWithIndex(2,1);
+		System.out.println(mytile1);
+		System.out.println(mytile2);
+
+		mytile1.changeTileType('A');
+		System.out.println(mytile1);
+		System.out.println(myGrid);
 	}
 }
