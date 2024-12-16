@@ -55,7 +55,7 @@ public class FighterMonster extends Monster{
             if(randomMove == 2){
                 if(this.grid.indexInRange(x-1,y)){
                     Tile tile = this.grid.findTileWithIndex(x-1, y);
-                    if(!(tile.getTileType() == E)){
+                    if(!(tile.getTileType() == 'E')){
                         moveRandomly();
                     }
                     else{
