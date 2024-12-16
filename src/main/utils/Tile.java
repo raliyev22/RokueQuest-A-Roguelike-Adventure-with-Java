@@ -9,30 +9,28 @@ public class Tile {
 	protected int topSide;
 	protected int bottomSide;
 	protected char tileType; // E = empty, M = monster, H = hero etc.
-	protected TileLocation location;
 
 	// Normal constructor
-	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, char tileType, TileLocation location) {
+	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, char tileType) {
 		super();
 		this.leftSide = leftSide;
 		this.rightSide = rightSide;
 		this.topSide = topSide;
 		this.bottomSide = bottomSide;
 		this.tileType = tileType;
-		this.location = location;
 	}
 
 	//Constructor without specifying tileType
-	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, TileLocation location) {
+	public Tile(int leftSide, int rightSide, int topSide, int bottomSide) {
 		// Using this() function to call above constructor. If we change above, this changes too.
-		this(leftSide, rightSide, topSide, bottomSide, 'E', location);
+		this(leftSide, rightSide, topSide, bottomSide, 'E');
 	}
 
 	// toString Method
 	@Override
 	public String toString() {
-		return "Tile [leftSide=" + leftSide + ", rightSide=" + rightSide + ", bottomSide="
-		+ bottomSide + ", topSide=" + topSide + ", tileType=" + tileType + "]";
+		return "Tile [leftSide=" + leftSide + ", rightSide=" + rightSide + ", topSide=" + topSide + 
+		", bottomSide=" + bottomSide + ", tileType=" + tileType + "]";
 	}
 
 	public boolean isInside(Pair<Float, Float> point) {
