@@ -268,10 +268,24 @@ public class Grid {
 		} else {
 			int x = findXofTile(currentTile);
 			int y = findYofTile(currentTile);
-			int newY = y - this.rowLength;
+			int newX = x + 1;
 
-			Tile belowTile = findTileWithIndex(x, newY);
-			return belowTile;
+			Tile rightTile = findTileWithIndex(newX, y);
+			return rightTile;
+		}
+	}
+
+	// Finds the left tile
+	public Tile findWestTile(Tile currentTile) { //TODO
+		if (isLeftTile(currentTile)) {
+			return null;
+		} else {
+			int x = findXofTile(currentTile);
+			int y = findYofTile(currentTile);
+			int newX = x - 1;
+
+			Tile leftTile = findTileWithIndex(newX, y);
+			return leftTile;
 		}
 	}
 
