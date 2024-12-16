@@ -81,21 +81,16 @@ public void start(Stage stage) {
         heartsContainer.getChildren().add(heart);
     }
 
-    // Envanter Bölmesi (Büyük ve Tek Slot)
-    Label inventoryLabel = new Label("Inventory");
-    inventoryLabel.setTextFill(Color.WHITE);
-    inventoryLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-underline: true;");
-
     // Büyük Inventory Görseli
     ImageView inventoryImage = new ImageView(new Image("/rokue-like_assets/Inventory.png"));
-    inventoryImage.setFitWidth(120); // Daha büyük boyut
+    inventoryImage.setFitWidth(150); // Daha büyük boyut
     inventoryImage.setFitHeight(200);
 
     Region spacer = new Region();
-    spacer.setPrefHeight(200); // Boşluk mümkün olduğunca genişletilecek
+    spacer.setPrefHeight(150); // Boşluk mümkün olduğunca genişletilecek
     
     // UI bileşenlerini ekle
-    uiContainer.getChildren().addAll(timeLabel, heartsContainer,  spacer, inventoryLabel, inventoryImage);
+    uiContainer.getChildren().addAll(timeLabel, heartsContainer,  spacer, inventoryImage);
     root.getChildren().add(uiContainer);
 
 
