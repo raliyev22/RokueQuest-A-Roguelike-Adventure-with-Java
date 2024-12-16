@@ -1,9 +1,12 @@
 package main.model;
+import main.utils.Grid
+
 
 public abstract class Monster {
     int x;
     int y;
     MonsterType type;
+    Grid grid;
     
     public int getX(){
         return x;

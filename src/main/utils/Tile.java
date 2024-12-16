@@ -57,4 +57,7 @@ public class Tile {
 		
 		return true;
 	}
+	public char getTileType(){
+		return this.tileType;
+	}
 }
