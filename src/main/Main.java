@@ -15,8 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-//Raul testing
-//Raul engineering 2
+
 
 public class Main extends Application {
     @Override
