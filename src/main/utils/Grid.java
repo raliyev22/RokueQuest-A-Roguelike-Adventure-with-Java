@@ -233,14 +233,62 @@ public class Grid {
 		|| (tile.location.equals(TileLocation.BOTTOM_RIGHT)));
 	}
 
+	// Finds the above tile
 	public Tile findNorthTile(Tile currentTile) { //TODO
 		if (isTopTile(currentTile)) {
 			return null;
 		} else {
-			int y = currentTile;
-			return null;
+			int x = findXofTile(currentTile);
+			int y = findYofTile(currentTile);
+			int newY = y + this.rowLength;
+
+			Tile aboveTile = findTileWithIndex(x, newY);
+			return aboveTile;
 		}
 	}
+
+	// Finds the below tile
+	public Tile findSouthTile(Tile currentTile) { //TODO
+		if (isBottomTile(currentTile)) {
+			return null;
+		} else {
+			int x = findXofTile(currentTile);
+			int y = findYofTile(currentTile);
+			int newY = y - this.rowLength;
+
+			Tile belowTile = findTileWithIndex(x, newY);
+			return belowTile;
+		}
+	}
+
+	// Finds the right tile
+	public Tile findEastTile(Tile currentTile) { //TODO
+		if (isRightTile(currentTile)) {
+			return null;
+		} else {
+			int x = findXofTile(currentTile);
+			int y = findYofTile(currentTile);
+			int newX = x + 1;
+
+			Tile rightTile = findTileWithIndex(newX, y);
+			return rightTile;
+		}
+	}
+
+	// Finds the left tile
+	public Tile findWestTile(Tile currentTile) { //TODO
+		if (isLeftTile(currentTile)) {
+			return null;
+		} else {
+			int x = findXofTile(currentTile);
+			int y = findYofTile(currentTile);
+			int newX = x - 1;
+
+			Tile leftTile = findTileWithIndex(newX, y);
+			return leftTile;
+		}
+	}
+
 	// Finds the north, south, east, west tiles.
 	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) { //TODO
 		HashSet<Integer> adjacentTiles = new HashSet<>();
