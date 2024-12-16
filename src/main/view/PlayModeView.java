@@ -22,7 +22,7 @@ public class PlayModeView extends Application{
     boolean gameOver = false;
     boolean upPressed, downPressed, leftPressed, rightPressed = false;
     private GraphicsContext gc;
-    Hero player = new Hero(400,300, PLAYER_SIZE, PLAYER_IMAGE);
+    Hero player = new Hero(400,300, PLAYER_IMAGE, 0 ,0);
     List<Monster> monsters;
 
 
