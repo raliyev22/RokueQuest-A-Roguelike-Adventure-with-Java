@@ -16,6 +16,7 @@ public class PlayModeViewGrid {
     protected Grid playModeGrid;
     protected Hero player;
     protected ArrayList<Monster> monsters;
+    protected int time;
 
 
     public PlayModeViewGrid() {
@@ -25,7 +26,7 @@ public class PlayModeViewGrid {
     }
     
     public Hero initializeHero(int xCoordinate, int yCoordinate, int size, Image img) {
-        Hero hero = new Hero(xCoordinate, yCoordinate, null,0,0);
+        Hero hero = new Hero(xCoordinate, yCoordinate, null);
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }
