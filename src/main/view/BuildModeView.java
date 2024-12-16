@@ -3,11 +3,14 @@ package main.view;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 
@@ -21,7 +24,8 @@ public class BuildModeView extends Application {
     static final Image OBJECT5_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
     static final Image OBJECT6_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
     static final Image OBJECT7_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
-
+    static final ImageView xButtonView = new ImageView(new Image("/rokue-like_assets/x_button.png"));
+   
     static final double GRID_X_OFFSET = 0;
     static final double GRID_Y_OFFSET = 0;
 
@@ -31,11 +35,30 @@ public class BuildModeView extends Application {
     public void start(Stage stage) {
         Pane root = new Pane();
 
+        xButtonView.setFitWidth(30); // Adjust size
+        xButtonView.setFitHeight(30);
+
+        // Create the button and set its graphic
+        Button xButton = new Button();
+        xButton.setGraphic(xButtonView);
+        xButton.setStyle("-fx-background-color: transparent;"); // Remove button background
+        xButton.setLayoutX(1175); // Position the button
+        xButton.setLayoutY(15);
+
+        // Add an action to the button (e.g., close the app)
+        xButton.setOnAction(event -> {
+            System.out.println("X button clicked. Closing application...");
+            stage.close();
+        });
+
+
+        double screenWidth = Screen.getPrimary().getBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getBounds().getHeight();
         // Scene setup
-        Scene scene = new Scene(root, 1280, 720);
+        Scene scene = new Scene(root, screenWidth, screenHeight);
 
         // Add chest
-        Rectangle chest = new Rectangle(1105, 0, 175, 720);
+        Rectangle chest = new Rectangle(1105, 50, 175, 720);
         chest.setFill(new ImagePattern(CHEST_IMAGE));
         root.getChildren().add(chest);
 
@@ -49,16 +72,16 @@ public class BuildModeView extends Application {
         grids.forEach(grid -> root.getChildren().add(grid.getGridOutline()));
 
         // Add draggable objects
-        Rectangle object1 = createDraggableObject(1172.5, 100, OBJECT1_IMAGE, root, 40, 75);
-        Rectangle object2 = createDraggableObject(1172.5, 200, OBJECT2_IMAGE, root, 40, 50);
-        Rectangle object3 = createDraggableObject(1172.5, 275, OBJECT3_IMAGE, root, 40, 50);
-        Rectangle object4 = createDraggableObject(1172.5, 350, OBJECT4_IMAGE, root, 40 ,75);
-        Rectangle object5 = createDraggableObject(1172.5, 450, OBJECT5_IMAGE, root, 40, 50);
-        Rectangle object6 = createDraggableObject(1180, 525, OBJECT6_IMAGE, root, 25, 25);
-        Rectangle object7 = createDraggableObject(1172.5, 575, OBJECT7_IMAGE, root, 40, 50);
+        Rectangle object1 = createDraggableObject(1175, 150, OBJECT1_IMAGE, root, 30, 75);
+        Rectangle object2 = createDraggableObject(1175, 250, OBJECT2_IMAGE, root, 30, 30);
+        Rectangle object3 = createDraggableObject(1175, 325, OBJECT3_IMAGE, root, 30, 50);
+        Rectangle object4 = createDraggableObject(1175, 400, OBJECT4_IMAGE, root, 30 ,75);
+        Rectangle object5 = createDraggableObject(1175, 500, OBJECT5_IMAGE, root, 25, 30);
+        Rectangle object6 = createDraggableObject(1180, 575, OBJECT6_IMAGE, root, 15, 15);
+        Rectangle object7 = createDraggableObject(1172.5, 625, OBJECT7_IMAGE, root, 40, 50);
 
 
-        root.getChildren().addAll(object1, object2, object3, object4, object5, object6, object7);
+        root.getChildren().addAll(object1, object2, object3, object4, object5, object6, object7, xButton);
 
         stage.setScene(scene);
         stage.show();
