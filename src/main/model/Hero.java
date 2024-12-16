@@ -3,7 +3,7 @@ package main.model;
 import javafx.scene.image.Image;
 
 public class Hero {
-    public final int maxLives = 3;
+    public final int maxLives = 4;
     private int posX, posY, remainingLives;
     private Image img;
     
