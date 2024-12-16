@@ -12,6 +12,8 @@ import main.utils.Tile;
 
 public class Run extends Application {
 
+    private int tileSize = 32;
+
     public void start(Stage primaryStage) {
 
         // Create a pane
@@ -44,12 +46,14 @@ public class Run extends Application {
         //int result = (int) (hall1.getLayoutX() + hall1.getWidth());
 
 
+        System.out.println(hall1.getHeight());
         
-        Grid grid1 = new Grid(10,8,32,32,(int) (hall1.getLayoutX() + hall1.getWidth()),(int) (hall1.getLayoutY() + hall1.getHeight()));
+        Grid grid1 = new Grid(10,8,tileSize,tileSize,(int) (hall1.getLayoutX()+10),(int) (hall1.getLayoutY() + hall1.getHeight()-tileSize));
         List<Tile> tilemap1 = grid1.getTileMap();
         for (Tile tile : tilemap1) {
             // Perform actions with each tile
-            System.out.println(tile);
+
+            //System.out.printf("");
         }
     }
 
