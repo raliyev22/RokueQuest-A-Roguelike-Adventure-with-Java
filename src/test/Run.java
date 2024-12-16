@@ -77,7 +77,6 @@ public class Run extends Application {
         );
 
 
-        //int result = (int) (hall1.getLayoutX() + hall1.getWidth());
 
 
         System.out.println(hall1.getHeight());
