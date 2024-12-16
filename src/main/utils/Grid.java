@@ -234,7 +234,7 @@ public class Grid {
 	}
 
 	// Finds the above tile
-	public Tile findNorthTile(Tile currentTile) { //TODO
+	public Tile findNorthTile(Tile currentTile) {
 		if (isTopTile(currentTile)) {
 			return null;
 		} else {
@@ -248,7 +248,7 @@ public class Grid {
 	}
 
 	// Finds the below tile
-	public Tile findSouthTile(Tile currentTile) { //TODO
+	public Tile findSouthTile(Tile currentTile) {
 		if (isBottomTile(currentTile)) {
 			return null;
 		} else {
@@ -262,7 +262,7 @@ public class Grid {
 	}
 
 	// Finds the right tile
-	public Tile findEastTile(Tile currentTile) { //TODO
+	public Tile findEastTile(Tile currentTile) {
 		if (isRightTile(currentTile)) {
 			return null;
 		} else {
@@ -276,7 +276,7 @@ public class Grid {
 	}
 
 	// Finds the left tile
-	public Tile findWestTile(Tile currentTile) { //TODO
+	public Tile findWestTile(Tile currentTile) {
 		if (isLeftTile(currentTile)) {
 			return null;
 		} else {
@@ -290,10 +290,37 @@ public class Grid {
 	}
 
 	// Finds the north, south, east, west tiles.
-	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) { //TODO
-		HashSet<Integer> adjacentTiles = new HashSet<>();
+	public Set<Directions> findAdjacentTiles(Tile tile) {
+		HashSet<Directions> adjacentTiles = new HashSet<>();
 		
+		Tile aboveTile = findNorthTile(tile);
+		if (aboveTile != null) {
+			adjacentTiles.add(Directions.NORTH);
+		}
+
+		Tile belowTile = findSouthTile(tile);
+		if (belowTile != null) {
+			adjacentTiles.add(Directions.SOUTH);
+		}
+
+		Tile rightTile = findEastTile(tile);
+		if (rightTile != null) {
+			adjacentTiles.add(Directions.EAST);
+		}
+		
+		Tile leftTile = findWestTile(tile);
+		if (leftTile != null) {
+			adjacentTiles.add(Directions.WEST);
+		}
+
+
 		return adjacentTiles;
+	}
+
+	public Set<Directions> findAdjacentTilesWithIndex(int x, int y) {
+		Tile currentTile = findTileWithIndex(x, y);
+		
+		return findAdjacentTiles(currentTile);
 	}
 
 	public List<Tile> getTileMap() {
