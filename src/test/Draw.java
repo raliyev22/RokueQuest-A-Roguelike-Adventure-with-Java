@@ -17,6 +17,8 @@ import main.model.*;
 
 
 public class Draw extends Application{
+    //hello
+    //sfjkvsfjkvjf
 
     static final Image blockImage = new Image("/rokue-like_assets/Block_x2_32_40.png");
     static final Image sideBorder = new Image("/rokue-like_assets/BlockSideBorder_x2_10_36.png");
