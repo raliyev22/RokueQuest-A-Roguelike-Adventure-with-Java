@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javafx.util.Pair;
 import main.model.Directions;
 
 // This class creates tile-maps. Maybe it will have utility functions too
@@ -122,6 +124,36 @@ public class Grid {
 		Tile currentTile = findTileWithIndex(x, y);
 		currentTile.changeTileType(c);
 	}
+
+	public Pair<Integer, Integer> findCoordinatesofTile(int index) {
+		int x = index % this.rowLength;
+		int y = index / this.rowLength;
+
+		Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
+		return coordinates;
+	}
+
+	public int findXofTile(Tile tile) {
+		int leftSide = tile.leftSide;
+
+		int x = (leftSide - this.bottomLeftXCoordinate) / this.tileWidth;
+		return x;
+	}
+
+	public int findYofTile(Tile tile) {
+		int bottomSide = tile.bottomSide;
+
+		int y = (bottomSide - this.bottomLeftYCoordinate) / this.tileHeight;
+		return y;
+	}
+
+	public Pair<Integer, Integer> findCoordinatesofTile(Tile tile) {
+		int x = findXofTile(tile);
+		int y = findYofTile(tile);
+
+		Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
+		return coordinates;
+	}
 	
 	// Return available directions of a tile, for example we cannot go left or down
 	// from the bottom left tile, so this function would return {NORTH, EAST}
@@ -177,20 +209,47 @@ public class Grid {
 		return dirs;
 	}
 
+	public boolean isTopTile(Tile tile) {
+		return ((tile.location.equals(TileLocation.TOP_LEFT)) 
+		|| (tile.location.equals(TileLocation.TOP)) 
+		|| (tile.location.equals(TileLocation.TOP_RIGHT)));
+	}
+
+	public boolean isLeftTile(Tile tile) {
+		return ((tile.location.equals(TileLocation.TOP_LEFT)) 
+		|| (tile.location.equals(TileLocation.LEFT)) 
+		|| (tile.location.equals(TileLocation.BOTTOM_LEFT)));
+	}
+
+	public boolean isBottomTile(Tile tile) {
+		return ((tile.location.equals(TileLocation.BOTTOM_LEFT)) 
+		|| (tile.location.equals(TileLocation.BOTTOM)) 
+		|| (tile.location.equals(TileLocation.BOTTOM_RIGHT)));
+	}
+
+	public boolean isRightTile(Tile tile) {
+		return ((tile.location.equals(TileLocation.TOP_RIGHT)) 
+		|| (tile.location.equals(TileLocation.RIGHT)) 
+		|| (tile.location.equals(TileLocation.BOTTOM_RIGHT)));
+	}
+
 	public Tile findNorthTile(Tile currentTile) { //TODO
-		if ((currentTile.location.equals(TileLocation.TOP_LEFT)) 
-		|| (currentTile.location.equals(TileLocation.TOP)) 
-		|| (currentTile.location.equals(TileLocation.TOP_RIGHT))) {
+		if (isTopTile(currentTile)) {
+			return null;
+		} else {
+			int y = currentTile;
 			return null;
 		}
-
-		
 	}
 	// Finds the north, south, east, west tiles.
 	public Set<Integer> findAdjacentTilesWithIndex(int row, int column) { //TODO
 		HashSet<Integer> adjacentTiles = new HashSet<>();
 		
 		return adjacentTiles;
+	}
+
+	public List<Tile> getTileMap() {
+		return this.tileMap;
 	}
 	
 	@Override
