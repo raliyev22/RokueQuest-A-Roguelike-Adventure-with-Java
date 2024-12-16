@@ -11,9 +11,9 @@ public class ArcherMonster extends Monster {
         this.y = y;
         type = MonsterType.ARCHER;
     }
-    public static moveRandomly(){
+    public void moveRandomly(){
         Random rand = new Random();
-        int randomMove = int n = rand.nextInt(5);
+        int randomMove = rand.nextInt(5);
         Boolean existMovement = false;
         if(this.grid.isInsideGrid(x+1,y)){
             if(this.grid.findTileWithIndex(x+1,y).getTileType().equals("E")){
