@@ -34,12 +34,14 @@ public class BuildModeView extends Application {
         Pane root = new Pane();
 
         xButtonView.setFitWidth(30); // Adjust size
-        xButtonView.setFitHeight(30);
+        xButtonView.setFitHeight(29);
 
         // Create the button and set its graphic
         Button xButton = new Button();
         xButton.setGraphic(xButtonView);
-        xButton.setStyle("-fx-background-color: transparent;"); // Remove button background
+        xButton.setStyle("-fx-background-color: transparent;"); 
+        
+        // Remove button background
         xButton.setLayoutX(1175); // Position the button
         xButton.setLayoutY(15);
 
