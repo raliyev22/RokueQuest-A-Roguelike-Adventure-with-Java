@@ -274,6 +274,14 @@ public class Grid {
 		return adjacentTiles;
 	}
 
+	// For coordinates x,y check if they are inside the grid or not
+	public boolean coordinatesAreInGrid(double x, double y) {
+		return ((x >= this.topLeftXCoordinate) 
+		&& (y >= this.topLeftYCoordinate)
+		&& (x < this.topLeftXCoordinate + this.rowLength * this.tileWidth)
+		&& (y < this.topLeftYCoordinate + this.columnLength * this.tileHeight));
+	}
+
 	public List<Tile> getTileMap() {
 		return this.tileMap;
 	}
@@ -303,8 +311,11 @@ public class Grid {
 		Grid myGrid = new Grid(3, 5, 20, 10, 3, 11);
 		System.out.println(myGrid);
 
-		Tile mytile0 = myGrid.findTileWithIndex(1,1);
+		Tile mytile0 = myGrid.findTileWithIndex(2,4);
 		System.out.println(mytile0);
+
+		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
+		/*
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
 		System.out.println(mytile1);
 		Tile mytile2 = myGrid.findTileWithIndex(2,1);
@@ -313,9 +324,10 @@ public class Grid {
 		mytile1.changeTileType('A');
 		System.out.println(mytile1);
 		System.out.println(myGrid);
-		System.out.println(myGrid.findAdjacentTilesWithIndex(2,0));
+		System.out.println(myGrid.findAdjacentTilesWithIndex(1,0));
 		System.out.println(mytile1);
 		System.out.println(myGrid.findNorthTile(mytile1));
 		System.out.println(myGrid.findSouthTile(mytile1));
+		*/
 	}
 }
