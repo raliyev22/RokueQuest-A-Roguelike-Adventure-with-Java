@@ -14,7 +14,7 @@ public class Grid {
 	protected final int columnLength; // How many tiles are there within a single column
 	protected final int tileWidth;
 	protected final int tileHeight;
-	// We will create the tile map starting from bottom left
+	// We will create the tile map starting from top left
 	protected final int topLeftXCoordinate;
 	protected final int topLeftYCoordinate;
 	protected List<Tile> tileMap;
@@ -34,19 +34,6 @@ public class Grid {
 		this.tileMap = createTileMap(rowLength, columnLength, 
 		tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
 	}
-
-/*  Possibly unused code, maybe will use later:
-	public boolean indexInRange(int rowLength, int columnLength, int index) {
-        return ((index >= 0) && (index <= rowLength * columnLength - 1));
-	}
-
-	public TileLocation findTileLocation(int rowLength, int columnLength, int index) {
-		if (!indexInRange(rowLength, columnLength, index)) {
-			System.err.println("Index not in range for findTileLocation");
-			return null;
-		}
-	}
-*/
 	
 	// Creating a tile map using other variables
 	private List<Tile> createTileMap(int rowLength, int columnLength, 
@@ -92,11 +79,11 @@ public class Grid {
 	}
 
 	public boolean indexInRange(int index) {
-        return ((index >= 0) && (index <= this.rowLength * this.columnLength - 1));
+        return ((index >= 0) && (index < this.rowLength * this.columnLength));
 	}
 
 	public boolean indexInRange(int x, int y) {
-        return ((x >= 0) && (x <= this.rowLength - 1) && (y >= 0) && (y <= this.columnLength - 1));
+        return ((x >= 0) && (x < this.rowLength) && (y >= 0) && (y < this.columnLength));
 	}
 	
 	public Tile findTileWithIndex(int x, int y) {
@@ -224,8 +211,8 @@ public class Grid {
 		}
 	}
 
-	// Finds the north, south, east, west tiles.
-	public Set<Directions> findAdjacentTiles(Tile tile) {
+	// Finds which directions we can go to, only considering out of bounds.
+	public Set<Directions> findAvailableDirections(Tile tile) {
 		HashSet<Directions> adjacentTiles = new HashSet<>();
 		
 		Tile aboveTile = findNorthTile(tile);
@@ -251,10 +238,48 @@ public class Grid {
 		return adjacentTiles;
 	}
 
-	public Set<Directions> findAdjacentTilesWithIndex(int x, int y) {
+	public Set<Directions> findAvailableDirectionsWithIndex(int x, int y) {
 		Tile currentTile = findTileWithIndex(x, y);
 		
-		return findAdjacentTiles(currentTile);
+		return findAvailableDirections(currentTile);
+	}
+
+	public Set<Tile> findAdjacentTiles(Tile tile) {
+		int x = findXofTile(tile);
+		int y = findYofTile(tile);
+
+		return findAdjacentTilesWithIndex(x, y);
+	}
+
+	public Set<Tile> findAdjacentTilesWithIndex(int x, int y) {
+		HashSet<Tile> adjacentTiles = new HashSet<>();
+
+		if (y > 0) {
+			Tile aboveTile = findTileWithIndex(x, y - 1);
+			adjacentTiles.add(aboveTile);
+		}
+		if (y + 1 < this.columnLength) {
+			Tile belowTile = findTileWithIndex(x, y + 1);
+			adjacentTiles.add(belowTile);
+		}
+		if (x > 0) {
+			Tile rightTile = findTileWithIndex(x - 1, y);
+			adjacentTiles.add(rightTile);
+		}
+		if (x + 1 < this.rowLength) {
+			Tile leftTile = findTileWithIndex(x + 1, y);
+			adjacentTiles.add(leftTile);
+		}
+
+		return adjacentTiles;
+	}
+
+	// For coordinates x,y check if they are inside the grid or not
+	public boolean coordinatesAreInGrid(double x, double y) {
+		return ((x >= this.topLeftXCoordinate) 
+		&& (y >= this.topLeftYCoordinate)
+		&& (x < this.topLeftXCoordinate + this.rowLength * this.tileWidth)
+		&& (y < this.topLeftYCoordinate + this.columnLength * this.tileHeight));
 	}
 
 	public List<Tile> getTileMap() {
@@ -286,8 +311,11 @@ public class Grid {
 		Grid myGrid = new Grid(3, 5, 20, 10, 3, 11);
 		System.out.println(myGrid);
 
-		Tile mytile0 = myGrid.findTileWithIndex(1,1);
+		Tile mytile0 = myGrid.findTileWithIndex(2,4);
 		System.out.println(mytile0);
+
+		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
+		/*
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
 		System.out.println(mytile1);
 		Tile mytile2 = myGrid.findTileWithIndex(2,1);
@@ -296,8 +324,10 @@ public class Grid {
 		mytile1.changeTileType('A');
 		System.out.println(mytile1);
 		System.out.println(myGrid);
-		System.out.println(myGrid.findAdjacentTilesWithIndex(2,0));
+		System.out.println(myGrid.findAdjacentTilesWithIndex(1,0));
 		System.out.println(mytile1);
 		System.out.println(myGrid.findNorthTile(mytile1));
+		System.out.println(myGrid.findSouthTile(mytile1));
+		*/
 	}
 }
