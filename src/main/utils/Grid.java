@@ -14,7 +14,7 @@ public class Grid {
 	protected final int columnLength; // How many tiles are there within a single column
 	protected final int tileWidth;
 	protected final int tileHeight;
-	// We will create the tile map starting from bottom left
+	// We will create the tile map starting from top left
 	protected final int topLeftXCoordinate;
 	protected final int topLeftYCoordinate;
 	protected List<Tile> tileMap;
@@ -299,5 +299,6 @@ public class Grid {
 		System.out.println(myGrid.findAdjacentTilesWithIndex(2,0));
 		System.out.println(mytile1);
 		System.out.println(myGrid.findNorthTile(mytile1));
+		System.out.println(myGrid.findSouthTile(mytile1));
 	}
 }
