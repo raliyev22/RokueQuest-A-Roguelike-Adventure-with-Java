@@ -237,7 +237,7 @@ public class Grid {
 		if (isTopTile(currentTile)) {
 			return null;
 		} else {
-			int y = currentTile;
+			Tile y = currentTile;
 			return null;
 		}
 	}
