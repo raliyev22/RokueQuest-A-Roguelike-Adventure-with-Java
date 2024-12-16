@@ -9,8 +9,8 @@ public class ExtraLifeEnchantment extends Enchantment {
     @Override
     public void applyEffect(Hero hero) {
         if (isActive) {
-            hero.addLife(1); // Hero'nun canını 1 artırır
-            System.out.println("Extra Life collected! Hero now has " + hero.getLives() + " lives.");
+            hero.increaseLives(1); // Hero'nun canını 1 artırır
+            System.out.println("Extra Life collected! Hero now has " + hero.getLiveCount() + " lives.");
             deactivate();
         }
     }

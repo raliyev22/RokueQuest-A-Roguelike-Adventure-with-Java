@@ -1,5 +1,5 @@
 package main.model;
-import main.utils.Grid
+import main.utils.Grid;
 
 
 public abstract class Monster {
