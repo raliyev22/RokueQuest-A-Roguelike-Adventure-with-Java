@@ -12,7 +12,7 @@ public class ExtraTimeEnchantment extends Enchantment {
     @Override
     public void applyEffect(Hero hero) {
         if (isActive) {
-            hero.addTime(extraTime); // Hero'nun zamanını artırır
+            // hero.addTime(extraTime); // Hero'nun zamanını artırır
             System.out.println("Extra Time collected! +" + extraTime + " seconds added.");
             deactivate();
         }

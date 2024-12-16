@@ -16,6 +16,7 @@ public class PlayModeViewGrid {
     protected Grid playModeGrid;
     protected Hero player;
     protected ArrayList<Monster> monsters;
+    protected int time;
 
 
     public PlayModeViewGrid() {
