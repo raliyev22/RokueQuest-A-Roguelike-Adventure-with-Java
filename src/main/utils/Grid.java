@@ -282,6 +282,19 @@ public class Grid {
 		&& (y < this.topLeftYCoordinate + this.columnLength * this.tileHeight));
 	}
 
+	// For coordinates x,y check which tile it is in
+	public Tile findTileUsingCoordinates(double x, double y) {
+		if (!coordinatesAreInGrid(x, y)) {
+			return null;
+		}
+
+		double tileX = Math.floor((x - this.topLeftXCoordinate) / this.tileWidth);
+		double tileY = Math.floor((y - this.topLeftYCoordinate) / this.tileHeight);
+
+		return findTileWithIndex((int) tileX, (int) tileY);
+	}
+
+
 	public List<Tile> getTileMap() {
 		return this.tileMap;
 	}
@@ -315,6 +328,7 @@ public class Grid {
 		System.out.println(mytile0);
 
 		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
+		System.out.println(myGrid.findTileUsingCoordinates(62.99999999999999, 60.99999999));
 		/*
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
 		System.out.println(mytile1);
