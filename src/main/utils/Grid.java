@@ -115,14 +115,28 @@ public class Grid {
 	public int tileIndex(int x, int y) {
 		return y * rowLength + x; // Uses 0 indexing
 	}
+
+	public boolean indexInRange(int index) {
+        return ((index >= 0) && (index <= this.rowLength * this.columnLength - 1));
+	}
+
+	public boolean indexInRange(int x, int y) {
+        return ((x >= 0) && (x <= this.rowLength - 1) && (y >= 0) && (y <= this.columnLength - 1));
+	}
 	
 	public Tile findTileWithIndex(int x, int y) {
-		return tileMap.get(tileIndex(x, y));
+		if (indexInRange(x, y)) {
+			return tileMap.get(tileIndex(x, y));
+		} else {
+			return null;
+		}
 	}
 	
 	public void changeTileWithIndex(int x, int y, char c) {
-		Tile currentTile = findTileWithIndex(x, y);
-		currentTile.changeTileType(c);
+		if (indexInRange(tileIndex(x, y))) {
+			Tile currentTile = findTileWithIndex(x, y);
+			currentTile.changeTileType(c);
+		}
 	}
 
 	public Pair<Integer, Integer> findCoordinatesofTile(int index) {
@@ -240,7 +254,7 @@ public class Grid {
 		} else {
 			int x = findXofTile(currentTile);
 			int y = findYofTile(currentTile);
-			int newY = y + this.rowLength;
+			int newY = y + 1;
 
 			Tile aboveTile = findTileWithIndex(x, newY);
 			return aboveTile;
@@ -254,7 +268,7 @@ public class Grid {
 		} else {
 			int x = findXofTile(currentTile);
 			int y = findYofTile(currentTile);
-			int newY = y - this.rowLength;
+			int newY = y - 1;
 
 			Tile belowTile = findTileWithIndex(x, newY);
 			return belowTile;
@@ -313,7 +327,6 @@ public class Grid {
 			adjacentTiles.add(Directions.WEST);
 		}
 
-
 		return adjacentTiles;
 	}
 
@@ -362,5 +375,8 @@ public class Grid {
 		mytile1.changeTileType('A');
 		System.out.println(mytile1);
 		System.out.println(myGrid);
+		System.out.println(myGrid.findAdjacentTilesWithIndex(2,0));
+		System.out.println(mytile1);
+		System.out.println(myGrid.findNorthTile(mytile1));
 	}
 }
