@@ -35,11 +35,11 @@ public class Grid {
 		tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
 	}
 
+/*  Possibly unused code, maybe will use later:
 	public boolean indexInRange(int rowLength, int columnLength, int index) {
         return ((index >= 0) && (index <= rowLength * columnLength - 1));
 	}
 
-/*  Possibly unused code:
 	public TileLocation findTileLocation(int rowLength, int columnLength, int index) {
 		if (!indexInRange(rowLength, columnLength, index)) {
 			System.err.println("Index not in range for findTileLocation");
@@ -88,7 +88,7 @@ public class Grid {
 	// 06 07 08
 	// 09 10 11
 	public int tileIndex(int x, int y) {
-		return y * rowLength + x; // Uses 0 indexing
+		return y * this.rowLength + x; // Uses 0 indexing
 	}
 
 	public boolean indexInRange(int index) {
@@ -143,85 +143,29 @@ public class Grid {
 		Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
 		return coordinates;
 	}
-	
-	/*
-	// Return available directions of a tile, for example we cannot go left or down
-	// from the bottom left tile, so this function would return {NORTH, EAST}
-	public Set<Directions> availableDirections(int x, int y) {
-		HashSet<Directions> dirs = new HashSet<>();
-		Tile currentTile = findTileWithIndex(x, y);
-		
-		switch (currentTile.location) { // Have you seen a code that is this elegantly written?
-			case TileLocation.BOTTOM_LEFT -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.EAST);
-			}
-			case TileLocation.BOTTOM -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.WEST);
-				dirs.add(Directions.EAST);
-			}
-			case TileLocation.BOTTOM_RIGHT -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.WEST);
-			}
-			case TileLocation.LEFT -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.EAST);
-				dirs.add(Directions.SOUTH);
-			}
-			case TileLocation.INSIDE -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.WEST);
-				dirs.add(Directions.SOUTH);
-				dirs.add(Directions.EAST);
-			}
-			case TileLocation.RIGHT -> {
-				dirs.add(Directions.NORTH);
-				dirs.add(Directions.WEST);
-				dirs.add(Directions.SOUTH);
-			}
-			case TileLocation.TOP_LEFT -> {
-				dirs.add(Directions.SOUTH);
-				dirs.add(Directions.EAST);
-			}
-			case TileLocation.TOP -> {
-				dirs.add(Directions.EAST);
-				dirs.add(Directions.SOUTH);
-				dirs.add(Directions.WEST);
-			}
-			case TileLocation.TOP_RIGHT -> {
-				dirs.add(Directions.SOUTH);
-				dirs.add(Directions.WEST);
-			}
-			default -> throw new AssertionError();
-		}
-		return dirs;
-	}
-		*/
 
 	public boolean isTopTile(Tile tile) {
-		return ((tile.location.equals(TileLocation.TOP_LEFT)) 
-		|| (tile.location.equals(TileLocation.TOP)) 
-		|| (tile.location.equals(TileLocation.TOP_RIGHT)));
+		int y = findYofTile(tile);
+
+		return (y == 0);
 	}
 
 	public boolean isLeftTile(Tile tile) {
-		return ((tile.location.equals(TileLocation.TOP_LEFT)) 
-		|| (tile.location.equals(TileLocation.LEFT)) 
-		|| (tile.location.equals(TileLocation.BOTTOM_LEFT)));
+		int x = findXofTile(tile);
+
+		return (x == 0);
 	}
 
 	public boolean isBottomTile(Tile tile) {
-		return ((tile.location.equals(TileLocation.BOTTOM_LEFT)) 
-		|| (tile.location.equals(TileLocation.BOTTOM)) 
-		|| (tile.location.equals(TileLocation.BOTTOM_RIGHT)));
+		int y = findYofTile(tile);
+
+		return (y == this.columnLength - 1);
 	}
 
 	public boolean isRightTile(Tile tile) {
-		return ((tile.location.equals(TileLocation.TOP_RIGHT)) 
-		|| (tile.location.equals(TileLocation.RIGHT)) 
-		|| (tile.location.equals(TileLocation.BOTTOM_RIGHT)));
+		int x = findXofTile(tile);
+
+		return (x == this.rowLength - 1);
 	}
 
 	// Finds the above tile
