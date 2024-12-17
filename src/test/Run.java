@@ -40,7 +40,7 @@ public class Run extends Application {
 
 
         // Create 4 TiledHall instances with specific sizes
-        TiledHall hall1 = new TiledHall(10, 8); // Default size
+        TiledHall hall1 = new TiledHall(10, 7); // Default size
         TiledHall hall2 = new TiledHall(10, 8);  // Smaller
         TiledHall hall3 = new TiledHall(10, 8); // Default size
         TiledHall hall4 = new TiledHall(10, 8);  // Smaller

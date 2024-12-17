@@ -12,6 +12,8 @@ public class TiledHall extends Pane {
     private static final Image BOTTOM_BORDER = new Image("/rokue-like_assets/BlockBottomBorder_x2_10_46.png");
     private static final Image UP_BORDER = new Image("/rokue-like_assets/BlockUpBorder_x2_10_48.png");
 
+    private static final Image SIDE_BORDER1 = new Image("/rokue-like_assets/BlockSideBorder_x2_10_32.png");
+
     private final double blockCount;
     private final double sideBorderCount;
 
@@ -26,6 +28,8 @@ public class TiledHall extends Pane {
 
     private final double upBorderWidth = 10;
     private final double upBorderHeight = 48;
+
+    private final double sideBorder1Height = 22;
 
     public TiledHall(double blockCount, double sideBorderCount) {
         this.blockCount = blockCount;
@@ -42,7 +46,7 @@ public class TiledHall extends Pane {
         getChildren().add(upBorder1);
 
         // Bottom-left corner border
-        Rectangle downBorder1 = new Rectangle(0, upBorderHeight + sideBorderCount * sideBorderHeight, bottomBorderWidth + 1, bottomBorderHeight);
+        Rectangle downBorder1 = new Rectangle(0, upBorderHeight + sideBorderCount * sideBorderHeight+sideBorder1Height, bottomBorderWidth + 1, bottomBorderHeight);
         downBorder1.setFill(new ImagePattern(BOTTOM_BORDER));
         getChildren().add(downBorder1);
 
@@ -52,7 +56,7 @@ public class TiledHall extends Pane {
         getChildren().add(upBorder2);
 
         // Bottom-right corner border
-        Rectangle downBorder2 = new Rectangle(bottomBorderWidth + blockCount * blockWidth, upBorderHeight + sideBorderCount * sideBorderHeight, bottomBorderWidth+1, bottomBorderHeight);
+        Rectangle downBorder2 = new Rectangle(bottomBorderWidth + blockCount * blockWidth, upBorderHeight + sideBorderCount * sideBorderHeight+sideBorder1Height, bottomBorderWidth+1, bottomBorderHeight);
         downBorder2.setFill(new ImagePattern(BOTTOM_BORDER));
         getChildren().add(downBorder2);
 
@@ -63,9 +67,9 @@ public class TiledHall extends Pane {
             getChildren().add(topWall);
         }
 
-        // Bottom wall
+        //Bottom wall
         for (int i = 0; i < blockCount; i++) {
-            Rectangle bottomWall = new Rectangle(bottomBorderWidth + i * blockWidth, 6 + upBorderHeight + sideBorderCount * sideBorderHeight, blockWidth + 1, blockHeight);
+            Rectangle bottomWall = new Rectangle(bottomBorderWidth + i * blockWidth, 6 + upBorderHeight + sideBorderCount * sideBorderHeight+sideBorder1Height, blockWidth + 1, blockHeight);
             bottomWall.setFill(new ImagePattern(BLOCK_IMAGE));
             getChildren().add(bottomWall);
         }
@@ -84,7 +88,15 @@ public class TiledHall extends Pane {
             getChildren().add(rightWall);
         }
 
+        Rectangle sideBorder1 = new Rectangle(sideBorderWidth + blockWidth * blockCount, upBorderHeight + sideBorderCount * sideBorderHeight, sideBorderWidth + 1, sideBorder1Height);
+        sideBorder1.setFill(new ImagePattern(SIDE_BORDER1));
+        getChildren().add(sideBorder1);
+
+        Rectangle sideBorder2 = new Rectangle(0, upBorderHeight + sideBorderCount * sideBorderHeight, sideBorderWidth + 1, sideBorder1Height);
+        sideBorder2.setFill(new ImagePattern(SIDE_BORDER1));
+        getChildren().add(sideBorder2);
+
         // Set preferred size for the pane
-        setPrefSize(upBorderWidth * 2 + blockCount * blockWidth, upBorderHeight + bottomBorderHeight + sideBorderCount * sideBorderHeight);
+        setPrefSize(upBorderWidth * 2 + blockCount * blockWidth, upBorderHeight + bottomBorderHeight + sideBorderCount * sideBorderHeight+sideBorder1Height);
     }
 }
