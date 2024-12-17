@@ -32,8 +32,6 @@ public class PlayModeView extends Application{
     Hero player = new Hero(400,300, PLAYER_IMAGE);
     List<Monster> monsters;
 
-
-
 @Override
 public void start(Stage stage) {
     // Ana root pane
@@ -45,6 +43,11 @@ public void start(Stage stage) {
     background.setFill(new ImagePattern(backgroundImage));
     root.getChildren().add(background);
 
+    TiledHall hall1 = new TiledHall(17, 12);
+    hall1.setLayoutX(40);
+    hall1.setLayoutY(20);
+    root.getChildren().addAll(hall1);
+
     // ===================== Oyuncu (Player) =====================
     Rectangle player = new Rectangle(50, 50, 40, 40);
     ImagePattern playerPattern = new ImagePattern(PLAYER_IMAGE);
@@ -52,11 +55,6 @@ public void start(Stage stage) {
     player.setX(100);
     player.setY(100);
     root.getChildren().add(player);
-
-    // ===================== Düşman (Enemy) =====================
-    Rectangle enemy = new Rectangle(200, 200, 40, 40);
-    enemy.setFill(Color.RED);
-    root.getChildren().add(enemy);
 
     // ===================== UI Bileşenleri =====================
     VBox uiContainer = new VBox(10);
@@ -117,27 +115,16 @@ public void start(Stage stage) {
     // ===================== Ana Oyun Döngüsü =====================
     AnimationTimer gameLoop = new AnimationTimer() {
         public void handle(long now) {
-            // Oyuncunun koordinatlarını kontrol ederek sınırları belirle
             double newX = player.getX();
             double newY = player.getY();
-    
+
             if (upPressed) newY -= 2;
             if (downPressed) newY += 2;
             if (leftPressed) newX -= 2;
             if (rightPressed) newX += 2;
-    
-            // Sınırları kontrol et
-            if (newX >= 50 && newX + player.getWidth() <= 600) {
-                player.setX(newX);
-            }
-            if (newY >= 50 && newY + player.getHeight() <= 500) {
-                player.setY(newY);
-            }
-    
-            // Çarpışma kontrolü
-            if (player.getBoundsInParent().intersects(enemy.getBoundsInParent())) {
-                System.out.println("ded");
-            }
+
+            if (newX >= 50 && newX + player.getWidth() <= 600) player.setX(newX);
+            if (newY >= 58 && newY + player.getHeight() <= 507) player.setY(newY);
         }
     };
     
