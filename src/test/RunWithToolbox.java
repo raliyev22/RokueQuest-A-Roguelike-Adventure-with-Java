@@ -22,6 +22,11 @@ public class RunWithToolbox extends Application {
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
     static final Image OBJECT1_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
     static final Image OBJECT2_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
+    static final Image OBJECT3_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
+    static final Image OBJECT4_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
+    static final Image OBJECT5_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
+    static final Image OBJECT6_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
+    static final Image OBJECT7_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     ArrayList<TiledHall> halls = new ArrayList<>(); // List of TiledHalls
 
@@ -77,10 +82,18 @@ public class RunWithToolbox extends Application {
         root.getChildren().add(chest);
 
         // Adding Draggable Objects to the chest
+        // Add draggable objects to the toolbox
         Rectangle object1 = createDraggableObject(1175, 150, OBJECT1_IMAGE, root, 30, 75, halls);
         Rectangle object2 = createDraggableObject(1175, 250, OBJECT2_IMAGE, root, 30, 30, halls);
+        Rectangle object3 = createDraggableObject(1175, 325, OBJECT3_IMAGE, root, 30, 40, halls);
+        Rectangle object4 = createDraggableObject(1175, 400, OBJECT4_IMAGE, root, 30, 60, halls);
+        Rectangle object5 = createDraggableObject(1175, 475, OBJECT5_IMAGE, root, 20, 30, halls);
+        Rectangle object6 = createDraggableObject(1175, 525, OBJECT6_IMAGE, root, 15, 15, halls);
+        Rectangle object7 = createDraggableObject(1175, 575, OBJECT7_IMAGE, root, 30, 40, halls);
 
-        root.getChildren().addAll(object1, object2, xButton);
+        // Add all objects to the root
+        root.getChildren().addAll(object1, object2, object3, object4, object5, object6, object7);
+
 
         
         Scene scene = new Scene(root, 1536, 800);
