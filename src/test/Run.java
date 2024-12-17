@@ -28,22 +28,22 @@ public class Run extends Application {
         // Create a pane
         Pane pane = new Pane();
 
-        // for(int a = 0;a<1536;a+=tileSize){
-        //     for(int b = 0;b<800;b+=tileSize){
-        //         Rectangle tideRectangle = new Rectangle(a,b, tileSize,tileSize);
+        for(int a = 0;a<1536;a+=tileSize){
+            for(int b = 0;b<800;b+=tileSize){
+                Rectangle tideRectangle = new Rectangle(a,b, tileSize,tileSize);
 
-        //         tideRectangle.setFill(new ImagePattern(tileImage));
-        //         pane.getChildren().add(tideRectangle);
-        //     }
-        // }
+                tideRectangle.setFill(new ImagePattern(tileImage));
+                pane.getChildren().add(tideRectangle);
+            }
+        }
 
 
 
         // Create 4 TiledHall instances with specific sizes
         TiledHall hall1 = new TiledHall(10, 7); // Default size
-        TiledHall hall2 = new TiledHall(10, 8);  // Smaller
-        TiledHall hall3 = new TiledHall(10, 8); // Default size
-        TiledHall hall4 = new TiledHall(10, 8);  // Smaller
+        TiledHall hall2 = new TiledHall(10, 7);  // Smaller
+        TiledHall hall3 = new TiledHall(10,7); // Default size
+        TiledHall hall4 = new TiledHall(10, 7);  // Smaller
         //TiledHall hall3 = new TiledHall(12, 10); // Larger
         //TiledHall hall4 = new TiledHall(7, 5);  // Smallest
 
@@ -80,24 +80,24 @@ public class Run extends Application {
 
 
         
-        Grid grid1 = new Grid(10,9,tileSize,tileSize,(int) (hall1.getLayoutX()+10),(int) (hall1.getLayoutY() + blockHeight));
-        List<Tile> tilemap1 = grid1.getTileMap();
+        // Grid grid1 = new Grid(10,9,tileSize,tileSize,(int) (hall1.getLayoutX()+10),(int) (hall1.getLayoutY() + blockHeight));
+        // List<Tile> tilemap1 = grid1.getTileMap();
 
-        int a = 0;
-        for (Tile tile : tilemap1) {
+        // int a = 0;
+        // for (Tile tile : tilemap1) {
 
-            Rectangle tideRectangle = new Rectangle(tile.getLeftSide()-98,tile.getTopSide()-4, tileSize,tileSize);
-            tideRectangle.setFill(new ImagePattern(tileImage));
-            hall1.getChildren().add(tideRectangle);
-            a++;
+        //     Rectangle tideRectangle = new Rectangle(tile.getLeftSide()-98,tile.getTopSide()-4, tileSize,tileSize);
+        //     tideRectangle.setFill(new ImagePattern(tileImage));
+        //     hall1.getChildren().add(tideRectangle);
+        //     a++;
 
-            System.out.println(tile);
+        //     System.out.println(tile);
 
             
 
-        }
-        System.out.println(hall1.getHeight());
-        System.out.println(a);
+        // }
+        // System.out.println(hall1.getHeight());
+        // System.out.println(a);
     }
 
     public static void main(String[] args) {
