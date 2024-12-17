@@ -1,5 +1,6 @@
 package test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,6 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
+import main.view.Toolbox;
 
 public class Run extends Application {
 
@@ -44,6 +46,14 @@ public class Run extends Application {
         TiledHall hall2 = new TiledHall(10, 7);  // Smaller
         TiledHall hall3 = new TiledHall(10,7); // Default size
         TiledHall hall4 = new TiledHall(10, 7);  // Smaller
+
+        ArrayList<TiledHall> halls = new ArrayList<TiledHall>();
+        halls.add(hall1);
+        halls.add(hall2);
+        halls.add(hall3);
+        halls.add(hall4);
+
+        
         //TiledHall hall3 = new TiledHall(12, 10); // Larger
         //TiledHall hall4 = new TiledHall(7, 5);  // Smallest
 
@@ -63,6 +73,9 @@ public class Run extends Application {
 
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2,hall3,hall4);
+
+        Toolbox toolbox = new Toolbox(1105, 50, 175, 720, pane, halls);
+        pane.getChildren().add(toolbox);
 
         // Create a scene
         Scene scene = new Scene(pane, 1536, 800);
