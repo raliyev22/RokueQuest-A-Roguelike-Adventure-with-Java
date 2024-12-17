@@ -9,6 +9,7 @@ public class Tile {
 	protected int topSide;
 	protected int bottomSide;
 	protected char tileType; // E = empty, M = monster, H = hero etc.
+	
 
 	// Normal constructor
 	public Tile(int leftSide, int rightSide, int topSide, int bottomSide, char tileType) {
@@ -18,6 +19,14 @@ public class Tile {
 		this.topSide = topSide;
 		this.bottomSide = bottomSide;
 		this.tileType = tileType;
+	}
+
+	public int getLeftSide(){
+		return this.leftSide;
+	}
+
+	public int getTopSide(){
+		return this.topSide;
 	}
 
 	//Constructor without specifying tileType

@@ -47,12 +47,12 @@ public class TiledHall extends Pane {
         getChildren().add(downBorder1);
 
         // Top-right corner border
-        Rectangle upBorder2 = new Rectangle(upBorderWidth + blockCount * blockWidth, 0, upBorderWidth, upBorderHeight);
+        Rectangle upBorder2 = new Rectangle(upBorderWidth + blockCount * blockWidth, 0, upBorderWidth+1, upBorderHeight);
         upBorder2.setFill(new ImagePattern(UP_BORDER));
         getChildren().add(upBorder2);
 
         // Bottom-right corner border
-        Rectangle downBorder2 = new Rectangle(bottomBorderWidth + blockCount * blockWidth, upBorderHeight + sideBorderCount * sideBorderHeight, bottomBorderWidth, bottomBorderHeight);
+        Rectangle downBorder2 = new Rectangle(bottomBorderWidth + blockCount * blockWidth, upBorderHeight + sideBorderCount * sideBorderHeight, bottomBorderWidth+1, bottomBorderHeight);
         downBorder2.setFill(new ImagePattern(BOTTOM_BORDER));
         getChildren().add(downBorder2);
 
