@@ -15,8 +15,8 @@ public class Grid {
 	protected final int tileWidth;
 	protected final int tileHeight;
 	// We will create the tile map starting from top left
-	protected final int topLeftXCoordinate;
-	protected final int topLeftYCoordinate;
+	public int topLeftXCoordinate;
+	public int topLeftYCoordinate;
 	protected List<Tile> tileMap;
 	
 	public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
@@ -74,6 +74,14 @@ public class Grid {
 	// 03 04 05
 	// 06 07 08
 	// 09 10 11
+	public void setTopLeftXCordinate(int topLeftXCoordinate){
+		this.topLeftXCoordinate = topLeftXCoordinate;
+	}
+
+	public void setTopLeftYCordinate(int topLeftYCoordinate){
+		this.topLeftYCoordinate = topLeftYCoordinate;
+	}
+
 	public int tileIndex(int x, int y) {
 		return y * this.rowLength + x; // Uses 0 indexing
 	}

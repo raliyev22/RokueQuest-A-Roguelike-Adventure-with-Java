@@ -60,6 +60,9 @@ public class Run extends Application {
         // Set desired positions for each TiledHall
         hall1.setLayoutX(98);   // X-coordinate for hall1
         hall1.setLayoutY(4);   // Y-coordinate for hall1
+        hall1.getGrid().setTopLeftXCordinate(hall1.getGrid().topLeftXCoordinate + (int) hall1.getLayoutX());
+        hall1.getGrid().setTopLeftYCordinate(hall1.getGrid().topLeftYCoordinate + (int) hall1.getLayoutY());
+
 
         hall2.setLayoutX(482);  // X-coordinate for hall2
         hall2.setLayoutY(4);   // Y-coordinate for hall2
