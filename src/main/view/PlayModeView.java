@@ -124,7 +124,7 @@ public void start(Stage stage) {
             if (rightPressed) newX += 2;
 
             if (newX >= 50 && newX + player.getWidth() <= 600) player.setX(newX);
-            if (newY >= 58 && newY + player.getHeight() <= 507) player.setY(newY);
+            if (newY >= 58 && newY + player.getHeight() <= 530) player.setY(newY);
         }
     };
     
