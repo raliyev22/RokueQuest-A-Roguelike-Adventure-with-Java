@@ -94,20 +94,20 @@ public class Run extends Application {
         double toolboxY = 50;   // Absolute Y position for the toolbox on the screen
         double toolboxWidth = 175;
         double toolboxHeight = 720;
-    
+
         // Add toolbox background
         Rectangle chest = new Rectangle(toolboxX, toolboxY, toolboxWidth, toolboxHeight);
         chest.setFill(new ImagePattern(CHEST_IMAGE));
         root.getChildren().add(chest);
-    
+
         // Define absolute positions for draggable objects relative to the screen
         double objectStartX = toolboxX + 70; // Absolute X position for objects
         double[] positionsY = {
-            toolboxY + 50,  toolboxY + 150, toolboxY + 250, 
-            toolboxY + 350, toolboxY + 450, toolboxY + 550, 
+            toolboxY + 50,  toolboxY + 150, toolboxY + 250,
+            toolboxY + 350, toolboxY + 450, toolboxY + 550,
             toolboxY + 650
         };
-    
+
         // Create draggable objects (absolute positioning)
         createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 30, 75, halls, 'P');
         createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 30, 30, halls, 'L');
@@ -117,82 +117,65 @@ public class Run extends Application {
         createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 15, 15, halls, 'S');
         createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 30, 40, halls, 'C');
     }
-    
 
-    private Rectangle createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
+    private void createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
         Rectangle object = new Rectangle(x, y, width, height);
         object.setFill(new ImagePattern(image));
     
-        double[] startPos = new double[2];
-    
-        // Save the start position on press
         object.setOnMousePressed(event -> {
-            startPos[0] = event.getSceneX();
-            startPos[1] = event.getSceneY();
-            object.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
-        });
+            // Create a new copy when dragging starts
+            Rectangle clone = new Rectangle(width, height);
+            clone.setFill(new ImagePattern(image));
+            root.getChildren().add(clone);
     
-        // Update position while dragging
-        object.setOnMouseDragged(event -> {
-            double[] start = (double[]) object.getUserData();
-            double deltaX = event.getSceneX() - start[0];
-            double deltaY = event.getSceneY() - start[1];
-            object.setLayoutX(object.getLayoutX() + deltaX);
-            object.setLayoutY(object.getLayoutY() + deltaY);
-            object.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
-        });
+            // Update the position of the clone in real time
+            object.setOnMouseDragged(dragEvent -> {
+                // Position the clone to follow the mouse cursor
+                clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
+                clone.setY(dragEvent.getSceneY() - height / 2);
+            });
     
-        // On release, check if object is within any hall's grid and snap it to a tile
-        object.setOnMouseReleased(event -> {
-            boolean snappedToTile = false;
-        
-            // Get the scene coordinates of the released object
-            double sceneX = event.getSceneX();
-            double sceneY = event.getSceneY();
-        
-            for (TiledHall hall : halls) {
-                Grid grid = hall.getGrid();
-        
-                // Check if the object is within the grid
-                if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
-                    Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
-                    if (targetTile != null) {
-                        // Update the tile's type to match the dragged object
-                        targetTile.changeTileType(tileType);
-        
-                        // Create a new rectangle to represent the object visually
-                        Rectangle tileReplacement = new Rectangle(
-                            targetTile.getLeftSide(),  // Tile's X position
-                            targetTile.getTopSide(),   // Tile's Y position
-                            16,         // Object width
-                            21         // Object height
-                        );
-                        tileReplacement.setFill(object.getFill()); // Copy the object's image
-        
-                        // Add the new rectangle to the hall
-                        hall.getChildren().add(tileReplacement);
-        
-                        // Remove the original dragged object
-                        root.getChildren().remove(object);
-        
-                        snappedToTile = true;
-                        System.out.printf("Object placed at tile: %s%n", targetTile);
-                        break;
+            // Handle release for snapping or discarding
+            object.setOnMouseReleased(releaseEvent -> {
+                boolean snappedToTile = false;
+    
+                // Get the scene coordinates where the object was released
+                double sceneX = releaseEvent.getSceneX();
+                double sceneY = releaseEvent.getSceneY();
+    
+                for (TiledHall hall : halls) {
+                    Grid grid = hall.getGrid();
+    
+                    // Check if the object is within the grid
+                    if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
+                        Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
+                        if (targetTile != null) {
+                            // Update the tile's type to match the dragged object
+                            targetTile.changeTileType(tileType);
+    
+                            // Snap the clone to the target tile
+                            clone.setX(targetTile.getLeftSide());
+                            clone.setY(targetTile.getTopSide());
+                            hall.getChildren().add(clone);
+    
+                            snappedToTile = true;
+                            System.out.printf("Object placed at tile: %s%n", targetTile);
+    
+                            break;
+                        }
                     }
                 }
-            }
-        
-            // Reset to starting position if not snapped
-            if (!snappedToTile) {
-                object.setLayoutX(startPos[0]);
-                object.setLayoutY(startPos[1]);
-            }
+    
+                // If not snapped to a grid, remove the clone
+                if (!snappedToTile) {
+                    root.getChildren().remove(clone);
+                }
+            });
         });
-        
     
         root.getChildren().add(object);
-        return object;
     }
+    
     
 
     public static void main(String[] args) {
