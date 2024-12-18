@@ -77,13 +77,33 @@ public class Images extends Application {
 	public static final Image IMAGE_WIZARD_x4 = new Image("/rokue-like_assets/Wizard_x4_64_64.png");
 	
 	
+	
 	//Takes an Image and finds the char associated with it.
-	// Cannot use switch statements (image is not a primitive type) so idk what to do.
-	// One option is to use the hashCode of all the images.
-	// Other option is to use the toString method.
 	public static char convertImageToChar(Image img) {
+		// Cannot use switch statements (image is not a primitive type) so idk what to do.
+		// One option is to use the hashCode of all the images.
+		// Other option is to use the toString method.
+		// Never mind, found a workaround:
+		int hashCode = img.hashCode();
 		
-		return 'E';
+		for (char c = 'a'; c <= 'z'; c++) {
+			if (convertCharToImage(c) != null) {
+				if (convertCharToImage(c).hashCode() == hashCode) {
+					return c;
+				}
+			}
+		}
+
+		for (char c = 'A'; c <= 'Z'; c++) {
+			if (convertCharToImage(c) != null) {
+				if (convertCharToImage(c).hashCode() == hashCode) {
+					return c;
+				}
+			}
+		}
+
+
+		return '%'; // just an error character.
 	}
 	
 	// Takes a char and finds the image associated with it. Upper case means x2, lower case means x4.
@@ -154,7 +174,7 @@ public class Images extends Application {
 				return IMAGE_WIZARD_x2;
 			}
 			// As of writing this, I U V X Y Z are unused. Also Turkish characters, in case we need more.
-
+			
 			// Here are the same chars, but lower case. These return x4 images.
 			case 'a' -> {
 				return IMAGE_ARCHER_x4;
@@ -216,9 +236,9 @@ public class Images extends Application {
 			case 'w' -> {
 				return IMAGE_WIZARD_x4;
 			}
-
-			default -> throw new AssertionError();
 		}
+		
+		return null;
 	}
 	
 	public static void main(String[] args) {
@@ -227,16 +247,19 @@ public class Images extends Application {
 				continue;
 			}
 			System.out.println(c);
-			System.out.println(convertCharToImage(c).toString());
+			System.out.println(convertCharToImage(c).hashCode());
+			System.out.println(convertImageToChar(convertCharToImage(c)));
+			System.out.println("------------------------------------------");
 		}
-
+		
 		for (char c = 'a'; c <= 'w'; c++) {
 			if (c == 'i' || c == 'u' || c == 'v') {
 				continue;
 			}
 			System.out.println(c);
-			System.out.println(convertCharToImage(c).toString());
+			System.out.println(convertCharToImage(c).hashCode());
+			System.out.println(convertImageToChar(convertCharToImage(c)));
+			System.out.println("------------------------------------------");
 		}
-
 	}
 }
