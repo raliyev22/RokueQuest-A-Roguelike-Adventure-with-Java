@@ -1,17 +1,24 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import javafx.util.Pair;
+import java.util.Set;
+import java.util.HashSet;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
+
+import java.util.Random;
 
 public class Run extends Application {
 
@@ -28,6 +35,10 @@ public class Run extends Application {
     static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
     static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
     // static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
+
+    private HashMap<TiledHall,List<Tile>> tileMap = new HashMap<TiledHall,List<Tile>>();
+    private Set<Pair<Integer,Integer>> runeLocationList = new HashSet<Pair<Integer,Integer>>();
+    private static final List<String> directionList = new ArrayList<String>();
 
     public void start(Stage primaryStage) {
 
@@ -67,6 +78,17 @@ public class Run extends Application {
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
 
+        //
+        tileMap.put(hall1, new ArrayList<Tile>());
+        tileMap.put(hall2, new ArrayList<Tile>());
+        tileMap.put(hall3, new ArrayList<Tile>());
+        tileMap.put(hall4, new ArrayList<Tile>());
+
+        directionList.add("UP");
+        directionList.add("DOWN");
+        directionList.add("LEFT");
+        directionList.add("RIGHT");
+
         // Create a scene
         Scene scene = new Scene(pane, 1536, 800);
         primaryStage.setTitle("Tiled Hall Example");
@@ -79,6 +101,16 @@ public class Run extends Application {
         scene.heightProperty().addListener((obs, oldVal, newVal) ->
                 primaryStage.setTitle("Width: " + (int) scene.getWidth() + ", Height: " + newVal.intValue())
         );
+
+        scene.setOnKeyPressed(event -> {
+        if (event.getCode() == KeyCode.S) {
+
+            for(TiledHall hall : halls){
+                runeLocationList.add(getRuneLocatiom(hall));
+            }
+
+        }
+    });
     }
 
     private void setHallPosition(TiledHall hall, int x, int y) {
@@ -163,6 +195,12 @@ public class Run extends Application {
                         if (targetTile != null && targetTile.getTileType() == 'E') {
                             // Update the tile's type to match the dragged object
                             targetTile.changeTileType(tileType);
+
+
+                            //add the target tile to the tileList
+                            if(!tileMap.get(hall).contains(targetTile)){tileMap.get(hall).add(targetTile);}
+
+
                             if (flag){
                             Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
                             if(flagTile!=null){
@@ -194,8 +232,31 @@ public class Run extends Application {
     }
     
     
-    
-    
+    //hides the rune in one of the objects
+    private Pair<Integer,Integer> getRuneLocatiom(TiledHall hall){
+        if(!tileMap.containsKey(hall)){return null;}
+
+        int length = tileMap.get(hall).size();
+        Random random = new Random();
+        int randomIndex = random.nextInt(length);
+
+        Pair<Integer,Integer> myPair = new Pair<Integer,Integer>(tileMap.get(hall).get(randomIndex).getLeftSide(), tileMap.get(hall).get(randomIndex).getTopSide());
+
+        return myPair;
+
+        
+
+    }
+
+    private void useRevealEnchantment(Pair<Integer,Integer> location){
+        Random random = new Random();
+
+        int verticalIndex = random.nextInt()%2; 
+        int horizontalIndex = random.nextInt(2) + 2; 
+
+        
+
+    }
     
 
     public static void main(String[] args) {
