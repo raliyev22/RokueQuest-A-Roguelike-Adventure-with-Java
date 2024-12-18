@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import main.model.*;
 import main.utils.*;
 
-public class PlayModeViewGrid {
+public class PlayModeController {
     protected final int ROW = 8;
     protected final int COLUMN = 8;
     protected final int tileWidth = 10;
@@ -19,7 +19,7 @@ public class PlayModeViewGrid {
     protected int time;
 
 
-    public PlayModeViewGrid() {
+    public PlayModeController() {
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
         player = initializeHero(2, 4, 10, null);
         monsters = new ArrayList<>();
@@ -62,7 +62,7 @@ public class PlayModeViewGrid {
         return playModeGrid.toString();
     }
     public static void main(String[] args) {
-        PlayModeViewGrid playGrid = new PlayModeViewGrid();
+        PlayModeController playGrid = new PlayModeController();
         Hero player = playGrid.player;
         playGrid.createMonster(3, 5, MonsterType.ARCHER);
         playGrid.createMonster(8, 8, MonsterType.ARCHER);
