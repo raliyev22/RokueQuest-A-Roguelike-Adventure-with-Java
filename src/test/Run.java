@@ -21,12 +21,12 @@ public class Run extends Application {
     static final Image tileImage = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
-    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/PillarWithTile_16_43.png");
-    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
     static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
-    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
-    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
-    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
     static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     public void start(Stage primaryStage) {
@@ -109,13 +109,13 @@ public class Run extends Application {
         };
 
         // Create draggable objects (absolute positioning)
-        createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 30, 75, halls, 'P');
-        createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 30, 30, halls, 'L');
-        createDraggableObject(objectStartX, positionsY[2], Box_IMAGE, root, 30, 40, halls, 'b');
-        createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 30, 60, halls, 'B');
-        createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 20, 30, halls, 'c');
-        createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 15, 15, halls, 'S');
-        createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 30, 40, halls, 'C');
+        createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 32, 64, halls, 'P');
+        createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 32, 32, halls, 'L');
+        createDraggableObject(objectStartX, positionsY[2], Box_IMAGE, root, 32, 32, halls, 'b');
+        createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 32, 64, halls, 'B');
+        createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 32, 32, halls, 'c');
+        createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 32, 32, halls, 'S');
+        createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');
     }
 
     private void createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
