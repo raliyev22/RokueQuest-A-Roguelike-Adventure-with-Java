@@ -97,6 +97,7 @@ private Rectangle createDraggableObject(double x, double y, Image image, Pane ro
                 Grid grid = hall.getGrid();
                 Tile targetTile = grid.findTileUsingCoordinates(event.getSceneX() , event.getSceneY());
                 grid.changeTileWithIndex(targetTile.getLeftSide(), targetTile.getTopSide(), c);
+                TiledHall updatedHall= new TiledHall(10, 7, grid);
     
                 if (targetTile != null) {
                     // Snap the object to the tile

@@ -145,7 +145,6 @@ public class TiledHall extends Pane {
                 
                 
                 default:
-                    System.out.println("None of types of objects, it is empty");
                     break;
             }
             Rectangle tileRect = new Rectangle(tile.getLeftSide(), tile.getTopSide(), 32, 32);

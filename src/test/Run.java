@@ -3,7 +3,6 @@ package test;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -13,7 +12,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
-import main.view.Toolbox;
 
 public class Run extends Application {
 
@@ -22,69 +20,52 @@ public class Run extends Application {
 
     static final Image tileImage = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 
-    private int column=10;
-    private int row = 9;
+    static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
+    static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
+    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     public void start(Stage primaryStage) {
 
         // Create a pane
         Pane pane = new Pane();
 
-        for(int a = 0;a<1536;a+=tileSize){
-            for(int b = 0;b<800;b+=tileSize){
-                Rectangle tideRectangle = new Rectangle(a,b, tileSize,tileSize);
-
+        // Create the background grid
+        for (int a = 0; a < 1536; a += tileSize) {
+            for (int b = 0; b < 800; b += tileSize) {
+                Rectangle tideRectangle = new Rectangle(a, b, tileSize, tileSize);
                 tideRectangle.setFill(new ImagePattern(tileImage));
                 pane.getChildren().add(tideRectangle);
             }
         }
 
-
-
         // Create 4 TiledHall instances with specific sizes
-        TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40)); // Default size
-        TiledHall hall2 = new TiledHall(10, 7,new Grid(10, 9, 32, 32, 10, 40));  // Smaller
-        TiledHall hall3 = new TiledHall(10,7,new Grid(10, 9, 32, 32, 10, 40)); // Default size
-        TiledHall hall4 = new TiledHall(10, 7,new Grid(10, 9, 32, 32, 10, 40));  // Smaller
+        TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
+        TiledHall hall2 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
+        TiledHall hall3 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
+        TiledHall hall4 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
 
-        ArrayList<TiledHall> halls = new ArrayList<TiledHall>();
+        ArrayList<TiledHall> halls = new ArrayList<>();
         halls.add(hall1);
         halls.add(hall2);
         halls.add(hall3);
         halls.add(hall4);
 
-        
-        //TiledHall hall3 = new TiledHall(12, 10); // Larger
-        //TiledHall hall4 = new TiledHall(7, 5);  // Smallest
-
         // Set desired positions for each TiledHall
-        hall1.setLayoutX(98);   // X-coordinate for hall1
-        hall1.setLayoutY(4);   // Y-coordinate for hall1
-        hall1.getGrid().setTopLeftXCordinate(hall1.getGrid().topLeftXCoordinate + (int) hall1.getLayoutX());
-        hall1.getGrid().setTopLeftYCordinate(hall1.getGrid().topLeftYCoordinate + (int) hall1.getLayoutY());
-
-
-        hall2.setLayoutX(482);  // X-coordinate for hall2
-        hall2.setLayoutY(4);   // Y-coordinate for hall2
-        hall2.getGrid().setTopLeftXCordinate(hall2.getGrid().topLeftXCoordinate + (int) hall2.getLayoutX());
-        hall2.getGrid().setTopLeftYCordinate(hall2.getGrid().topLeftYCoordinate + (int) hall2.getLayoutY());
-
-        hall3.setLayoutX(98);  // X-coordinate for hall2
-        hall3.setLayoutY(420);
-        hall3.getGrid().setTopLeftXCordinate(hall3.getGrid().topLeftXCoordinate + (int) hall3.getLayoutX());
-        hall3.getGrid().setTopLeftYCordinate(hall3.getGrid().topLeftYCoordinate + (int) hall3.getLayoutY());
-
-        hall4.setLayoutX(482);  // X-coordinate for hall2
-        hall4.setLayoutY(420);
-        hall4.getGrid().setTopLeftXCordinate(hall4.getGrid().topLeftXCoordinate + (int) hall4.getLayoutX());
-        hall4.getGrid().setTopLeftYCordinate(hall4.getGrid().topLeftYCoordinate + (int) hall4.getLayoutY());
-
+        setHallPosition(hall1, 98, 4);
+        setHallPosition(hall2, 482, 4);
+        setHallPosition(hall3, 98, 420);
+        setHallPosition(hall4, 482, 420);
 
         // Add TiledHalls to the pane
-        pane.getChildren().addAll(hall1, hall2,hall3,hall4);
+        pane.getChildren().addAll(hall1, hall2, hall3, hall4);
 
-        Toolbox toolbox = new Toolbox(1105, 50, 175, 720, pane, halls);
-        pane.getChildren().add(toolbox);
+        // Add toolbox UI directly in Run
+        addToolbox(pane, halls);
 
         // Create a scene
         Scene scene = new Scene(pane, 1536, 800);
@@ -92,35 +73,127 @@ public class Run extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-
-        scene.widthProperty().addListener((obs, oldVal, newVal) -> 
-            primaryStage.setTitle("Width: " + newVal.intValue() + ", Height: " + (int) scene.getHeight())
+        scene.widthProperty().addListener((obs, oldVal, newVal) ->
+                primaryStage.setTitle("Width: " + newVal.intValue() + ", Height: " + (int) scene.getHeight())
         );
-        scene.heightProperty().addListener((obs, oldVal, newVal) -> 
-            primaryStage.setTitle("Width: " + (int) scene.getWidth() + ", Height: " + newVal.intValue())
+        scene.heightProperty().addListener((obs, oldVal, newVal) ->
+                primaryStage.setTitle("Width: " + (int) scene.getWidth() + ", Height: " + newVal.intValue())
         );
-
-
-        
-        // Grid grid1 = new Grid(10,9,tileSize,tileSize,(int) (hall1.getLayoutX()+10),(int) (hall1.getLayoutY() + blockHeight));
-        // List<Tile> tilemap1 = grid1.getTileMap();
-
-        // int a = 0;
-        // for (Tile tile : tilemap1) {
-
-        //     Rectangle tideRectangle = new Rectangle(tile.getLeftSide()-98,tile.getTopSide()-4, tileSize,tileSize);
-        //     tideRectangle.setFill(new ImagePattern(tileImage));
-        //     hall1.getChildren().add(tideRectangle);
-        //     a++;
-
-        //     System.out.println(tile);
-
-            
-
-        // }
-        // System.out.println(hall1.getHeight());
-        // System.out.println(a);
     }
+
+    private void setHallPosition(TiledHall hall, int x, int y) {
+        hall.setLayoutX(x);
+        hall.setLayoutY(y);
+        hall.getGrid().setTopLeftXCordinate(hall.getGrid().topLeftXCoordinate + x);
+        hall.getGrid().setTopLeftYCordinate(hall.getGrid().topLeftYCoordinate + y);
+    }
+
+    private void addToolbox(Pane root, List<TiledHall> halls) {
+        // Define toolbox dimensions and positions relative to the screen
+        double toolboxX = 1105; // Absolute X position for the toolbox on the screen
+        double toolboxY = 50;   // Absolute Y position for the toolbox on the screen
+        double toolboxWidth = 175;
+        double toolboxHeight = 720;
+    
+        // Add toolbox background
+        Rectangle chest = new Rectangle(toolboxX, toolboxY, toolboxWidth, toolboxHeight);
+        chest.setFill(new ImagePattern(CHEST_IMAGE));
+        root.getChildren().add(chest);
+    
+        // Define absolute positions for draggable objects relative to the screen
+        double objectStartX = toolboxX + 70; // Absolute X position for objects
+        double[] positionsY = {
+            toolboxY + 50,  toolboxY + 150, toolboxY + 250, 
+            toolboxY + 350, toolboxY + 450, toolboxY + 550, 
+            toolboxY + 650
+        };
+    
+        // Create draggable objects (absolute positioning)
+        createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 30, 75, halls, 'P');
+        createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 30, 30, halls, 'L');
+        createDraggableObject(objectStartX, positionsY[2], Box_IMAGE, root, 30, 40, halls, 'b');
+        createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 30, 60, halls, 'B');
+        createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 20, 30, halls, 'c');
+        createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 15, 15, halls, 'S');
+        createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 30, 40, halls, 'C');
+    }
+    
+
+    private Rectangle createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
+        Rectangle object = new Rectangle(x, y, width, height);
+        object.setFill(new ImagePattern(image));
+    
+        double[] startPos = new double[2];
+    
+        // Save the start position on press
+        object.setOnMousePressed(event -> {
+            startPos[0] = event.getSceneX();
+            startPos[1] = event.getSceneY();
+            object.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
+        });
+    
+        // Update position while dragging
+        object.setOnMouseDragged(event -> {
+            double[] start = (double[]) object.getUserData();
+            double deltaX = event.getSceneX() - start[0];
+            double deltaY = event.getSceneY() - start[1];
+            object.setLayoutX(object.getLayoutX() + deltaX);
+            object.setLayoutY(object.getLayoutY() + deltaY);
+            object.setUserData(new double[]{event.getSceneX(), event.getSceneY()});
+        });
+    
+        // On release, check if object is within any hall's grid and snap it to a tile
+        object.setOnMouseReleased(event -> {
+            boolean snappedToTile = false;
+        
+            // Get the scene coordinates of the released object
+            double sceneX = event.getSceneX();
+            double sceneY = event.getSceneY();
+        
+            for (TiledHall hall : halls) {
+                Grid grid = hall.getGrid();
+        
+                // Check if the object is within the grid
+                if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
+                    Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
+                    if (targetTile != null) {
+                        // Update the tile's type to match the dragged object
+                        targetTile.changeTileType(tileType);
+        
+                        // Create a new rectangle to represent the object visually
+                        Rectangle tileReplacement = new Rectangle(
+                            targetTile.getLeftSide(),  // Tile's X position
+                            targetTile.getTopSide(),   // Tile's Y position
+                            16,         // Object width
+                            21         // Object height
+                        );
+                        tileReplacement.setFill(object.getFill()); // Copy the object's image
+        
+                        // Add the new rectangle to the hall
+                        hall.getChildren().add(tileReplacement);
+        
+                        // Remove the original dragged object
+                        root.getChildren().remove(object);
+        
+                        snappedToTile = true;
+                        System.out.printf("Object placed at tile: %s%n", targetTile);
+                        break;
+                    }
+                }
+            }
+        
+            // Reset to starting position if not snapped
+            if (!snappedToTile) {
+                object.setLayoutX(startPos[0]);
+                object.setLayoutY(startPos[1]);
+            }
+        });
+        
+    
+        root.getChildren().add(object);
+        return object;
+    }
+    
 
     public static void main(String[] args) {
         launch(args);
