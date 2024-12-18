@@ -52,6 +52,14 @@ public class Tile {
 	public void changeTileType(char c) {
 		this.tileType = c;
 	}
+
+	public boolean tileisEmpty() {
+		return (this.tileType == 'E');
+	}
+
+	public boolean tileisWalkable() {
+		return ((this.tileType == 'E') || (this.tileType == 'X'));
+	}
 	
 	public boolean isInside(float xCoordinate, float yCoordinate) {
 		// Check if x is in range

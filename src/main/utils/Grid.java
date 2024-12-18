@@ -1,11 +1,14 @@
 package main.utils;
 
+import java.awt.font.NumericShaper;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javafx.util.Pair;
+import main.controller.PlayModeController;
 import main.model.Directions;
 
 // This class creates tile-maps. Maybe it will have utility functions too
@@ -69,11 +72,6 @@ public class Grid {
 		return tileM;
 	}
 	
-	// For a grid like below, tileIndex(1, 2) returns 7:
-	// 00 01 02
-	// 03 04 05
-	// 06 07 08
-	// 09 10 11
 	public void setTopLeftXCordinate(int topLeftXCoordinate){
 		this.topLeftXCoordinate = topLeftXCoordinate;
 	}
@@ -82,6 +80,11 @@ public class Grid {
 		this.topLeftYCoordinate = topLeftYCoordinate;
 	}
 
+	// For a grid like below, tileIndex(1, 2) returns 7:
+	// 00 01 02
+	// 03 04 05
+	// 06 07 08
+	// 09 10 11
 	public int tileIndex(int x, int y) {
 		return y * this.rowLength + x; // Uses 0 indexing
 	}
@@ -252,7 +255,7 @@ public class Grid {
 		return findAvailableDirections(currentTile);
 	}
 
-	// See below function
+	// Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
 	public Set<Tile> findAdjacentTiles(Tile tile) {
 		int x = findXofTile(tile);
 		int y = findYofTile(tile);
@@ -284,7 +287,7 @@ public class Grid {
 		return adjacentTiles;
 	}
 
-	//See below function
+	//Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
 	public Set<Tile> findNeighbouringTiles(Tile tile) {
 		int x = findXofTile(tile);
 		int y = findYofTile(tile);
@@ -331,6 +334,54 @@ public class Grid {
 		}
 
 		return neighbouringTiles;
+	}
+
+	// Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
+	public Set<Tile> findNxNSquare(Tile tile, int N) {
+		int x = findXofTile(tile);
+		int y = findYofTile(tile);
+
+		return findNxNSquareWithIndex(x, y, N);
+	}
+
+	// Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
+	public Set<Tile> findNxNSquareWithIndex(int x, int y, int N) {
+		if ((N > this.rowLength) || (N > this.columnLength)) {
+			Set<Tile> foo = new HashSet<>(this.tileMap);
+			return foo;
+		}
+
+		SecureRandom rng = new SecureRandom();
+
+		// The square needs to be within these bounds
+		int leftStart = Math.max(x - N + 1, 0);
+		int leftEnd = Math.min(x, this.rowLength - N);
+
+		int topStart = Math.max(y - N + 1, 0);
+		int topEnd = Math.min(y, this.columnLength - N);
+
+		// int possibleSquaresCount = (leftEnd - leftStart) * (topEnd - topStart);
+
+		int luckySquareX = rng.nextInt(leftStart, leftEnd + 1);
+		int luckySquareY = rng.nextInt(topStart, topEnd + 1);
+
+		HashSet<Tile> square = (HashSet<Tile>) constructRectangleOfTiles
+		(luckySquareX, luckySquareX + N - 1, luckySquareY, luckySquareY + N - 1);
+
+		return square;
+	}
+
+	public Set<Tile> constructRectangleOfTiles(int left, int right, int top, int bottom)  {
+		HashSet<Tile> rectangle = new HashSet<>();
+		for (int x = left; x <= right; x++) {
+			for (int y = top; y <= bottom; y++) {
+				Tile currTile = findTileWithIndex(x, y);
+
+				rectangle.add(currTile);
+			}
+		}
+
+		return rectangle;
 	}
 
 	// For coordinates x,y check if they are inside the grid or not
@@ -380,17 +431,15 @@ public class Grid {
 	}
 	
 	public static void main(String[] args) {
-		Grid myGrid = new Grid(3, 5, 20, 10, 3, 11);
+		Grid myGrid = new Grid(8, 9, 20, 10, 3, 11);
 		System.out.println(myGrid);
 
-		Tile mytile0 = myGrid.findTileWithIndex(1,3);
-		System.out.println(mytile0);
+		Tile mytile0 = myGrid.findTileWithIndex(2,4);
 
-		System.out.println(myGrid.findTileUsingCoordinates(62.99999999999999, 60.99999999));
-		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
+		System.out.println("---------------------");
 
-		for (Tile elem : myGrid.findNeighbouringTiles(mytile0)) {
-			System.out.println(elem);
+		for (Tile elem : myGrid.findNxNSquare(mytile0, 2)) {
+			System.out.println(myGrid.findCoordinatesofTile(elem));
 		}
 		/*
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
