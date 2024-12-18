@@ -58,18 +58,18 @@ public class PlayModeController {
     }
     
     public Grid updateGrid() {
-        playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+        this.playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
         for (Monster monster : monsters) {
-            playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
+            this.playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
         }
-        playModeGrid.changeTileWithIndex(player.getPosX(), player.getPosY(), player.getCharType());
-        return playModeGrid;
+        this.playModeGrid.changeTileWithIndex(player.getPosX(), player.getPosY(), player.getCharType());
+        return this.playModeGrid;
     }
 
+	public Grid getPlayModeGrid() {
+		return this.playModeGrid;
+	}
 
-    public String toString() {
-        return playModeGrid.toString();
-    }
     public static void main(String[] args) {
         PlayModeController playGrid = new PlayModeController();
         Hero player = playGrid.player;
