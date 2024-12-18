@@ -252,6 +252,7 @@ public class Grid {
 		return findAvailableDirections(currentTile);
 	}
 
+	// See below function
 	public Set<Tile> findAdjacentTiles(Tile tile) {
 		int x = findXofTile(tile);
 		int y = findYofTile(tile);
@@ -259,6 +260,7 @@ public class Grid {
 		return findAdjacentTilesWithIndex(x, y);
 	}
 
+	// Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
 	public Set<Tile> findAdjacentTilesWithIndex(int x, int y) {
 		HashSet<Tile> adjacentTiles = new HashSet<>();
 
@@ -271,15 +273,64 @@ public class Grid {
 			adjacentTiles.add(belowTile);
 		}
 		if (x > 0) {
-			Tile rightTile = findTileWithIndex(x - 1, y);
-			adjacentTiles.add(rightTile);
+			Tile leftTile = findTileWithIndex(x - 1, y);
+			adjacentTiles.add(leftTile);
 		}
 		if (x + 1 < this.rowLength) {
-			Tile leftTile = findTileWithIndex(x + 1, y);
-			adjacentTiles.add(leftTile);
+			Tile rightTile = findTileWithIndex(x + 1, y);
+			adjacentTiles.add(rightTile);
 		}
 
 		return adjacentTiles;
+	}
+
+	//See below function
+	public Set<Tile> findNeighbouringTiles(Tile tile) {
+		int x = findXofTile(tile);
+		int y = findYofTile(tile);
+
+		return findNeighbouringTilesWithIndex(x, y);
+	}
+
+	//Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
+	public Set<Tile> findNeighbouringTilesWithIndex(int x, int y) {
+		HashSet<Tile> neighbouringTiles = new HashSet<>();
+
+		if (y > 0) {
+			Tile aboveTile = findTileWithIndex(x, y - 1);
+			neighbouringTiles.add(aboveTile);
+			if (x > 0) {
+				Tile aboveLeftTile = findTileWithIndex(x - 1, y - 1);
+				neighbouringTiles.add(aboveLeftTile);
+			}
+			if (x + 1 < this.rowLength) {
+				Tile aboveRightTile = findTileWithIndex(x + 1, y - 1);
+				neighbouringTiles.add(aboveRightTile);
+			}
+		}
+		if (y + 1 < this.columnLength) {
+			Tile belowTile = findTileWithIndex(x, y + 1);
+			neighbouringTiles.add(belowTile);
+
+			if (x > 0) {
+				Tile belowLeftTile = findTileWithIndex(x - 1, y + 1);
+				neighbouringTiles.add(belowLeftTile);
+			}
+			if (x + 1 < this.rowLength) {
+				Tile belowRightTile = findTileWithIndex(x + 1, y + 1);
+				neighbouringTiles.add(belowRightTile);
+			}
+		}
+		if (x > 0) {
+			Tile leftTile = findTileWithIndex(x - 1, y);
+			neighbouringTiles.add(leftTile);
+		}
+		if (x + 1 < this.rowLength) {
+			Tile rightTile = findTileWithIndex(x + 1, y);
+			neighbouringTiles.add(rightTile);
+		}
+
+		return neighbouringTiles;
 	}
 
 	// For coordinates x,y check if they are inside the grid or not
@@ -332,11 +383,15 @@ public class Grid {
 		Grid myGrid = new Grid(3, 5, 20, 10, 3, 11);
 		System.out.println(myGrid);
 
-		Tile mytile0 = myGrid.findTileWithIndex(2,4);
+		Tile mytile0 = myGrid.findTileWithIndex(1,3);
 		System.out.println(mytile0);
 
-		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
 		System.out.println(myGrid.findTileUsingCoordinates(62.99999999999999, 60.99999999));
+		System.out.println(myGrid.coordinatesAreInGrid(62.99999999999999, 60.99999999));
+
+		for (Tile elem : myGrid.findNeighbouringTiles(mytile0)) {
+			System.out.println(elem);
+		}
 		/*
 		Tile mytile1 = myGrid.findTileWithIndex(1,2);
 		System.out.println(mytile1);
