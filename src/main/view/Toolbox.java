@@ -13,13 +13,13 @@ import main.utils.*;
 public class Toolbox extends Pane {
 
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
-    static final Image OBJECT1_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
-    static final Image OBJECT2_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
-    static final Image OBJECT3_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
-    static final Image OBJECT4_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
-    static final Image OBJECT5_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
-    static final Image OBJECT6_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
-    static final Image OBJECT7_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
+    static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
+    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     public Toolbox(double x, double y, double width, double height, Pane root, List<TiledHall> halls) {
         setLayoutX(x);
@@ -41,18 +41,17 @@ public class Toolbox extends Pane {
         double[] positionsY = {100, 180, 260, 340, 420, 500, 580};
 
         // Create draggable objects
-        Rectangle object1 = createDraggableObject(startX, positionsY[0], OBJECT1_IMAGE, root, 30, 75, halls);
-        Rectangle object2 = createDraggableObject(startX, positionsY[1], OBJECT2_IMAGE, root, 30, 30, halls);
-        Rectangle object3 = createDraggableObject(startX, positionsY[2], OBJECT3_IMAGE, root, 30, 40, halls);
-        Rectangle object4 = createDraggableObject(startX, positionsY[3], OBJECT4_IMAGE, root, 30, 60, halls);
-        Rectangle object5 = createDraggableObject(startX, positionsY[4], OBJECT5_IMAGE, root, 20, 30, halls);
-        Rectangle object6 = createDraggableObject(startX, positionsY[5], OBJECT6_IMAGE, root, 15, 15, halls);
-        Rectangle object7 = createDraggableObject(startX, positionsY[6], OBJECT7_IMAGE, root, 30, 40, halls);
-
+        Rectangle object1 = createDraggableObject(startX, positionsY[0], Pillar_IMAGE, root, 30, 75, halls,'P');
+        Rectangle object2 = createDraggableObject(startX, positionsY[1], Ladder_IMAGE, root, 30, 30, halls,'L');
+        Rectangle object3 = createDraggableObject(startX, positionsY[2], Box_IMAGE, root, 30, 40, halls,'b');
+        Rectangle object4 = createDraggableObject(startX, positionsY[3], BoxOnBox_IMAGE, root, 30, 60, halls,'B');
+        Rectangle object5 = createDraggableObject(startX, positionsY[4], Cube_IMAGE, root, 20, 30, halls,'c');
+        Rectangle object6 = createDraggableObject(startX, positionsY[5], Skull_IMAGE, root, 15, 15, halls,'S');
+        Rectangle object7 = createDraggableObject(startX, positionsY[6], CHEST_IMAGE, root, 30, 40, halls,'C');
         getChildren().addAll(object1, object2, object3, object4, object5, object6, object7);
     }
 
-private Rectangle createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls) {
+private Rectangle createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char c) {
     Rectangle object = new Rectangle(x, y, width, height);
     object.setFill(new ImagePattern(image));
 
@@ -91,17 +90,13 @@ private Rectangle createDraggableObject(double x, double y, Image image, Pane ro
             // Convert hall's grid position to scene coordinates
             double hallLayoutX = hall.getLayoutX();
             double hallLayoutY = hall.getLayoutY();
-
-            //System.out.printf("%f fhs %f",hallLayoutX,hallLayoutY);
             
-            System.out.printf("%d dbfdfbwf %d %n",hall.getGrid().topLeftXCoordinate,hall.getGrid().topLeftYCoordinate);
-            System.out.println();
-            System.out.printf("%f hfbsjsh %f %n",event.getSceneX(),event.getSceneY());
-            System.out.printf("%b   in the grid%n",hall.getGrid().coordinatesAreInGrid(event.getSceneX() , event.getSceneY() ));
+            
             if (hall.getGrid().coordinatesAreInGrid(event.getSceneX() , event.getSceneY() )) {
                 // Get the grid of the hall
                 Grid grid = hall.getGrid();
                 Tile targetTile = grid.findTileUsingCoordinates(event.getSceneX() , event.getSceneY());
+                grid.changeTileWithIndex(targetTile.getLeftSide(), targetTile.getTopSide(), c);
     
                 if (targetTile != null) {
                     // Snap the object to the tile
@@ -114,9 +109,7 @@ private Rectangle createDraggableObject(double x, double y, Image image, Pane ro
                     System.out.printf("Object snapped to tile: X=%d, Y=%d%n", targetTile.getLeftSide(), targetTile.getTopSide());
                     break;
                 }
-                else{
-                    System.out.println("no tile");
-                }
+                
             }
         }
     

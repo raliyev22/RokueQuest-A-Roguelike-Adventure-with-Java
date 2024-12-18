@@ -15,7 +15,16 @@ public class TiledHall extends Pane {
     private static final Image UP_BORDER = new Image("/rokue-like_assets/BlockUpBorder_x2_10_48.png");
     private static final Image SIDE_BORDER1 = new Image("/rokue-like_assets/BlockSideBorder_x2_10_32.png");
 
-    private static final Image TILE_IMAGE = new Image("/rokue-like_assets/Tile_x2_32_32.png");
+    //Objects
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
+    static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_8_14.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_6_6.png");
+    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
+
+    private static final Image Empty_IMAGE = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 
     private final double blockCount;
     private final double sideBorderCount;
@@ -36,11 +45,12 @@ public class TiledHall extends Pane {
 
     private Grid grid; // Grid instance to hold the tiles
 
-    public TiledHall(double blockCount, double sideBorderCount) {
+    public TiledHall(double blockCount, double sideBorderCount, Grid givenGrid) {
         this.blockCount = blockCount;
         this.sideBorderCount = sideBorderCount;
         drawHall();
-        addGrid(); // Add the grid inside the hall
+        this.grid=givenGrid;
+        showGrid(grid);
     }
 
     private void drawHall() {
@@ -107,22 +117,39 @@ public class TiledHall extends Pane {
         setPrefSize(upBorderWidth * 2 + blockCount * blockWidth, upBorderHeight + bottomBorderHeight + sideBorderCount * sideBorderHeight + sideBorder1Height);
     }
 
-    private void addGrid() {
+    private void showGrid(Grid grid) {
         // Calculate grid parameters
-        int gridRows = 9; // Example row count
-        int gridColumns = 10; // Example column count
-        int tileSize = 32;
-
-        int gridTopLeftX = (int) upBorderWidth;
-        int gridTopLeftY = (int) blockHeight;
-
-        // Initialize the grid
-        grid = new Grid(gridColumns, gridRows, tileSize, tileSize, gridTopLeftX, gridTopLeftY);
+        Image image=Pillar_IMAGE;
 
         // Draw the grid tiles
         for (Tile tile : grid.getTileMap()) {
-            Rectangle tileRect = new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
-            tileRect.setFill(new ImagePattern(TILE_IMAGE)); // Assign tile image
+            switch (tile.getTileType()) {
+                case 'P':
+                    image=Pillar_IMAGE;
+                    break;
+                case 'c':
+                    image=Cube_IMAGE;
+                    break;
+                case 'B':
+                    image=BoxOnBox_IMAGE;
+                case 'b':
+                    image=Box_IMAGE;
+                    break;
+                case 'L':
+                    image=Ladder_IMAGE;
+                    break;
+                case 'S':
+                    image=Skull_IMAGE;
+                case 'C':
+                    image=Chest_IMAGE;
+                
+                
+                default:
+                    System.out.println("None of types of objects, it is empty");
+                    break;
+            }
+            Rectangle tileRect = new Rectangle(tile.getLeftSide(), tile.getTopSide(), 32, 32);
+            tileRect.setFill(new ImagePattern(image)); // Assign tile image
             getChildren().add(tileRect);
         }
     }

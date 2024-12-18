@@ -42,10 +42,10 @@ public class Run extends Application {
 
 
         // Create 4 TiledHall instances with specific sizes
-        TiledHall hall1 = new TiledHall(10, 7); // Default size
-        TiledHall hall2 = new TiledHall(10, 7);  // Smaller
-        TiledHall hall3 = new TiledHall(10,7); // Default size
-        TiledHall hall4 = new TiledHall(10, 7);  // Smaller
+        TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40)); // Default size
+        TiledHall hall2 = new TiledHall(10, 7,new Grid(10, 9, 32, 32, 10, 40));  // Smaller
+        TiledHall hall3 = new TiledHall(10,7,new Grid(10, 9, 32, 32, 10, 40)); // Default size
+        TiledHall hall4 = new TiledHall(10, 7,new Grid(10, 9, 32, 32, 10, 40));  // Smaller
 
         ArrayList<TiledHall> halls = new ArrayList<TiledHall>();
         halls.add(hall1);
@@ -66,12 +66,18 @@ public class Run extends Application {
 
         hall2.setLayoutX(482);  // X-coordinate for hall2
         hall2.setLayoutY(4);   // Y-coordinate for hall2
+        hall2.getGrid().setTopLeftXCordinate(hall2.getGrid().topLeftXCoordinate + (int) hall2.getLayoutX());
+        hall2.getGrid().setTopLeftYCordinate(hall2.getGrid().topLeftYCoordinate + (int) hall2.getLayoutY());
 
         hall3.setLayoutX(98);  // X-coordinate for hall2
         hall3.setLayoutY(420);
+        hall3.getGrid().setTopLeftXCordinate(hall3.getGrid().topLeftXCoordinate + (int) hall3.getLayoutX());
+        hall3.getGrid().setTopLeftYCordinate(hall3.getGrid().topLeftYCoordinate + (int) hall3.getLayoutY());
 
         hall4.setLayoutX(482);  // X-coordinate for hall2
         hall4.setLayoutY(420);
+        hall4.getGrid().setTopLeftXCordinate(hall4.getGrid().topLeftXCoordinate + (int) hall4.getLayoutX());
+        hall4.getGrid().setTopLeftYCordinate(hall4.getGrid().topLeftYCoordinate + (int) hall4.getLayoutY());
 
 
         // Add TiledHalls to the pane
