@@ -1,0 +1,91 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "main.Main",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Grid",
+            "request": "launch",
+            "mainClass": "main.utils.Grid",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "MainMenuView",
+            "request": "launch",
+            "mainClass": "main.view.MainMenuView",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "PlayModeView",
+            "request": "launch",
+            "mainClass": "main.view.PlayModeView",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "PlayModeViewGrid",
+            "request": "launch",
+            "mainClass": "main.view.PlayModeViewGrid",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Draw",
+            "request": "launch",
+            "mainClass": "test.Draw",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml"
+        },
+        {
+            "type": "java",
+            "name": "Run",
+            "request": "launch",
+            "mainClass": "test.Run",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml",
+            
+        },
+        {
+            "type": "java",
+            "name": "BuildModeView",
+            "request": "launch",
+            "mainClass": "main.view.BuildModeView",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml",
+            
+        }
+        ,
+        {
+            "type": "java",
+            "name": "RunWithToolbox",
+            "request": "launch",
+            "mainClass": "test.RunWithToolbox",
+            "projectName": "comp302-HallOfFame_c38266ac",
+            "vmArgs": "--module-path /Users/Raul/Desktop/javafx-sdk-23.0.1/lib --add-modules javafx.controls,javafx.fxml",
+            
+        }
+    ]
+}

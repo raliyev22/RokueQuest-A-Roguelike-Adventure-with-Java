@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "src",
+        ""
+    ],
+    "java.project.referencedLibraries": [
+    "/Users/Raul/Desktop/javafx-sdk-23.0.1/lib/*.jar"
+]
+
+
+}
