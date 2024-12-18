@@ -21,7 +21,7 @@ public class Run extends Application {
     static final Image tileImage = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
-    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_16_43.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/PillarWithTile_16_43.png");
     static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_16_16.png");
     static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
     static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_16_32.png");
