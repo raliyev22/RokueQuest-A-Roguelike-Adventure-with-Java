@@ -71,6 +71,22 @@ public class Grid {
 		
 		return tileM;
 	}
+
+	public void copyTileMap(Grid otherGrid) {
+		if (otherGrid == null) {
+			return ;
+		}
+		if (this.rowLength != otherGrid.rowLength) {
+			return ;
+		}
+		if (this.columnLength != otherGrid.columnLength) {
+			return ;
+		}
+
+		for (int i = 0; i < this.tileMap.size(); i++) {
+			this.tileMap.get(i).changeTileType(otherGrid.tileMap.get(i).tileType);
+		}
+	}
 	
 	public void setTopLeftXCordinate(int topLeftXCoordinate){
 		this.topLeftXCoordinate = topLeftXCoordinate;

@@ -27,6 +27,8 @@ public class PlayModeController {
 
     public PlayModeController() {
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+		playModeGrid.copyTileMap(earthHall);
+
         player = initializeHero(2, 4, 10, null);
         monsters = new ArrayList<>();
     }

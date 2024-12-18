@@ -6,6 +6,8 @@ public class Hero {
     public final int maxLives = 4;
     private int posX, posY, remainingLives;
     private Image img;
+	public boolean isMoving;
+	public boolean isTakingDamage;
     
 
     public Hero(int posX, int posY, Image img) {
@@ -13,6 +15,8 @@ public class Hero {
         this.posY = posY;
         this.img = img;
         remainingLives = 4;
+		isMoving = false;
+		isTakingDamage = false;
     }
 
     public void move(Directions direction) {
