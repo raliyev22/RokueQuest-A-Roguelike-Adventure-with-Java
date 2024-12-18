@@ -24,6 +24,9 @@ public class Tile {
 	public int getLeftSide(){
 		return this.leftSide;
 	}
+	public int getBottomSide(){
+		return this.bottomSide;
+	}
 
 	public int getTopSide(){
 		return this.topSide;

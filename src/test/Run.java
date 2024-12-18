@@ -23,11 +23,11 @@ public class Run extends Application {
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
     static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
     static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
-    static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png");
+    // static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png"); 32-32 needed -- Turan :)
     static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
     static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
     static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
-    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
+    // static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     public void start(Stage primaryStage) {
 
@@ -103,19 +103,19 @@ public class Run extends Application {
         // Define absolute positions for draggable objects relative to the screen
         double objectStartX = toolboxX + 70; // Absolute X position for objects
         double[] positionsY = {
-            toolboxY + 50,  toolboxY + 150, toolboxY + 250,
-            toolboxY + 350, toolboxY + 450, toolboxY + 550,
-            toolboxY + 650
+            toolboxY + 100,  toolboxY + 200, toolboxY + 300,
+            toolboxY + 400, toolboxY + 500, toolboxY + 600,
+            toolboxY + 700
         };
 
         // Create draggable objects (absolute positioning)
         createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 32, 64, halls, 'P');
         createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 32, 32, halls, 'L');
-        createDraggableObject(objectStartX, positionsY[2], Box_IMAGE, root, 32, 32, halls, 'b');
+        // createDraggableObject(objectStartX, positionsY[2], Box_IMAGE, root, 32, 32, halls, 'b');
         createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 32, 64, halls, 'B');
         createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 32, 32, halls, 'c');
         createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 32, 32, halls, 'S');
-        createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');
+        // createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');
     }
 
     private void createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
@@ -142,21 +142,37 @@ public class Run extends Application {
                 // Get the scene coordinates where the object was released
                 double sceneX = releaseEvent.getSceneX();
                 double sceneY = releaseEvent.getSceneY();
+
+                int adjustmentForBigObjects=0;
+                boolean flag=false;
+    
+                // Adjust the Y-coordinate for tall objects (32x64)
+                if (height == 64) {
+                    flag=true;
+                    adjustmentForBigObjects=32;
+                    sceneY += adjustmentForBigObjects; // Align the bottom part with the grid
+                }
     
                 for (TiledHall hall : halls) {
                     Grid grid = hall.getGrid();
     
-                    // Check if the object is within the grid
+                    // Check if the adjusted position is within the grid
                     if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
                         Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
-
-                        if (targetTile.getTileType()=='E') {
+    
+                        if (targetTile != null && targetTile.getTileType() == 'E') {
                             // Update the tile's type to match the dragged object
-                            grid.findTileUsingCoordinates(sceneX, sceneY).changeTileType(tileType);
+                            targetTile.changeTileType(tileType);
+                            if (flag){
+                            Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
+                            if(flagTile!=null){
+                                flagTile.changeTileType('X');
+                            }
+                            }
     
                             // Snap the clone to the target tile
                             clone.setX(targetTile.getLeftSide());
-                            clone.setY(targetTile.getTopSide());
+                            clone.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
                             hall.getChildren().add(clone);
     
                             snappedToTile = true;
@@ -176,6 +192,9 @@ public class Run extends Application {
     
         root.getChildren().add(object);
     }
+    
+    
+    
     
     
 
