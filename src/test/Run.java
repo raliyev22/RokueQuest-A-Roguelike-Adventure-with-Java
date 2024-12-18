@@ -149,9 +149,10 @@ public class Run extends Application {
                     // Check if the object is within the grid
                     if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
                         Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
-                        if (targetTile != null) {
+
+                        if (targetTile.getTileType()=='E') {
                             // Update the tile's type to match the dragged object
-                            targetTile.changeTileType(tileType);
+                            grid.findTileUsingCoordinates(sceneX, sceneY).changeTileType(tileType);
     
                             // Snap the clone to the target tile
                             clone.setX(targetTile.getLeftSide());
@@ -160,7 +161,7 @@ public class Run extends Application {
     
                             snappedToTile = true;
                             System.out.printf("Object placed at tile: %s%n", targetTile);
-    
+                            System.out.println(grid.toString());
                             break;
                         }
                     }
