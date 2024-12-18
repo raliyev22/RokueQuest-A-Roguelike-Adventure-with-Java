@@ -1,6 +1,7 @@
 package main.view;
 
 import java.awt.Image;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import main.model.*;
 import main.utils.*;
@@ -12,11 +13,17 @@ public class PlayModeController {
     protected final int tileHeight = 10;
     protected final int bottomLeftXCoordinate = 15;
     protected final int bottomLeftYCoordinate = 15;
+
+	protected static Grid earthHall;
+	protected static Grid airHall;
+	protected static Grid waterHall;
+	protected static Grid fireHall;
     
     protected Grid playModeGrid;
     protected Hero player;
     protected ArrayList<Monster> monsters;
     protected int time;
+	protected SecureRandom rng;
 
 
     public PlayModeController() {
@@ -57,6 +64,7 @@ public class PlayModeController {
         playModeGrid.changeTileWithIndex(player.getPosX(), player.getPosY(), player.getCharType());
         return playModeGrid;
     }
+
 
     public String toString() {
         return playModeGrid.toString();
