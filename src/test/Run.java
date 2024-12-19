@@ -6,12 +6,15 @@ import java.util.List;
 import javafx.util.Pair;
 import java.util.Set;
 import java.util.HashSet;
+import javafx.util.Duration;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -37,7 +40,7 @@ public class Run extends Application {
     // static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
 
     private HashMap<TiledHall,List<Tile>> tileMap = new HashMap<TiledHall,List<Tile>>();
-    private Set<Pair<Integer,Integer>> runeLocationList = new HashSet<Pair<Integer,Integer>>();
+    private List<Pair<Integer,Integer>> runeLocationList = new ArrayList<Pair<Integer,Integer>>();
     private static final List<String> directionList = new ArrayList<String>();
 
     public void start(Stage primaryStage) {
@@ -103,14 +106,18 @@ public class Run extends Application {
         );
 
         scene.setOnKeyPressed(event -> {
-        if (event.getCode() == KeyCode.S) {
-
-            for(TiledHall hall : halls){
-                runeLocationList.add(getRuneLocatiom(hall));
+            if (event.getCode() == KeyCode.S) {
+                for (TiledHall hall : halls) {
+                    runeLocationList.add(getRuneLocatiom(hall));
+                }
+            } else if (event.getCode() == KeyCode.R) {
+                // Uncomment this if useRevealEnchantment is implemented:
+                useRevealEnchantment(runeLocationList.get(0), hall1);
             }
+        });
 
-        }
-    });
+    
+
     }
 
     private void setHallPosition(TiledHall hall, int x, int y) {
@@ -248,14 +255,89 @@ public class Run extends Application {
 
     }
 
-    private void useRevealEnchantment(Pair<Integer,Integer> location){
+    private void useRevealEnchantment(Pair<Integer,Integer> location,TiledHall hall){
         Random random = new Random();
 
-        int verticalIndex = random.nextInt()%2; 
+        int verticalIndex = random.nextInt(Integer.MAX_VALUE)%2; 
         int horizontalIndex = random.nextInt(2) + 2; 
 
+        String horizontalDirection = directionList.get(horizontalIndex);
+        String verticalDirection = directionList.get(verticalIndex);
+
+        List<Tile> tileMap = hall.getGrid().getTileMap();
+
+        int size = tileMap.size();
+
+        int BottomYBound = tileMap.get(0).getTopSide();
+        int UpperYBound = tileMap.get(size-1).getBottomSide();
+
+        int BottomXBound = tileMap.get(0).getLeftSide();
+        int UpperXBound = tileMap.get(size-1).getRightSide();
+
+        int horizontalStep;
+        int verticalStep;
+
+        int yStartingPoint=Integer.MAX_VALUE;
+        int xStartingPoint=Integer.MAX_VALUE;
+        if(verticalDirection.equals("UP")){
+            verticalStep = random.nextInt(4);
+            yStartingPoint = location.getValue()-verticalStep*tileSize;
+            while(BottomYBound>yStartingPoint && yStartingPoint!=Integer.MAX_VALUE){
+                verticalStep = random.nextInt(4);
+                yStartingPoint = location.getValue()-verticalStep*tileSize;
+            }
+            
+        }
+        else if(verticalDirection.equals("DOWN")){
+            verticalStep = random.nextInt(5);
+            yStartingPoint = location.getValue()+verticalStep*tileSize;
+            while(yStartingPoint>UpperYBound && yStartingPoint!=Integer.MAX_VALUE){
+                verticalStep = random.nextInt(5);
+                yStartingPoint = location.getValue()+verticalStep*tileSize;
+            }
+        }
+
+        if(horizontalDirection.equals("RIGHT")){
+            horizontalStep = random.nextInt(5);
+            xStartingPoint = location.getKey()+horizontalStep*tileSize;
+            while(xStartingPoint>UpperXBound &&xStartingPoint!=Integer.MAX_VALUE){
+                horizontalStep = random.nextInt(5);
+                xStartingPoint = location.getKey()+horizontalStep*tileSize;
+            }
+        }
+        else if(horizontalDirection.equals("LEFT")){
+            horizontalStep = random.nextInt(4);
+            xStartingPoint = location.getKey()-horizontalStep*tileSize;
+            while(xStartingPoint<BottomXBound&&xStartingPoint!=Integer.MAX_VALUE){
+                horizontalStep = random.nextInt(4);
+                xStartingPoint = location.getKey()-horizontalStep*tileSize;
+            }
+        }
+        System.out.println(xStartingPoint);
+        System.out.println(yStartingPoint);
+
+        if(xStartingPoint!=Integer.MAX_VALUE && yStartingPoint!=Integer.MAX_VALUE){
+            highlightRuneLocation(xStartingPoint, yStartingPoint, hall);
+            System.out.println(xStartingPoint);
+        }
         
 
+
+        
+    }
+    public void highlightRuneLocation(int xPoint,int yPoint,TiledHall hall){
+        System.out.printf("%d x  %d  y",xPoint,yPoint);
+        Rectangle rectangle = new Rectangle(xPoint, yPoint, 4*tileSize, 4*tileSize);
+        rectangle.setStroke(Color.WHITE); // Border color
+        rectangle.setFill(Color.TRANSPARENT); // Transparent fill
+
+        // Add the rectangle to the pane
+        hall.getChildren().add(rectangle);
+
+        // Create a PauseTransition to remove the rectangle after 10 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(10));
+        pause.setOnFinished(event -> hall.getChildren().remove(rectangle));
+        pause.play();
     }
     
 

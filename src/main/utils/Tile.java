@@ -28,6 +28,10 @@ public class Tile {
 		return this.bottomSide;
 	}
 
+	public int getRightSide(){
+		return this.rightSide;
+	}
+
 	public int getTopSide(){
 		return this.topSide;
 	}
