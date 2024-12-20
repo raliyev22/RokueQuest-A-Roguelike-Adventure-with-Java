@@ -119,7 +119,7 @@ public class TiledHall extends Pane {
 
     private void showGrid(Grid grid) {
         // Calculate grid parameters
-        Image image=Pillar_IMAGE;
+        Image image=Empty_IMAGE;
 
         // Draw the grid tiles
         for (Tile tile : grid.getTileMap()) {
