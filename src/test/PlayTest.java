@@ -19,19 +19,22 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import main.model.HallType;
+import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
+import main.view.BuildModeView;
 
 public class PlayTest extends Application {
     private int tileSize = 64;
     static final Image tileImage = new Image("/rokue-like_assets/Tile_x4_64_64.png");
-    // static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
-    // static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
     static final Image Box_IMAGE = new Image("rokue-like_assets/Box_x4_64_84.png");
-    // static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
-    // static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
-    // static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
-    // static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
+    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
     static final Image Player_IMAGE = new Image("/rokue-like_assets/player4x.png");
     boolean upPressed, downPressed, leftPressed, rightPressed = false;
     public void start(Stage primaryStage) {
@@ -40,16 +43,35 @@ public class PlayTest extends Application {
         // Create a pane
         Pane pane = new Pane();
         Grid grid = hall.getGrid();
-        for (int i = 0; i < 20; i++){
-            Random rand = new Random();
-            int randomTileX = rand.nextInt(9);
-            int randomTileY = rand.nextInt(9);
-            grid.changeTileWithIndex(randomTileX, randomTileY, 'C');
-            Rectangle clone = new Rectangle(64,64);
-            clone.setFill(new ImagePattern(Box_IMAGE));
-            clone.setX(randomTileX*64);
-            clone.setY(randomTileY*64);
-            hall.getChildren().add(clone);
+        HashMap<TiledHall, List<Tile>> tileMap = BuildModeView.sharedTileMap;
+        if (tileMap != null && !tileMap.isEmpty()) {
+            TiledHall earthHall = null;
+
+            for (TiledHall h : BuildModeView.hallTypeMap.keySet()) {
+                if (BuildModeView.hallTypeMap.get(h) == HallType.EARTH) {
+                    earthHall = h;
+                    break;
+                }
+            }
+
+            if (earthHall != null) {
+                List<Tile> tiles = BuildModeView.sharedTileMap.get(earthHall);
+                for (Tile tile : tiles) {
+                    Rectangle rect = new Rectangle(tileSize, tileSize);
+                    rect.setX(tile.getLeftSide()*2);
+                    rect.setY(tile.getTopSide()*2-tileSize);
+
+                    // Tile türüne göre görselleri ayarla
+                    Image image = Images.convertCharToImage(tile.getTileType());
+                    if (image != null) {
+                        rect.setFill(new ImagePattern(image));
+                    } else {
+                        rect.setFill(Color.GRAY);
+                    }
+
+                    hall.getChildren().add(rect);
+                }
+            }
         }
 
         Random rand = new Random();

@@ -1,5 +1,6 @@
 package main.view;
 import main.Main;
+import main.model.HallType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
+import test.PlayTest;
 import test.TiledHall;
 
 import java.util.Random;
@@ -52,6 +54,8 @@ public class BuildModeView extends Application {
     
     private HashMap<TiledHall,List<Tile>> tileMap = new HashMap<TiledHall,List<Tile>>();
     private List<Pair<Integer,Integer>> runeLocationList = new ArrayList<Pair<Integer,Integer>>();
+    public static HashMap<TiledHall, List<Tile>> sharedTileMap = new HashMap<>();
+    public static HashMap<TiledHall, HallType> hallTypeMap = new HashMap<>(); // Yeni ekleme
 
     public void start(Stage primaryStage) {
 
@@ -94,6 +98,10 @@ public class BuildModeView extends Application {
         addToolbox(pane, halls);
 
         //hashmap to that keeps count of objects in each hall
+        addTiledHall(hall1, HallType.EARTH);
+        addTiledHall(hall2, HallType.AIR);
+        addTiledHall(hall3, HallType.WATER);
+        addTiledHall(hall4, HallType.FIRE);
         tileMap.put(hall1, new ArrayList<Tile>());
         tileMap.put(hall2, new ArrayList<Tile>());
         tileMap.put(hall3, new ArrayList<Tile>());
@@ -193,32 +201,35 @@ public class BuildModeView extends Application {
             alert.setHeaderText("Insufficient object count.");
         
             // Check constraints for each hall
-            if (earthHall == null || earthHall.size() < 6) {
+            if (earthHall == null || earthHall.size() < 3) {
                 alert.setContentText("The earth hall must contain at least 6 objects.");
                 alert.showAndWait();
                 System.out.println(earthHall.size());
                 return;
             }
         
-            if (airHall == null || airHall.size() < 9) {
+            if (airHall == null || airHall.size() < 1) {
                 alert.setContentText("The air hall must contain at least 9 objects.");
                 alert.showAndWait();
                 return;
             }
         
-            if (waterHall == null || waterHall.size() < 13) {
+            if (waterHall == null || waterHall.size() < 1) {
                 alert.setContentText("The water hall must contain at least 13 objects.");
                 alert.showAndWait();
                 return;
             }
         
-            if (fireHall == null || fireHall.size() < 17) {
+            if (fireHall == null || fireHall.size() < 1) {
                 alert.setContentText("The fire hall must contain at least 17 objects.");
                 alert.showAndWait();
                 return;
             }
 
-
+        
+            BuildModeView.sharedTileMap.putAll(tileMap);
+            PlayTest playTest = new PlayTest();
+            playTest.start(primaryStage);
             //transition to play mode
 
 
@@ -430,6 +441,15 @@ public class BuildModeView extends Application {
         pause.play();
     }
 
+    public HashMap<TiledHall, List<Tile>> getTileMap() {
+        return tileMap;
+    }
+
+    public void addTiledHall(TiledHall hall, HallType type) {
+        tileMap.put(hall, new ArrayList<>());
+        hallTypeMap.put(hall, type); // Tür eşlemesi
+    }
+    
     public static void main(String[] args) {
         launch(args);
     }
