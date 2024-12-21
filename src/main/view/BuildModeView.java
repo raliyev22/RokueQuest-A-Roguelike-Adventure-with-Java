@@ -94,7 +94,6 @@ public class BuildModeView extends Application {
 
 
 
-        System.out.println(hall4.getHeight());
 
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2, hall3, hall4);
@@ -322,8 +321,7 @@ public class BuildModeView extends Application {
                             hall.getChildren().add(clone);
     
                             snappedToTile = true;
-                            System.out.printf("Object placed at tile: %s%n", targetTile);
-                            System.out.println(grid.toString());
+                            
                             break;
                         }
                     }
@@ -411,12 +409,6 @@ public class BuildModeView extends Application {
         pause.setOnFinished(event -> hall.getChildren().remove(rectangle));
         pause.play();
     }
-    private Text createHallLabel(String textContent) {
-    Text label = new Text(textContent);
-    label.setFont(Font.font("Verdana", 20));
-    label.setFill(Color.LIGHTBLUE); // Adjust the color as needed
-    return label;
-}
 
     public static void main(String[] args) {
         launch(args);
