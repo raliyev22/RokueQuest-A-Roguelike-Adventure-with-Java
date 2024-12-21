@@ -43,7 +43,6 @@ public class Run extends Application {
     static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
     static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
     static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
-    // static final Image Box_IMAGE = new Image("/rokue-like_assets/Box_16_21.png"); 32-32 needed -- Turan :)
     static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
     static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
     static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
@@ -51,14 +50,7 @@ public class Run extends Application {
     static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png");
     
     static final Image CHEST = new Image("/rokue-like_assets/ChestHeart_x2_32_28.png");
-
-
-    //static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png", 32, 32, false, false);
-    //static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png", 32, 32, false, false);
     
-
-    //static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
-
     private HashMap<TiledHall,List<Tile>> tileMap = new HashMap<TiledHall,List<Tile>>();
     private List<Pair<Integer,Integer>> runeLocationList = new ArrayList<Pair<Integer,Integer>>();
 
