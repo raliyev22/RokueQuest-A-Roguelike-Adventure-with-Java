@@ -27,6 +27,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -82,10 +84,15 @@ public class BuildModeView extends Application {
         halls.add(hall4);
 
         // Set desired positions for each TiledHall
-        setHallPosition(hall1, 200, 50); // Adjust X and Y positions
-        setHallPosition(hall2, 600, 50);
-        setHallPosition(hall3, 200, 400);
-        setHallPosition(hall4, 600, 400);
+        // Adjust the positions of the halls
+// Adjust the positions of the halls with vertical gaps
+        setHallPosition(hall1, 150, 25);  // First row
+        setHallPosition(hall2, 550, 25);  // First row
+        setHallPosition(hall3, 150, 425); // Second row with vertical gap
+        setHallPosition(hall4, 550, 425); // Second row with vertical gap
+
+
+
 
         System.out.println(hall4.getHeight());
 
@@ -94,6 +101,7 @@ public class BuildModeView extends Application {
 
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
+        
 
         //
         tileMap.put(hall1, new ArrayList<Tile>());
@@ -105,6 +113,9 @@ public class BuildModeView extends Application {
         Scene scene = new Scene(pane, 1200, 800); // Example: Decrease width
         primaryStage.setTitle("Tiled Hall Example");
         primaryStage.setScene(scene);
+        javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        primaryStage.setX((screenBounds.getWidth() - 1200) / 2); // Width of the scene
+        primaryStage.setY((screenBounds.getHeight() - 800) / 2); // Height of the scene
         primaryStage.show();
 
         scene.widthProperty().addListener((obs, oldVal, newVal) ->
@@ -128,11 +139,14 @@ public class BuildModeView extends Application {
         
         // Place the button below the toolbox
         double toolboxX = 950; // Toolbox X coordinate
-        double toolboxY = 0;   // Toolbox Y coordinate
+        double toolboxY = 20;   // Toolbox Y coordinate
+        double toolboxWidth = 150; // Toolbox width
         double toolboxHeight = 720; // Toolbox height
-        
-        button.setLayoutX(toolboxX + 12); // Center the button under the toolbox
-        button.setLayoutY(toolboxY + toolboxHeight + 10); // Place it slightly below the toolbox
+
+        // Center the button horizontally under the toolbox
+        button.setLayoutX(toolboxX + (toolboxWidth / 2) - 50); // 50 is half the button's width (assuming 100px button width)
+        button.setLayoutY(toolboxY + toolboxHeight + 10); // Slightly below the bottom of the toolbox
+
         pane.getChildren().add(button);
 
         button.setOnAction(event -> {
@@ -210,7 +224,7 @@ public class BuildModeView extends Application {
         // Define toolbox dimensions and positions relative to the screen
         // double toolboxX = 1105; // Absolute X position for the toolbox on the screen
         double toolboxX = 950;
-        double toolboxY = 0;   // Absolute Y position for the toolbox on the screen
+        double toolboxY = 25;   // Absolute Y position for the toolbox on the screen
         double toolboxWidth = 150;
         double toolboxHeight = 720;
 
@@ -220,7 +234,7 @@ public class BuildModeView extends Application {
         root.getChildren().add(chest);
 
         // Define absolute positions for draggable objects relative to the screen
-        double objectStartX = toolboxX + 70; // Absolute X position for objects
+        double objectStartX = toolboxX + 60; // Absolute X position for objects
         double[] positionsY = {
             toolboxY + 100,  toolboxY + 100+64+20, toolboxY + 184+32+20,
             toolboxY + 236+42+20, toolboxY + 362+20, toolboxY + 410+20,
@@ -397,6 +411,12 @@ public class BuildModeView extends Application {
         pause.setOnFinished(event -> hall.getChildren().remove(rectangle));
         pause.play();
     }
+    private Text createHallLabel(String textContent) {
+    Text label = new Text(textContent);
+    label.setFont(Font.font("Verdana", 20));
+    label.setFill(Color.LIGHTBLUE); // Adjust the color as needed
+    return label;
+}
 
     public static void main(String[] args) {
         launch(args);
