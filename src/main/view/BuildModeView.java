@@ -1,34 +1,29 @@
 package main.view;
+import main.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javafx.util.Pair;
-import java.util.Set;
-import java.util.HashSet;
+
 import javafx.util.Duration;
-import java.awt.image.BufferedImage;
-import java.awt.Dialog;
-import java.awt.Graphics2D;
+
+import javafx.scene.paint.ImagePattern;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -53,6 +48,7 @@ public class BuildModeView extends Application {
     static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png");
     
     static final Image CHEST = new Image("/rokue-like_assets/ChestHeart_x2_32_28.png");
+    static final Image Exit_Button = new Image("/rokue-like_assets/ExitButton_x2_32_32.png");
     
     private HashMap<TiledHall,List<Tile>> tileMap = new HashMap<TiledHall,List<Tile>>();
     private List<Pair<Integer,Integer>> runeLocationList = new ArrayList<Pair<Integer,Integer>>();
@@ -85,24 +81,19 @@ public class BuildModeView extends Application {
 
         // Set desired positions for each TiledHall
         // Adjust the positions of the halls
-// Adjust the positions of the halls with vertical gaps
+        // Adjust the positions of the halls with vertical gaps
         setHallPosition(hall1, 150, 25);  // First row
         setHallPosition(hall2, 550, 25);  // First row
         setHallPosition(hall3, 150, 425); // Second row with vertical gap
         setHallPosition(hall4, 550, 425); // Second row with vertical gap
-
-
-
-
 
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2, hall3, hall4);
 
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
-        
 
-        //
+        //hashmap to that keeps count of objects in each hall
         tileMap.put(hall1, new ArrayList<Tile>());
         tileMap.put(hall2, new ArrayList<Tile>());
         tileMap.put(hall3, new ArrayList<Tile>());
@@ -110,37 +101,80 @@ public class BuildModeView extends Application {
 
         // Create a scene
         Scene scene = new Scene(pane, 1200, 800); // Example: Decrease width
-        primaryStage.setTitle("Tiled Hall Example");
         primaryStage.setScene(scene);
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
         primaryStage.setX((screenBounds.getWidth() - 1200) / 2); // Width of the scene
         primaryStage.setY((screenBounds.getHeight() - 800) / 2); // Height of the scene
         primaryStage.show();
 
-        scene.widthProperty().addListener((obs, oldVal, newVal) ->
-                primaryStage.setTitle("Width: " + newVal.intValue() + ", Height: " + (int) scene.getHeight())
-        );
-        scene.heightProperty().addListener((obs, oldVal, newVal) ->
-                primaryStage.setTitle("Width: " + (int) scene.getWidth() + ", Height: " + newVal.intValue())
-        );
-
+        //Create a button to click when the build mode is finished
         Button button = new Button("Finish");
         button.setStyle(
-            "-fx-background-color: #303843; " + // Light brown color
-            "-fx-text-fill: white; " +         // White text
-            "-fx-font-size: 18px; " +         // Larger font size
-            "-fx-padding: 10px 20px; " +      // Padding for better sizing
-            "-fx-background-radius: 10; " +  // Rounded corners
-            "-fx-border-color: #FFFFFF; " +   // Optional: add a border
-            "-fx-border-width: 1px; " +       // Border thickness
-            "-fx-border-radius: 10;"         // Rounded border to match background
+        "-fx-background-color: #303843; " +
+        "-fx-text-fill: white; " +
+        "-fx-font-size: 18px; " +
+        "-fx-padding: 10px 20px; " +
+        "-fx-background-radius: 10; " +
+        "-fx-border-color: #FFFFFF; " +
+        "-fx-border-width: 1px; " +
+        "-fx-border-radius: 10; " +
+        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
+    );
+
+    button.setOnMouseEntered(e -> {
+        button.setStyle(
+            "-fx-background-color: rgb(78, 90, 107); " + // Change background on hover
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 18px; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-background-radius: 10; " +
+            "-fx-border-color: #FFFFFF; " +
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 10; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
         );
-        
+        button.setCursor(Cursor.HAND); 
+    });
+
+    button.setOnMouseExited(e -> {
+        button.setStyle(
+            "-fx-background-color: #303843; " + // Revert to original color
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 18px; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-background-radius: 10; " +
+            "-fx-border-color: #FFFFFF; " +
+            "-fx-border-width: 1px; " +
+            "-fx-border-radius: 10; " +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
+        );
+        button.setCursor(Cursor.DEFAULT);
+    });
+
         // Place the button below the toolbox
         double toolboxX = 950; // Toolbox X coordinate
         double toolboxY = 20;   // Toolbox Y coordinate
         double toolboxWidth = 150; // Toolbox width
         double toolboxHeight = 720; // Toolbox height
+
+        //Exit button to exit the play mode
+        Rectangle exitButton = new Rectangle(toolboxX + (toolboxWidth / 2) - 16, toolboxY+675, 32, 32);
+        exitButton.setFill(new ImagePattern(Exit_Button));
+        pane.getChildren().add(exitButton);
+
+        exitButton.setOnMouseEntered(event -> {
+            exitButton.setCursor(Cursor.HAND);
+        });
+        
+        exitButton.setOnMouseExited(event -> {
+            exitButton.setCursor(Cursor.DEFAULT);
+        });
+
+        exitButton.setOnMouseClicked(event -> {
+            Main mainPage = new Main();
+            mainPage.start(primaryStage);
+            
+        });
 
         // Center the button horizontally under the toolbox
         button.setLayoutX(toolboxX + (toolboxWidth / 2) - 50); // 50 is half the button's width (assuming 100px button width)
@@ -149,20 +183,20 @@ public class BuildModeView extends Application {
         pane.getChildren().add(button);
 
         button.setOnAction(event -> {
-            List<Tile> earthHall = tileMap.get("earth");
-            List<Tile> airHall = tileMap.get("air");
-            List<Tile> waterHall = tileMap.get("water");
-            List<Tile> fireHall = tileMap.get("fire");
+            List<Tile> earthHall = tileMap.get(hall1);
+            List<Tile> airHall = tileMap.get(hall2);
+            List<Tile> waterHall = tileMap.get(hall3);
+            List<Tile> fireHall = tileMap.get(hall4);
 
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Message Here...");
-            alert.setHeaderText("Look, an Information Dialog");
-            alert.setContentText("I have a great message for you!");
+            alert.setTitle("Warning!!!");
+            alert.setHeaderText("Insufficient object count.");
         
             // Check constraints for each hall
             if (earthHall == null || earthHall.size() < 6) {
                 alert.setContentText("The earth hall must contain at least 6 objects.");
                 alert.showAndWait();
+                System.out.println(earthHall.size());
                 return;
             }
         
@@ -185,30 +219,22 @@ public class BuildModeView extends Application {
             }
 
 
-        
-
-
-
+            //transition to play mode
 
 
         });
 
 
-
-
-
-
+        //Hide the rune in one of the objects for each hall
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.S) {
                 for (TiledHall hall : halls) {
                     runeLocationList.add(getRuneLocatiom(hall));
                 }
             } else if (event.getCode() == KeyCode.R) {
-                // Uncomment this if useRevealEnchantment is implemented:
                 useRevealEnchantment(runeLocationList.get(0), hall1);
             }
         });
-
 
     }
 
@@ -220,8 +246,6 @@ public class BuildModeView extends Application {
     }
 
     private void addToolbox(Pane root, List<TiledHall> halls) {
-        // Define toolbox dimensions and positions relative to the screen
-        // double toolboxX = 1105; // Absolute X position for the toolbox on the screen
         double toolboxX = 950;
         double toolboxY = 25;   // Absolute Y position for the toolbox on the screen
         double toolboxWidth = 150;
@@ -338,7 +362,7 @@ public class BuildModeView extends Application {
     }
     
     
-    //hides the rune in one of the objects
+    //Hides the rune in one of the objects
     private Pair<Integer,Integer> getRuneLocatiom(TiledHall hall){
         if(!tileMap.containsKey(hall) || tileMap.get(hall).size()==0){return null;}
 
@@ -353,10 +377,6 @@ public class BuildModeView extends Application {
         
 
     }
-
-
-
-    
 
     private void useRevealEnchantment(Pair<Integer,Integer> location,TiledHall hall){
         Random random = new Random();

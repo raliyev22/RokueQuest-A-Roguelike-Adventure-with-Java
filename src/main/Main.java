@@ -49,7 +49,7 @@ public class Main extends Application {
         StackPane root = new StackPane();
 
         // Add a background image
-        Image backgroundImage = new Image("/rokue-like_assets/rokue33.jpg");
+        Image backgroundImage = new Image("/rokue-like_assets/rokue33.png");
         ImageView backgroundView = new ImageView(backgroundImage);
         backgroundView.setFitWidth(600);  // Adjust the size as needed
         backgroundView.setFitHeight(400); // Adjust the size as needed
