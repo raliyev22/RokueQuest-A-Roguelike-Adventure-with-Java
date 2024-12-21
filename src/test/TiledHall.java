@@ -142,6 +142,8 @@ public class TiledHall extends Pane {
                     image=Skull_IMAGE;
                 case 'C':
                     image=Chest_IMAGE;
+                case 'X':
+                    image= Empty_IMAGE;
                 
                 
                 default:
