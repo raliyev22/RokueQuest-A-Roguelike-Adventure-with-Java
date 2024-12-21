@@ -61,8 +61,8 @@ public class BuildModeView extends Application {
         Pane pane = new Pane();
 
         // Create the background grid
-        for (int a = 0; a < 1536; a += tileSize) {
-            for (int b = 0; b < 840; b += tileSize) {
+        for (int a = 0; a < 1200; a += tileSize) {
+            for (int b = 0; b < 800; b += tileSize) {
                 Rectangle tideRectangle = new Rectangle(a, b, tileSize, tileSize);
                 tideRectangle.setFill(new ImagePattern(tileImage));
                 pane.getChildren().add(tideRectangle);
@@ -82,10 +82,11 @@ public class BuildModeView extends Application {
         halls.add(hall4);
 
         // Set desired positions for each TiledHall
-        setHallPosition(hall1, 304, 4);
-        setHallPosition(hall2, 688, 4);
-        setHallPosition(hall3, 304, 420);
-        setHallPosition(hall4, 688, 420);
+        setHallPosition(hall1, 200, 50); // Adjust X and Y positions
+        setHallPosition(hall2, 600, 50);
+        setHallPosition(hall3, 200, 400);
+        setHallPosition(hall4, 600, 400);
+
         System.out.println(hall4.getHeight());
 
         // Add TiledHalls to the pane
@@ -101,7 +102,7 @@ public class BuildModeView extends Application {
         tileMap.put(hall4, new ArrayList<Tile>());
 
         // Create a scene
-        Scene scene = new Scene(pane, 1536, 800);
+        Scene scene = new Scene(pane, 1200, 800); // Example: Decrease width
         primaryStage.setTitle("Tiled Hall Example");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -124,9 +125,14 @@ public class BuildModeView extends Application {
             "-fx-border-width: 1px; " +       // Border thickness
             "-fx-border-radius: 10;"         // Rounded border to match background
         );
-
-        button.setLayoutX(1103);
-        button.setLayoutY(740);
+        
+        // Place the button below the toolbox
+        double toolboxX = 950; // Toolbox X coordinate
+        double toolboxY = 0;   // Toolbox Y coordinate
+        double toolboxHeight = 720; // Toolbox height
+        
+        button.setLayoutX(toolboxX + 12); // Center the button under the toolbox
+        button.setLayoutY(toolboxY + toolboxHeight + 10); // Place it slightly below the toolbox
         pane.getChildren().add(button);
 
         button.setOnAction(event -> {
@@ -203,9 +209,9 @@ public class BuildModeView extends Application {
     private void addToolbox(Pane root, List<TiledHall> halls) {
         // Define toolbox dimensions and positions relative to the screen
         // double toolboxX = 1105; // Absolute X position for the toolbox on the screen
-        double toolboxX = 1056;
+        double toolboxX = 950;
         double toolboxY = 0;   // Absolute Y position for the toolbox on the screen
-        double toolboxWidth = 175;
+        double toolboxWidth = 150;
         double toolboxHeight = 720;
 
         // Add toolbox background
@@ -390,6 +396,10 @@ public class BuildModeView extends Application {
         PauseTransition pause = new PauseTransition(Duration.seconds(2));
         pause.setOnFinished(event -> hall.getChildren().remove(rectangle));
         pause.play();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
     
 
