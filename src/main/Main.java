@@ -15,8 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-
-
+import main.view.BuildModeView;
 
 public class Main extends Application {
     @Override
@@ -40,7 +39,6 @@ public class Main extends Application {
 
         Button exitButton = new Button("Exit");
         exitButton.setPrefWidth(200);
-        
         
         // Button Actions
         startButton.setOnAction(e -> startNewGame(primaryStage));
@@ -71,8 +69,17 @@ public class Main extends Application {
     }
 
     private void startNewGame(Stage primaryStage) {
-        // Transition to Building Mode or Game
-        System.out.println("Start New Game Clicked!");
+        // Close the current stage (Main menu)
+        primaryStage.close();
+        
+        // Launch the Run class (Building mode or Game mode)
+        BuildModeView runGame = new BuildModeView();
+        Stage gameStage = new Stage(); // Create a new stage for the Run class
+        try {
+            runGame.start(gameStage); // Start the Run game on the new stage
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void showHelp() {
