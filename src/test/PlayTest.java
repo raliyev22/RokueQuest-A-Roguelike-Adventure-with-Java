@@ -27,19 +27,11 @@ import main.view.BuildModeView;
 
 public class PlayTest extends Application {
     private int tileSize = 64;
-    static final Image tileImage = new Image("/rokue-like_assets/Tile_x4_64_64.png");
-    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
-    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
-    static final Image Box_IMAGE = new Image("rokue-like_assets/Box_x4_64_84.png");
-    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
-    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
-    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
-    static final Image Chest_IMAGE = new Image("/rokue-like_assets/Chest_Closed_16_14.png");
-    static final Image Player_IMAGE = new Image("/rokue-like_assets/player4x.png");
+
     boolean upPressed, downPressed, leftPressed, rightPressed = false;
     public void start(Stage primaryStage) {
         //THESE CODES FOR ONLY TEST PURPOSES, WHEN BUILDMODE IS AVAILABLE IT IS GOING TO BE PULLED FROM THAT//
-        TiledHall hall = new TiledHall(20, 14, new Grid(10,9,64,64,10,40));
+        TiledHall hall = new TiledHall(20, 15, new Grid(10,9,64,64,10,40));
         // Create a pane
         Pane pane = new Pane();
         Grid grid = hall.getGrid();
@@ -57,31 +49,44 @@ public class PlayTest extends Application {
             if (earthHall != null) {
                 List<Tile> tiles = BuildModeView.sharedTileMap.get(earthHall);
                 for (Tile tile : tiles) {
-                    Rectangle rect = new Rectangle(tileSize, tileSize);
-                    rect.setX(tile.getLeftSide()*2);
-                    rect.setY(tile.getTopSide()*2-tileSize);
-
-                    // Tile türüne göre görselleri ayarla
                     Image image = Images.convertCharToImage(tile.getTileType());
+
                     if (image != null) {
-                        rect.setFill(new ImagePattern(image));
-                    } else {
-                        rect.setFill(Color.GRAY);
+                        if (tile.getTileType() == 'P') { // Örneğin, uzun item (Pillar)
+                            drawTallItem(hall, tile, image); // Uzun itemi çiz
+                        }
+                        else if(tile.getTileType() == 'B') { // Örneğin, uzun item (Pillar)
+                                drawTallItem(hall, tile, image); // Uzun itemi çiz
+                        }
+                        else {
+                            drawNormalItem(hall, tile, image); // Normal itemi çiz
+                        }
                     }
 
-                    hall.getChildren().add(rect);
+                    // Rectangle rect = new Rectangle(tileSize, tileSize);
+                    // rect.setX(tile.getLeftSide()*2-10);
+                    // rect.setY(tile.getTopSide()*2-75);
+
+                    // // Tile türüne göre görselleri ayarla
+                    // Image image = Images.convertCharToImage(tile.getTileType());
+                    // if (image != null) {
+                    //     rect.setFill(new ImagePattern(image));
+                    // } else {
+                    //     rect.setFill(Color.GRAY);
+                    // }
+
+                    // hall.getChildren().add(rect);
                 }
             }
         }
 
         Random rand = new Random();
-        int randomX = rand.nextInt(9);
-        int randomY = rand.nextInt(9);
-        grid.changeTileWithIndex(randomX, randomY, 'H');
+        int randomX = rand.nextInt(9);;
+        int randomY = rand.nextInt(2,10);
         Rectangle hero = new Rectangle(64,64);
-        hero.setFill(new ImagePattern(Player_IMAGE));
-        hero.setX(randomX*64);
-        hero.setY(randomY*64);
+        hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
+        hero.setX(randomX*64+11);
+        hero.setY(randomY*64-90);
         hall.getChildren().add(hero);
         System.out.println(grid.toString());
 
@@ -89,11 +94,11 @@ public class PlayTest extends Application {
         for (int a = 0; a < 1536; a += tileSize) {
             for (int b = 0; b < 800; b += tileSize) {
                 Rectangle tideRectangle = new Rectangle(a, b, tileSize, tileSize);
-                tideRectangle.setFill(new ImagePattern(tileImage));
+                tideRectangle.setFill(new ImagePattern(Images.IMAGE_TILE_x4));
                 pane.getChildren().add(tideRectangle);
             }
         }
-        setHallPosition(hall, 98, 4);
+        setHallPosition(hall, 100,40);
         pane.getChildren().add(hall);
         //=====================================================================================//
         Scene scene = new Scene(pane, 1536, 800);
@@ -102,8 +107,14 @@ public class PlayTest extends Application {
             switch (event.getCode()) {
                 case UP, W -> upPressed = true;
                 case DOWN, S -> downPressed = true;
-                case LEFT, A -> leftPressed = true;
-                case RIGHT, D -> rightPressed = true;
+                case LEFT, A -> {
+                    leftPressed = true;
+                    hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4)); // Sol görsel
+                }
+                case RIGHT, D -> {
+                    rightPressed = true;
+                    hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4)); // Sağ görsel
+                }
             }
         });
 
@@ -132,8 +143,8 @@ public class PlayTest extends Application {
                     else if (rightPressed) newX += 64;
                     else end = 0;
                 }
-
-                if (newX >= 0 && newX + hero.getWidth() <= 640){
+                
+                if (newX >= 0 && newX + hero.getWidth() <= 700){
                     hero.setX(newX);
                 }
                 if (newY >= 0 && newY + hero.getHeight() <= 630){
@@ -156,6 +167,23 @@ public class PlayTest extends Application {
         hall.getGrid().setTopLeftXCordinate(hall.getGrid().topLeftXCoordinate + x);
         hall.getGrid().setTopLeftYCordinate(hall.getGrid().topLeftYCoordinate + y);
     }
+    private void drawTallItem(Pane hall, Tile tile, Image image) {
+    // Uzun item için iki karelik bir alan kaplayacak şekilde yerleştir
+    Rectangle tallItem = new Rectangle(tile.getLeftSide() * 2 -10, tile.getTopSide() * 2 -107, tileSize, tileSize*2);
+    tallItem.setFill(new ImagePattern(image));
+    hall.getChildren().add(tallItem);
+}
+
+// Normal itemleri tek kareye yerleştir
+private void drawNormalItem(Pane hall, Tile tile, Image image) {
+    Rectangle normalItem = new Rectangle(tile.getLeftSide() * 2-10, tile.getTopSide() * 2-43, tileSize, tileSize);
+    if (image != null) {
+        normalItem.setFill(new ImagePattern(image));
+    } else {
+        normalItem.setFill(Color.GRAY);
+    }
+    hall.getChildren().add(normalItem);
+}
     public static void main(String[] args) {
         launch(args);
     }

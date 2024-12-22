@@ -2,6 +2,7 @@ package main.model;
 
 import javafx.application.Application;
 import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 public class Images extends Application {
 	// Images that are usually used only once, these do not have a char associated with them.
@@ -115,7 +116,7 @@ public class Images extends Application {
 			case 'A' -> {
 				return IMAGE_ARCHER_X2;
 			}
-			case 'B' -> {
+			case 'E' -> {
 				return IMAGE_BOX_x2;
 			}
 			case 'C' -> {
@@ -124,8 +125,8 @@ public class Images extends Application {
 			case 'D' -> {
 				return IMAGE_BOXONBOX_x2;
 			}
-			case 'E' -> {
-				return IMAGE_TILE_x2;
+			case 'B' -> {
+				return IMAGE_BOXONBOX_x2;
 			}
 			case 'F' -> {
 				return IMAGE_FIGHTER_x2;
@@ -144,7 +145,7 @@ public class Images extends Application {
 				return IMAGE_CHESTOPEN_x2;
 			}
 			case 'L' -> {
-				return IMAGE_PLAYERLEFT_x2;
+				return IMAGE_LADDER_x2;
 			}
 			case 'M' -> {
 				return IMAGE_CHESTHEARTOPEN_x2;
@@ -183,7 +184,7 @@ public class Images extends Application {
 				return IMAGE_BOX_x4;
 			}
 			case 'c' -> {
-				return IMAGE_CHESTCLOSED_x4;
+				return IMAGE_CUBE_x4;
 			}
 			case 'd' -> {
 				return IMAGE_BOXONBOX_x4;
@@ -261,5 +262,11 @@ public class Images extends Application {
 			System.out.println(convertImageToChar(convertCharToImage(c)));
 			System.out.println("------------------------------------------");
 		}
+	}
+
+	@Override
+	public void start(Stage arg0) throws Exception {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'start'");
 	}
 }

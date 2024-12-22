@@ -201,26 +201,26 @@ public class BuildModeView extends Application {
             alert.setHeaderText("Insufficient object count.");
         
             // Check constraints for each hall
-            if (earthHall == null || earthHall.size() < 3) {
+            if (earthHall == null || earthHall.size() < 2) {
                 alert.setContentText("The earth hall must contain at least 6 objects.");
                 alert.showAndWait();
                 System.out.println(earthHall.size());
                 return;
             }
         
-            if (airHall == null || airHall.size() < 1) {
+            if (airHall == null || airHall.size() < 0) {
                 alert.setContentText("The air hall must contain at least 9 objects.");
                 alert.showAndWait();
                 return;
             }
         
-            if (waterHall == null || waterHall.size() < 1) {
+            if (waterHall == null || waterHall.size() < 0) {
                 alert.setContentText("The water hall must contain at least 13 objects.");
                 alert.showAndWait();
                 return;
             }
         
-            if (fireHall == null || fireHall.size() < 1) {
+            if (fireHall == null || fireHall.size() < 0) {
                 alert.setContentText("The fire hall must contain at least 17 objects.");
                 alert.showAndWait();
                 return;
