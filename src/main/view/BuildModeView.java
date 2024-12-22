@@ -102,10 +102,10 @@ public class BuildModeView extends Application {
         addTiledHall(hall2, HallType.AIR);
         addTiledHall(hall3, HallType.WATER);
         addTiledHall(hall4, HallType.FIRE);
-        tileMap.put(hall1, new ArrayList<Tile>());
-        tileMap.put(hall2, new ArrayList<Tile>());
-        tileMap.put(hall3, new ArrayList<Tile>());
-        tileMap.put(hall4, new ArrayList<Tile>());
+        // tileMap.put(hall1, new ArrayList<Tile>());
+        // tileMap.put(hall2, new ArrayList<Tile>());
+        // tileMap.put(hall3, new ArrayList<Tile>());
+        // tileMap.put(hall4, new ArrayList<Tile>());
 
         // Create a scene
         Scene scene = new Scene(pane, 1200, 800); // Example: Decrease width
