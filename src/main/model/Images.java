@@ -116,7 +116,7 @@ public class Images extends Application {
 			case 'A' -> {
 				return IMAGE_ARCHER_X2;
 			}
-			case 'E' -> {
+			case 'B' -> {
 				return IMAGE_BOX_x2;
 			}
 			case 'C' -> {
@@ -125,7 +125,7 @@ public class Images extends Application {
 			case 'D' -> {
 				return IMAGE_BOXONBOX_x2;
 			}
-			case 'B' -> {
+			case 'E' -> {
 				return IMAGE_BOXONBOX_x2;
 			}
 			case 'F' -> {
@@ -145,7 +145,7 @@ public class Images extends Application {
 				return IMAGE_CHESTOPEN_x2;
 			}
 			case 'L' -> {
-				return IMAGE_LADDER_x2;
+				return IMAGE_PLAYERLEFT_x2;
 			}
 			case 'M' -> {
 				return IMAGE_CHESTHEARTOPEN_x2;
