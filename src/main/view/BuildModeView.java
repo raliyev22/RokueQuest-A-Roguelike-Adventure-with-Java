@@ -277,10 +277,10 @@ public class BuildModeView extends Application {
 
         // Create draggable objects (absolute positioning)
         createDraggableObject(objectStartX, positionsY[0], Pillar_IMAGE, root, 32, 64, halls, 'P');
-        createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 32, 32, halls, 'L');
+        createDraggableObject(objectStartX, positionsY[1], Ladder_IMAGE, root, 32, 32, halls, 't');
 
         createDraggableObject(objectStartX, positionsY[2], BOX_IMAGE, root, 32, 32, halls, 'b');
-        createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 32, 64, halls, 'B');
+        createDraggableObject(objectStartX, positionsY[3], BoxOnBox_IMAGE, root, 32, 64, halls, 'd');
         createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 32, 32, halls, 'c');
         createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 32, 32, halls, 'S');
 

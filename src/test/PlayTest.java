@@ -50,7 +50,7 @@ public class PlayTest extends Application {
                     if (image != null) {
                         if (tile.getTileType() == 'P') {
                             drawTallItem(hall, tile, image);
-                        } else if (tile.getTileType() == 'B') {
+                        } else if (tile.getTileType() == 'd') {
                             drawTallItem(hall, tile, image);
                         } else {
                             drawNormalItem(hall, tile, image);
@@ -117,7 +117,7 @@ public class PlayTest extends Application {
                 double newX = hero.getX();
                 double newY = hero.getY();
                 if (System.currentTimeMillis() > end) {
-                    end = System.currentTimeMillis() + 100;
+                    end = System.currentTimeMillis() + 250;
                     if (upPressed)
                         newY -= 64;
                     else if (downPressed)
