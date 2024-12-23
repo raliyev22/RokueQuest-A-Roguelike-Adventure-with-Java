@@ -28,7 +28,9 @@ public class Images extends Application {
 	
 	public static final Image IMAGE_SMEARED = new Image("/rokue-like_assets/SmearedTile_32_32.png");
 	public static final Image IMAGE_SMEARED_x2 = new Image("/rokue-like_assets/SmearedTile_x2_64_64.png");
-	
+
+	public static final Image IMAGE_BACKGROUNDPNG = new Image("/rokue-like_assets/SmearedTile_x2_64_64.png");
+	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/SmearedTile_32_32.png");
 	
 	
 	
@@ -126,7 +128,7 @@ public class Images extends Application {
 				return IMAGE_BOXONBOX_x2;
 			}
 			case 'E' -> {
-				return IMAGE_BOXONBOX_x2;
+				return IMAGE_TILE_x2;
 			}
 			case 'F' -> {
 				return IMAGE_FIGHTER_x2;
