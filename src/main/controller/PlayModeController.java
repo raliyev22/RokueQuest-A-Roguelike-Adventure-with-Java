@@ -12,8 +12,8 @@ public class PlayModeController {
 	protected final int COLUMN = 9;
 	protected final int tileWidth = 32;
 	protected final int tileHeight = 32;
-	protected static final int topLeftXCoordinate = 10;
-	protected static final int topLeftYCoordinate = 40;
+	protected final int topLeftXCoordinate = 10;
+	protected final int topLeftYCoordinate = 40;
 	//public static final SecureRandom rng = new SecureRandom();
 	
 	protected final Grid earthHall;
@@ -175,6 +175,14 @@ public class PlayModeController {
 	
 	public Grid getPlayModeGrid() {
 		return this.playModeGrid;
+	}
+
+	public int getTopLeftXCoordinate() {
+		return this.topLeftXCoordinate;
+	}
+
+	public int getTopLeftYCoordinate() {
+		return this.topLeftYCoordinate;
 	}
 	
 	public static void main(String[] args) {
