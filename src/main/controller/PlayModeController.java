@@ -21,7 +21,7 @@ public class PlayModeController {
 	protected final Grid waterHall;
 	protected final Grid fireHall;
 	
-	protected Grid playModeGrid;
+	public Grid playModeGrid;
 	protected Hero hero;
 	protected ArrayList<Monster> monsters;
 	protected HallType hallType;
