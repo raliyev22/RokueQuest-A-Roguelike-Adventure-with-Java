@@ -83,87 +83,93 @@ public class PlayTest extends Application {
         // =====================================================================================//
         Scene scene = new Scene(pane, 1536, 800);
 
-        scene.setOnKeyPressed(event -> {
-            switch (event.getCode()) {
-                case UP, W -> upPressed = true;
-                case DOWN, S -> downPressed = true;
-                case LEFT, A -> {
-                    leftPressed = true;
-                    hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4)); // Sol görsel
-                }
-                case RIGHT, D -> {
-                    rightPressed = true;
-                    hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4)); // Sağ görsel
-                }
-            }
-        });
-
-        scene.setOnKeyReleased(event -> {
-            switch (event.getCode()) {
-                case UP, W -> upPressed = false;
-                case DOWN, S -> downPressed = false;
-                case LEFT, A -> leftPressed = false;
-                case RIGHT, D -> rightPressed = false;
-            }
-        });
-
-        AnimationTimer gameLoop = new AnimationTimer() {
-            private double targetX = hero.getX(); // Hedef X konumu
-            private double targetY = hero.getY(); // Hedef Y konumu
-            private final double speed = 5; // Kahramanın hızı (pikseller/frame)
-            private boolean isMoving = false; // Kahramanın şu anda hareket edip etmediğini takip eder
-        
-            @Override
-            public void handle(long now) {
-                // Tuş basımı sırasında hedef konumu yalnızca kahraman duruyorsa güncelle
-                if (!isMoving) {
-                    if (upPressed && hero.getY() > 40) {
-                        targetY = Math.max(hero.getY() - tileSize, 40); // Alt sınırı kontrol et
-                        isMoving = true; // Hareket başladı
-                    } else if (downPressed && hero.getY() < 615 - hero.getHeight()) {
-                        targetY = Math.min(hero.getY() + tileSize, 615 - hero.getHeight());
-                        isMoving = true;
-                    } else if (leftPressed && hero.getX() > 12) {
-                        targetX = Math.max(hero.getX() - tileSize, 12); // Sol sınırı kontrol et
-                        isMoving = true;
-                    } else if (rightPressed && hero.getX() < 650 - hero.getWidth()) {
-                        targetX = Math.min(hero.getX() + tileSize, 650 - hero.getWidth());
-                        isMoving = true;
-                    }
-                }
-        
-                // Akıcı hareket için kahramanın pozisyonunu güncelle
-                double currentX = hero.getX();
-                double currentY = hero.getY();
-        
-                if (currentX < targetX) {
-                    hero.setX(Math.min(currentX + speed, targetX));
-                } else if (currentX > targetX) {
-                    hero.setX(Math.max(currentX - speed, targetX));
-                }
-        
-                if (currentY < targetY) {
-                    hero.setY(Math.min(currentY + speed, targetY));
-                } else if (currentY > targetY) {
-                    hero.setY(Math.max(currentY - speed, targetY));
-                }
-        
-                // Kahraman hedef konumuna ulaştığında durumu sıfırla
-                if (currentX == targetX && currentY == targetY) {
-                    isMoving = false; // Hareket tamamlandı
-                }
-            }
-        };
-        
-        
-
-        gameLoop.start();
-
         primaryStage.setTitle("Play Example");
         primaryStage.setScene(scene);
         primaryStage.show();
-
+        
     }
+
+        // scene.setOnKeyPressed(event -> {
+        //     switch (event.getCode()) {
+        //         case UP, W -> upPressed = true;
+        //         case DOWN, S -> downPressed = true;
+        //         case LEFT, A -> {
+        //             leftPressed = true;
+        //             hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4)); // Sol görsel
+        //         }
+        //         case RIGHT, D -> {
+        //             rightPressed = true;
+        //             hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4)); // Sağ görsel
+        //         }
+        //     }
+        // });
+
+        // scene.setOnKeyReleased(event -> {
+        //     switch (event.getCode()) {
+        //         case UP, W -> upPressed = false;
+        //         case DOWN, S -> downPressed = false;
+        //         case LEFT, A -> leftPressed = false;
+        //         case RIGHT, D -> rightPressed = false;
+        //     }
+        // });
+
+    //     AnimationTimer gameLoop = new AnimationTimer() {
+    //         private double targetX = hero.getX(); // Hedef X konumu
+    //         private double targetY = hero.getY(); // Hedef Y konumu
+    //         private final double speed = 5; // Kahramanın hızı (pikseller/frame)
+    //         private boolean isMoving = false; // Kahramanın şu anda hareket edip etmediğini takip eder
+        
+    //         @Override
+    //         public void handle(long now) {
+    //             // Tuş basımı sırasında hedef konumu yalnızca kahraman duruyorsa güncelle
+    //             if (!isMoving) {
+    //                 if (upPressed && hero.getY() > 40) {
+    //                     targetY = Math.max(hero.getY() - tileSize, 40); // Alt sınırı kontrol et
+    //                     isMoving = true; // Hareket başladı
+    //                 } else if (downPressed && hero.getY() < 615 - hero.getHeight()) {
+    //                     targetY = Math.min(hero.getY() + tileSize, 615 - hero.getHeight());
+    //                     isMoving = true;
+    //                 } else if (leftPressed && hero.getX() > 12) {
+    //                     targetX = Math.max(hero.getX() - tileSize, 12); // Sol sınırı kontrol et
+    //                     isMoving = true;
+    //                 } else if (rightPressed && hero.getX() < 650 - hero.getWidth()) {
+    //                     targetX = Math.min(hero.getX() + tileSize, 650 - hero.getWidth());
+    //                     isMoving = true;
+    //                 }
+    //             }
+        
+    //             // Akıcı hareket için kahramanın pozisyonunu güncelle
+    //             double currentX = hero.getX();
+    //             double currentY = hero.getY();
+        
+    //             if (currentX < targetX) {
+    //                 hero.setX(Math.min(currentX + speed, targetX));
+    //             } else if (currentX > targetX) {
+    //                 hero.setX(Math.max(currentX - speed, targetX));
+    //             }
+        
+    //             if (currentY < targetY) {
+    //                 hero.setY(Math.min(currentY + speed, targetY));
+    //             } else if (currentY > targetY) {
+    //                 hero.setY(Math.max(currentY - speed, targetY));
+    //             }
+        
+    //             // Kahraman hedef konumuna ulaştığında durumu sıfırla
+    //             if (currentX == targetX && currentY == targetY) {
+    //                 isMoving = false; // Hareket tamamlandı
+    //             }
+    //         }
+    //     };
+        
+        
+
+    //     gameLoop.start();
+
+    //     primaryStage.setTitle("Play Example");
+    //     primaryStage.setScene(scene);
+    //     primaryStage.show();
+
+    // }
 
     private void setHallPosition(TiledHall hall, int x, int y) {
         hall.setLayoutX(x);
