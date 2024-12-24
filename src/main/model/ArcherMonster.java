@@ -18,15 +18,15 @@ public class ArcherMonster extends Monster {
             if(this.grid.findTileWithIndex(x+1,y).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x-1,y)){
+        }if(this.grid.indexInRange(x-1,y)){
             if(this.grid.findTileWithIndex(x-1,y).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x,y+1)){
+        }if(this.grid.indexInRange(x,y+1)){
             if(this.grid.findTileWithIndex(x,y+1).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x,y-1)){
+        }if(this.grid.indexInRange(x,y-1)){
             if(this.grid.findTileWithIndex(x,y-1).getTileType() == 'E'){
                 existMovement = true;
             }
