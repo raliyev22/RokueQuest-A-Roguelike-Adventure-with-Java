@@ -27,42 +27,41 @@ public class PlayTest extends Application {
     public void start(Stage primaryStage) {
         // THESE CODES FOR ONLY TEST PURPOSES, WHEN BUILDMODE IS AVAILABLE IT IS GOING
         // TO BE PULLED FROM THAT//
-        TiledHall hall = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),2);
+        TiledHall hall = new TiledHall(20, 15, new Grid(10, 9, 64, 64, 10, 40),2);
         // Create a pane
         Pane pane = new Pane();
         Grid grid = hall.getGrid();
         HashMap<TiledHall, List<Tile>> tileMap = BuildModeView.sharedTileMap;
-        if (tileMap != null && !tileMap.isEmpty()) {
-            TiledHall earthHall = null;
+        // if (tileMap != null && !tileMap.isEmpty()) {
+        //     TiledHall earthHall = null;
 
-            for (TiledHall h : BuildModeView.hallTypeMap.keySet()) {
-                if (BuildModeView.hallTypeMap.get(h) == HallType.EARTH) {
-                    earthHall = h;
-                    break;
-                }
-            }
+        //     for (TiledHall h : BuildModeView.hallTypeMap.keySet()) {
+        //         if (BuildModeView.hallTypeMap.get(h) == HallType.EARTH) {
+        //             earthHall = h;
+        //             break;
+        //         }
+        //     }
 
-            if (earthHall != null) {
-                List<Tile> tiles = BuildModeView.sharedTileMap.get(earthHall);
-                for (Tile tile : tiles) {
-                    Image image = Images.convertCharToImage(tile.getTileType());
+        //     if (earthHall != null) {
+        //         List<Tile> tiles = BuildModeView.sharedTileMap.get(earthHall);
+        //         for (Tile tile : tiles) {
+        //             Image image = Images.convertCharToImage(tile.getTileType());
 
-                    if (image != null) {
-                        if (tile.getTileType() == 'P') {
-                            drawTallItem(hall, tile, image);
-                        } else if (tile.getTileType() == 'd') {
-                            drawTallItem(hall, tile, image);
-                        } else {
-                            drawNormalItem(hall, tile, image);
-                        }
-                    }
-                }
-            }
-        }
+        //             if (image != null) {
+        //                 if (tile.getTileType() == 'P') {
+        //                     drawTallItem(hall, tile, image);
+        //                 } else if (tile.getTileType() == 'd') {
+        //                     drawTallItem(hall, tile, image);
+        //                 } else {
+        //                     drawNormalItem(hall, tile, image);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         Random rand = new Random();
         int randomX = rand.nextInt(9);
-        ;
         int randomY = rand.nextInt(2, 10);
         Rectangle hero = new Rectangle(64, 64);
         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
@@ -109,35 +108,54 @@ public class PlayTest extends Application {
         });
 
         AnimationTimer gameLoop = new AnimationTimer() {
-
-            long start = System.currentTimeMillis();
-            long end = start + 500;
-
+            private double targetX = hero.getX(); // Hedef X konumu
+            private double targetY = hero.getY(); // Hedef Y konumu
+            private final double speed = 5; // Kahramanın hızı (pikseller/frame)
+            private boolean isMoving = false; // Kahramanın şu anda hareket edip etmediğini takip eder
+        
+            @Override
             public void handle(long now) {
-                double newX = hero.getX();
-                double newY = hero.getY();
-                if (System.currentTimeMillis() > end) {
-                    end = System.currentTimeMillis() + 250;
-                    if (upPressed)
-                        newY -= 64;
-                    else if (downPressed)
-                        newY += 64;
-                    else if (leftPressed)
-                        newX -= 64;
-                    else if (rightPressed)
-                        newX += 64;
-                    else
-                        end = 0;
+                // Tuş basımı sırasında hedef konumu yalnızca kahraman duruyorsa güncelle
+                if (!isMoving) {
+                    if (upPressed && hero.getY() > 40) {
+                        targetY = Math.max(hero.getY() - tileSize, 40); // Alt sınırı kontrol et
+                        isMoving = true; // Hareket başladı
+                    } else if (downPressed && hero.getY() < 615 - hero.getHeight()) {
+                        targetY = Math.min(hero.getY() + tileSize, 615 - hero.getHeight());
+                        isMoving = true;
+                    } else if (leftPressed && hero.getX() > 12) {
+                        targetX = Math.max(hero.getX() - tileSize, 12); // Sol sınırı kontrol et
+                        isMoving = true;
+                    } else if (rightPressed && hero.getX() < 650 - hero.getWidth()) {
+                        targetX = Math.min(hero.getX() + tileSize, 650 - hero.getWidth());
+                        isMoving = true;
+                    }
                 }
-
-                if (newX >= 0 && newX + hero.getWidth() <= 700) {
-                    hero.setX(newX);
+        
+                // Akıcı hareket için kahramanın pozisyonunu güncelle
+                double currentX = hero.getX();
+                double currentY = hero.getY();
+        
+                if (currentX < targetX) {
+                    hero.setX(Math.min(currentX + speed, targetX));
+                } else if (currentX > targetX) {
+                    hero.setX(Math.max(currentX - speed, targetX));
                 }
-                if (newY >= 0 && newY + hero.getHeight() <= 630) {
-                    hero.setY(newY);
+        
+                if (currentY < targetY) {
+                    hero.setY(Math.min(currentY + speed, targetY));
+                } else if (currentY > targetY) {
+                    hero.setY(Math.max(currentY - speed, targetY));
+                }
+        
+                // Kahraman hedef konumuna ulaştığında durumu sıfırla
+                if (currentX == targetX && currentY == targetY) {
+                    isMoving = false; // Hareket tamamlandı
                 }
             }
         };
+        
+        
 
         gameLoop.start();
 
