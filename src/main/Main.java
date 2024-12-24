@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.view.BuildModeView;
+import main.view.CustomAlertView;
 import main.view.HelpView;
 
 public class Main extends Application {
@@ -41,7 +42,7 @@ public class Main extends Application {
         // Button Actions
         startButton.setOnAction(e -> startNewGame(primaryStage));
         helpButton.setOnAction(e -> showHelp(primaryStage));
-        exitButton.setOnAction(e -> primaryStage.close());
+        exitButton.setOnAction(e -> showExitConfirmation(primaryStage));
 
         // Add elements to VBox
         mainMenu.getChildren().addAll(title, startButton, helpButton, exitButton);
@@ -165,4 +166,15 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
+    private void showExitConfirmation(Stage primaryStage) {
+        CustomAlertView.showAlert(
+            primaryStage,
+            "Exit Confirmation",
+            "Are you sure you want to exit the game?"
+        );
+        // Add logic for handling OK button action inside `CustomAlertView` if needed
+        CustomAlertView.showAlert(primaryStage, "Exit Confirmation", "Are you sure you want to exit?");
+        // Handle the OK button click inside CustomAlertView to close the application.
+    }
+
 }
