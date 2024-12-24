@@ -18,7 +18,8 @@ import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 
 import javafx.scene.input.KeyCode;
@@ -180,9 +181,15 @@ public class BuildModeView extends Application {
 
         exitButton.setOnMouseClicked(event -> {
             Main mainPage = new Main();
+            javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
+        
+            // Set up the main stage in the center of the screen
+            primaryStage.setX((screenBounds1.getWidth() - 600) / 2); // Replace 600 with the width of the mainPage scene
+            primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
+        
             mainPage.start(primaryStage);
-            
         });
+        
 
         // Center the button horizontally under the toolbox
         button.setLayoutX(toolboxX + (toolboxWidth / 2) - 50); // 50 is half the button's width (assuming 100px button width)
@@ -195,46 +202,75 @@ public class BuildModeView extends Application {
             List<Tile> airHall = tileMap.get(hall2);
             List<Tile> waterHall = tileMap.get(hall3);
             List<Tile> fireHall = tileMap.get(hall4);
-
-            Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Warning!!!");
-            alert.setHeaderText("Insufficient object count.");
         
-            // Check constraints for each hall
-            if (earthHall == null || earthHall.size() < 2) {
-                alert.setContentText("The earth hall must contain at least 6 objects.");
-                alert.showAndWait();
-                System.out.println(earthHall.size());
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Build Mode Validation");
+            alert.setHeaderText("⚠️ Object Count Validation Failed");
+        
+            StringBuilder message = new StringBuilder();
+            boolean hasError = false;
+        
+            if (earthHall == null || earthHall.size() < 6) {
+                message.append("❌ Earth Hall: Requires at least 6 objects.\n");
+                hasError = true;
+            }
+            if (airHall == null || airHall.size() < 9) {
+                message.append("❌ Air Hall: Requires at least 9 objects.\n");
+                hasError = true;
+            }
+            if (waterHall == null || waterHall.size() < 13) {
+                message.append("❌ Water Hall: Requires at least 13 objects.\n");
+                hasError = true;
+            }
+            if (fireHall == null || fireHall.size() < 17) {
+                message.append("❌ Fire Hall: Requires at least 17 objects.\n");
+                hasError = true;
+            }
+        
+            if (!hasError) {
+                BuildModeView.sharedTileMap.putAll(tileMap);
+                PlayTest playTest = new PlayTest();
+                playTest.start(primaryStage);
                 return;
             }
         
-            if (airHall == null || airHall.size() < 0) {
-                alert.setContentText("The air hall must contain at least 9 objects.");
-                alert.showAndWait();
-                return;
-            }
+            alert.setContentText(message.toString());
         
-            if (waterHall == null || waterHall.size() < 0) {
-                alert.setContentText("The water hall must contain at least 13 objects.");
-                alert.showAndWait();
-                return;
-            }
-        
-            if (fireHall == null || fireHall.size() < 0) {
-                alert.setContentText("The fire hall must contain at least 17 objects.");
-                alert.showAndWait();
-                return;
-            }
+            // Custom styling for the dialog
+            // Custom styling for the dialog
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.setStyle(
+            "-fx-background-color: #352645; " + // Match BuildModeView purple
+            "-fx-border-color: #FFFFFF; " +     // Optional border for definition
+            "-fx-border-width: 2px;"
+        );
+
+        dialogPane.lookup(".header-panel").setStyle(
+            "-fx-background-color: #5A3E77; " + // Match a secondary color (or same as main)
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-text-fill: white; " +
+            "-fx-padding: 10px;"
+        );
+
+        dialogPane.lookup(".content").setStyle(
+            "-fx-font-size: 14px; " +
+            "-fx-text-fill: #FFD700; " + // Gold for better visibility
+            "-fx-padding: 10px;"
+        );
+
+        dialogPane.lookupButton(ButtonType.OK).setStyle(
+            "-fx-background-color: #5A3E77; " + // Match BuildModeView button color
+            "-fx-text-fill: white; " +
+            "-fx-font-size: 14px; " +
+            "-fx-padding: 5px 10px; " +
+            "-fx-background-radius: 5px;"
+        );
 
         
-            BuildModeView.sharedTileMap.putAll(tileMap);
-            PlayTest playTest = new PlayTest();
-            playTest.start(primaryStage);
-            //transition to play mode
-
-
+            alert.showAndWait();
         });
-
+        
 
         //Hide the rune in one of the objects for each hall
         scene.setOnKeyPressed(event -> {
