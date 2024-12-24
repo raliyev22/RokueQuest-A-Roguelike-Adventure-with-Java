@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.Main;
@@ -86,23 +87,37 @@ public class HelpView extends Application {
 
         // Title
         Text title = new Text(titleText);
-        title.setFont(Font.font("Verdana", 30));
+        title.setFont(Font.font("Verdana", 28));
         title.setFill(Color.GOLD);
         addTitleAnimation(title);
 
+        // Content background
+        VBox contentBox = new VBox();
+        contentBox.setStyle(
+            "-fx-background-color: rgba(0, 0, 0, 0.7); " + // Semi-transparent black
+            "-fx-padding: 20px; " +
+            "-fx-border-color: #FFFFFF; " +
+            "-fx-border-width: 2px; " +
+            "-fx-border-radius: 10; " +
+            "-fx-background-radius: 10;"
+        );
+        contentBox.setAlignment(Pos.CENTER);
+
         // Content text
         Text content = new Text(contentText);
-        content.setFont(Font.font("Arial", 16));
-        content.setFill(Color.WHITE);
+        content.setFont(Font.font("Verdana", 16));
+        content.setFill(Color.LIGHTYELLOW);
+        content.setTextAlignment(TextAlignment.LEFT);
         content.setWrappingWidth(500);
+
+        contentBox.getChildren().add(content);
 
         // Back button
         Button backButton = createStyledButton("Back to Help Menu", this::showMainHelpMenu);
 
-        // VBox layout
-        VBox layout = new VBox(20, title, content, backButton);
+        // Layout
+        VBox layout = new VBox(20, title, contentBox, backButton);
         layout.setAlignment(Pos.CENTER);
-
         root.getChildren().add(layout);
 
         // Scene
@@ -110,6 +125,7 @@ public class HelpView extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
+
 
     private Button createStyledButton(String text, Runnable action) {
         Button button = new Button(text);
