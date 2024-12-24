@@ -1,17 +1,18 @@
 package main.view;
 
-import java.awt.Image;
 import java.util.ArrayList;
+
+import javafx.scene.image.Image;
 import main.model.*;
 import main.utils.*;
 
 public class PlayModeController {
-    protected final int ROW = 8;
-    protected final int COLUMN = 8;
-    protected final int tileWidth = 10;
-    protected final int tileHeight = 10;
-    protected final int bottomLeftXCoordinate = 15;
-    protected final int bottomLeftYCoordinate = 15;
+    protected final int ROW = 10;
+    protected final int COLUMN = 9;
+    protected final int tileWidth = 32;
+    protected final int tileHeight = 32;
+    protected static final int topLeftXCoordinate = 10;
+    protected static final int topLeftYCoordinate = 40;
 	//public static final SecureRandom rng = new SecureRandom();
 
 	protected static Grid earthHall;
@@ -22,14 +23,19 @@ public class PlayModeController {
     protected Grid playModeGrid;
     protected Hero player;
     protected ArrayList<Monster> monsters;
+	protected HallType hallType;
+
     protected int time;
+	
 
 
     public PlayModeController() {
-        playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+        playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
+		hallType = HallType.EARTH;
 		playModeGrid.copyTileMap(earthHall);
 
-        player = initializeHero(2, 4, 10, null);
+
+        player = initializeHero(2, 4, tileHeight, Images.IMAGE_PLAYERRIGHT_x4);
         monsters = new ArrayList<>();
     }
     
@@ -53,12 +59,12 @@ public class PlayModeController {
             }
         }
         monsters.add(monster);
-        playModeGrid.changeTileWithIndex(monster.getX(),monster.getY(),monster.getCharType());
+        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
         return monster;
     }
     
     public Grid updateGrid() {
-        this.playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, bottomLeftXCoordinate, bottomLeftYCoordinate);
+        this.playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
         for (Monster monster : monsters) {
             this.playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
         }
