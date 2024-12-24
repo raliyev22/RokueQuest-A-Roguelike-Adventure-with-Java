@@ -71,6 +71,16 @@ public class PlayModeController {
 		playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
 		return monster;
 	}
+
+	public boolean isNearHero(Tile otherTile, int n) {
+		int otherTileX = playModeGrid.findXofTile(otherTile);
+		int otherTileY = playModeGrid.findYofTile(otherTile);
+		double euclideanDistance = 
+		Math.sqrt((hero.getPosX() - otherTileX) * (hero.getPosX() - otherTileX) + 
+				  (hero.getPosY() - otherTileY) * (hero.getPosY() - otherTileY));
+
+		return (euclideanDistance <= n);
+	}
 	
 	public Tile getRandomEmptyTile() {
 		SecureRandom rng = new SecureRandom();
@@ -171,11 +181,16 @@ public class PlayModeController {
 		PlayModeController playGrid = new PlayModeController(null,null,null,null);
 		Hero hero = playGrid.hero;
 		System.out.println(playGrid.playModeGrid.toString());
-		System.out.println(playGrid.checkHeroDirection(Directions.NORTH));
 		/*
 		playGrid.updateGrid();
 		System.out.println(playGrid.playModeGrid.toString());
 		*/
+		Tile tile = playGrid.getRandomEmptyTile();
+		System.out.println(hero.getPosX());
+		System.out.println(hero.getPosY());
+		System.out.println(playGrid.playModeGrid.findXofTile(tile));
+		System.out.println(playGrid.playModeGrid.findYofTile(tile));
+		System.out.println(playGrid.isNearHero(tile, 4));
 	}
 }
 
