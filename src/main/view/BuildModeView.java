@@ -58,6 +58,8 @@ public class BuildModeView extends Application {
     public static HashMap<TiledHall, List<Tile>> sharedTileMap = new HashMap<>();
     public static HashMap<TiledHall, HallType> hallTypeMap = new HashMap<>(); // Yeni ekleme
 
+    private List<TiledHall> halls;
+
     public void start(Stage primaryStage) {
 
         // Create a pane
@@ -78,7 +80,7 @@ public class BuildModeView extends Application {
         TiledHall hall3 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
         TiledHall hall4 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
 
-        ArrayList<TiledHall> halls = new ArrayList<>();
+        halls = new ArrayList<>();
         halls.add(hall1);
         halls.add(hall2);
         halls.add(hall3);
@@ -210,27 +212,30 @@ public class BuildModeView extends Application {
             StringBuilder message = new StringBuilder();
             boolean hasError = false;
         
-            if (earthHall == null || earthHall.size() < 6) {
+            if (earthHall == null || earthHall.size() < 2) {
                 message.append("❌ Earth Hall: Requires at least 6 objects.\n");
                 hasError = true;
             }
-            if (airHall == null || airHall.size() < 9) {
+            if (airHall == null || airHall.size() < 2) {
                 message.append("❌ Air Hall: Requires at least 9 objects.\n");
                 hasError = true;
             }
-            if (waterHall == null || waterHall.size() < 13) {
+            if (waterHall == null || waterHall.size() < 2) {
                 message.append("❌ Water Hall: Requires at least 13 objects.\n");
                 hasError = true;
             }
-            if (fireHall == null || fireHall.size() < 17) {
+            if (fireHall == null || fireHall.size() < 2) {
                 message.append("❌ Fire Hall: Requires at least 17 objects.\n");
                 hasError = true;
             }
         
             if (!hasError) {
-                BuildModeView.sharedTileMap.putAll(tileMap);
-                PlayTest playTest = new PlayTest();
-                playTest.start(primaryStage);
+                // BuildModeView.sharedTileMap.putAll(tileMap);
+                // PlayTest playTest = new PlayTest();
+                // playTest.start(primaryStage);
+                // return;
+                PlayModeView2 view = new PlayModeView2(halls);
+                view.start(primaryStage);
                 return;
             }
         

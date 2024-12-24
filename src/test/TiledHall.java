@@ -149,7 +149,7 @@ public class TiledHall extends Pane {
                 default:
                     break;
             }
-            Rectangle tileRect = new Rectangle(tile.getLeftSide(), tile.getTopSide(), 32, 32);
+            Rectangle tileRect = new Rectangle(tile.getLeftSide(), tile.getTopSide()-1, 32, 34);
             tileRect.setFill(new ImagePattern(image)); // Assign tile image
             getChildren().add(tileRect);
         }
