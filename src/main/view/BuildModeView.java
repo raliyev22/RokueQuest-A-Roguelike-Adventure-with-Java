@@ -65,7 +65,7 @@ public class BuildModeView extends Application {
         // Create a pane
         Pane pane = new Pane();
 
-        // Create the background grid
+        //Create the background grid
         for (int a = 0; a < 1200; a += tileSize) {
             for (int b = 0; b < 800; b += tileSize) {
                 Rectangle tideRectangle = new Rectangle(a, b, tileSize, tileSize);
@@ -75,10 +75,10 @@ public class BuildModeView extends Application {
         }
 
         // Create 4 TiledHall instances with specific sizes
-        TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
-        TiledHall hall2 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
-        TiledHall hall3 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
-        TiledHall hall4 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40));
+        TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
+        TiledHall hall2 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
+        TiledHall hall3 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
+        TiledHall hall4 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
 
         halls = new ArrayList<>();
         halls.add(hall1);
@@ -96,6 +96,7 @@ public class BuildModeView extends Application {
 
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2, hall3, hall4);
+        //pane.getChildren().add(hall1);
 
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
@@ -230,13 +231,13 @@ public class BuildModeView extends Application {
             }
         
             if (!hasError) {
-                // BuildModeView.sharedTileMap.putAll(tileMap);
-                // PlayTest playTest = new PlayTest();
-                // playTest.start(primaryStage);
-                // return;
-                PlayModeView2 view = new PlayModeView2(halls);
-                view.start(primaryStage);
+                BuildModeView.sharedTileMap.putAll(tileMap);
+                PlayTest playTest = new PlayTest();
+                playTest.start(primaryStage);
                 return;
+                // PlayModeView2 view = new PlayModeView2(halls);
+                // view.start(primaryStage);
+                // return;
             }
         
             alert.setContentText(message.toString());

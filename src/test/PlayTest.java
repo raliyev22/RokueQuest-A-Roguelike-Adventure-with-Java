@@ -27,7 +27,7 @@ public class PlayTest extends Application {
     public void start(Stage primaryStage) {
         // THESE CODES FOR ONLY TEST PURPOSES, WHEN BUILDMODE IS AVAILABLE IT IS GOING
         // TO BE PULLED FROM THAT//
-        TiledHall hall = new TiledHall(20, 15, new Grid(10, 9, 64, 64, 10, 40));
+        TiledHall hall = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),2);
         // Create a pane
         Pane pane = new Pane();
         Grid grid = hall.getGrid();
