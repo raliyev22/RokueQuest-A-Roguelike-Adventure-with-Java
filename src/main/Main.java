@@ -17,6 +17,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.view.BuildModeView;
+import main.view.HelpView;
 
 public class Main extends Application {
     @Override
@@ -39,7 +40,7 @@ public class Main extends Application {
 
         // Button Actions
         startButton.setOnAction(e -> startNewGame(primaryStage));
-        helpButton.setOnAction(e -> showHelp());
+        helpButton.setOnAction(e -> showHelp(primaryStage));
         exitButton.setOnAction(e -> primaryStage.close());
 
         // Add elements to VBox
@@ -155,12 +156,10 @@ public class Main extends Application {
         buildModeView.start(primaryStage);
     }
 
-    private void showHelp() {
+    private void showHelp(Stage primaryStage) {
         // Show Help Window
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, "This is a help message explaining how to play the game.", ButtonType.OK);
-        alert.setHeaderText("Help");
-        alert.setTitle("Help");
-        alert.showAndWait();
+        HelpView helpMenuView = new HelpView();
+        helpMenuView.start(primaryStage);
     }
 
     public static void main(String[] args) {
