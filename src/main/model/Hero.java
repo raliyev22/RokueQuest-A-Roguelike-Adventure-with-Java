@@ -20,14 +20,24 @@ public class Hero {
 		this.isTakingDamage = false;
 		this.facingDirection = Directions.EAST;
 	}
+
+	public Hero(int posX, int posY) {
+		this.posX = posX;
+		this.posY = posY;
+		this.img = null;
+		this.remainingLives = 4;
+		this.isMoving = false;
+		this.isTakingDamage = false;
+		this.facingDirection = Directions.EAST;
+	}
 	
 	public void move(Directions direction) {
 		switch (direction) {
 			case Directions.NORTH -> {
-				posY++;
+				posY--;
 			}
 			case Directions.SOUTH -> {
-				posY--;
+				posY++;
 			}
 			case Directions.EAST -> {
 				posX++;

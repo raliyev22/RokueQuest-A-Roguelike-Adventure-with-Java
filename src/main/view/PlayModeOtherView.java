@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.model.Images;
 import main.model.MonsterType;
+import main.utils.Grid;
 import main.utils.Tile;
 import test.TiledHall;
 
@@ -28,7 +29,8 @@ public class PlayModeOtherView extends Application {
 	
 	protected TiledHall hall = null;
 	
-	protected PlayModeController playModeController = new PlayModeController();
+	protected PlayModeController playModeController = 
+	new PlayModeController(Grid earthHall, Grid airHall, Grid waterHall, Grid fireHall);
 	
 	public void start(Stage primaryStage) {
 		Pane pane = new Pane();
@@ -46,9 +48,14 @@ public class PlayModeOtherView extends Application {
 		pane.getChildren().add(hall);
 		drawHall();
 		System.out.println(playModeController.getPlayModeGrid());
+		playModeController.getPlayModeGrid().changeTileWithIndex(2, 4, 'E');
 		playModeController.createMonster(5, 8, MonsterType.WIZARD);
 		drawHall();
 		System.out.println(playModeController.getPlayModeGrid());
+	}
+
+	private boolean isWalkable(char c) {
+
 	}
 
 	private void drawEmptyHall() {
