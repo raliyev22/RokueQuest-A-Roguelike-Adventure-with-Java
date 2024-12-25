@@ -218,15 +218,15 @@ public class BuildModeView extends Application {
                 message.append("❌ Earth Hall: Requires at least 6 objects.\n");
                 hasError = true;
             }
-            if (airHall == null || airHall.size() < 2) {
+            if (airHall == null || airHall.size() < 0) {
                 message.append("❌ Air Hall: Requires at least 9 objects.\n");
                 hasError = true;
             }
-            if (waterHall == null || waterHall.size() < 2) {
+            if (waterHall == null || waterHall.size() < 0) {
                 message.append("❌ Water Hall: Requires at least 13 objects.\n");
                 hasError = true;
             }
-            if (fireHall == null || fireHall.size() < 2) {
+            if (fireHall == null || fireHall.size() < 0) {
                 message.append("❌ Fire Hall: Requires at least 17 objects.\n");
                 hasError = true;
             }
@@ -240,6 +240,7 @@ public class BuildModeView extends Application {
                 PlayModeController playModeController = new PlayModeController();
 				Stage newStage = new Stage();
                 playModeController.start(newStage);
+                primaryStage.close();
                 return;
                 // PlayModeView2 view = new PlayModeView2(halls);
                 // view.start(primaryStage);

@@ -111,20 +111,25 @@ public class PlayModeController extends Application {
 		primaryStage.setFullScreen(true);
 		primaryStage.setFullScreenExitHint("");
 		primaryStage.show();
+
 		startGameLoop();
 	}
 	
 	private void initialize(Scene scene) {
 		scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
+		scene.getRoot().requestFocus();
 		scene.setOnKeyReleased(event -> handleKeyReleased(event.getCode()));
+		scene.getRoot().requestFocus();
 		scene.setOnMouseClicked(event -> {
 			mouseClicked = true;
 			mouseX = event.getX();
 			mouseY = event.getY();
 		});
-	}
+        scene.getRoot().requestFocus();
+    }
 	
 	private void handleKeyPressed(KeyCode code) {
+        System.out.println("Key Pressed: " + code); // Debugging statement
 		switch (code) {
 			case UP, W -> upPressed = true;
 			case DOWN, S -> downPressed = true;
@@ -333,7 +338,7 @@ public class PlayModeController extends Application {
 	
 	public static boolean isHallObjectTileType(char c) {
 		if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
-		|| c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
+		|| c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T' || c == 'X'){
 			return true;
 		}
 		return false;
@@ -375,7 +380,7 @@ public class PlayModeController extends Application {
 	}
 	
 	public static boolean isWalkableTileType(char c) {
-		if (c == 'E' || c == 'e') {
+		if (c == 'E' || c == 'e' || c == 'X') {
 			return true;
 		}
 		return false;
@@ -450,40 +455,40 @@ public class PlayModeController extends Application {
 	}
 	
 	public static void main(String[] args) {
-		/* 
-		Grid earthHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		earthHall1.changeTileWithIndex(5, 5, 'P');
-		earthHall1.changeTileWithIndex(0, 5, 'B');
-		earthHall1.changeTileWithIndex(0, 0, 'B');
-		earthHall1.changeTileWithIndex(0, 8, 'B');
-		earthHall1.changeTileWithIndex(7, 7, 'B');
-		PlayModeController.earthHall = earthHall1;
+
+		// Grid earthHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		// earthHall1.changeTileWithIndex(5, 5, 'P');
+		// earthHall1.changeTileWithIndex(0, 5, 'B');
+		// earthHall1.changeTileWithIndex(0, 0, 'B');
+		// earthHall1.changeTileWithIndex(0, 8, 'B');
+		// earthHall1.changeTileWithIndex(7, 7, 'B');
+		// PlayModeController.earthHall = earthHall1;
 		
-		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		airHall1.changeTileWithIndex(3, 5, 'H');
-		airHall1.changeTileWithIndex(2, 5, 'B');
-		airHall1.changeTileWithIndex(5, 6, 'S');
-		airHall1.changeTileWithIndex(0, 8, 'T');
-		airHall1.changeTileWithIndex(7, 2, 'D');
-		PlayModeController.airHall = airHall1;
+		// Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		// airHall1.changeTileWithIndex(3, 5, 'H');
+		// airHall1.changeTileWithIndex(2, 5, 'B');
+		// airHall1.changeTileWithIndex(5, 6, 'S');
+		// airHall1.changeTileWithIndex(0, 8, 'T');
+		// airHall1.changeTileWithIndex(7, 2, 'D');
+		// PlayModeController.airHall = airHall1;
 		
-		Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		waterHall1.changeTileWithIndex(2, 5, 'T');
-		waterHall1.changeTileWithIndex(0, 5, 'B');
-		waterHall1.changeTileWithIndex(2, 3, 'J');
-		waterHall1.changeTileWithIndex(0, 8, 'S');
-		waterHall1.changeTileWithIndex(7, 7, 'B');
-		PlayModeController.waterHall = waterHall1;
+		// Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		// waterHall1.changeTileWithIndex(2, 5, 'T');
+		// waterHall1.changeTileWithIndex(0, 5, 'B');
+		// waterHall1.changeTileWithIndex(2, 3, 'J');
+		// waterHall1.changeTileWithIndex(0, 8, 'S');
+		// waterHall1.changeTileWithIndex(7, 7, 'B');
+		// PlayModeController.waterHall = waterHall1;
 		
 		
-		Grid fireHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		fireHall1.changeTileWithIndex(2, 5, 'H');
-		fireHall1.changeTileWithIndex(0, 5, 'B');
-		fireHall1.changeTileWithIndex(9, 0, 'S');
-		fireHall1.changeTileWithIndex(7, 8, 'T');
-		fireHall1.changeTileWithIndex(7, 7, 'D');
-		PlayModeController.fireHall = fireHall1;
-		*/
+		// Grid fireHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		// fireHall1.changeTileWithIndex(2, 5, 'H');
+		// fireHall1.changeTileWithIndex(0, 5, 'B');
+		// fireHall1.changeTileWithIndex(9, 0, 'S');
+		// fireHall1.changeTileWithIndex(7, 8, 'T');
+		// fireHall1.changeTileWithIndex(7, 7, 'D');
+		// PlayModeController.fireHall = fireHall1;
+
 		launch(args);
 	}
 	
