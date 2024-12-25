@@ -245,17 +245,10 @@ public class Images extends Application {
 	}
 
 	private boolean isHallObject(char c) {
-		if (c == 'B' 
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'
-		 || c == 'C'){
+		if (c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'G' || c == 'H'
+		 || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
 			return true;
-		}
+		 }
 		return false;
 	}
 	
