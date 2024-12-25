@@ -78,7 +78,6 @@ public class PlayModeController extends Application {
 	private void initialize(Scene scene) {
 		scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
 		scene.setOnKeyReleased(event -> handleKeyReleased(event.getCode()));
-		scene.setOnMousePressed(event -> handleMouseClicked(event.getCode()));
 	}
 	
 	private void handleKeyPressed(KeyCode code) {
@@ -178,12 +177,8 @@ public class PlayModeController extends Application {
 						movingDirection = null;
 					}
 				}
-		
 			}
 		};
-
-
-
 		gameLoop.start();
 	}
 	
@@ -283,6 +278,7 @@ public class PlayModeController extends Application {
 				hallObjectTiles.add(tile);
 			}
 		}
+		System.out.println(hallObjectTiles);
 		
 		return hallObjectTiles;
 	}
@@ -393,30 +389,6 @@ public class PlayModeController extends Application {
 		earthHall1.changeTileWithIndex(0, 8, 'B');
 		earthHall1.changeTileWithIndex(7, 7, 'B');
 		PlayModeController.earthHall = earthHall1;
-
-		Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		waterHall1.changeTileWithIndex(2, 5, 'T');
-		waterHall1.changeTileWithIndex(0, 5, 'B');
-		waterHall1.changeTileWithIndex(2, 3, 'J');
-		waterHall1.changeTileWithIndex(0, 8, 'S');
-		waterHall1.changeTileWithIndex(7, 7, 'B');
-		PlayModeController.waterHall = waterHall1;
-
-		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		airHall1.changeTileWithIndex(5, 5, 'H');
-		airHall1.changeTileWithIndex(0, 5, 'B');
-		airHall1.changeTileWithIndex(0, 0, 'S');
-		airHall1.changeTileWithIndex(0, 8, 'T');
-		airHall1.changeTileWithIndex(7, 7, 'D');
-		PlayModeController.airHall = airHall1;
-
-		Grid fireHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		fireHall1.changeTileWithIndex(2, 5, 'H');
-		fireHall1.changeTileWithIndex(0, 5, 'B');
-		fireHall1.changeTileWithIndex(9, 0, 'S');
-		fireHall1.changeTileWithIndex(7, 8, 'T');
-		fireHall1.changeTileWithIndex(7, 7, 'D');
-		PlayModeController.fireHall = fireHall1;
 		
 		launch(args);
 	}
