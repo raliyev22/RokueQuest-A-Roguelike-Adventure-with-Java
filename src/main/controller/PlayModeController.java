@@ -223,6 +223,7 @@ public class PlayModeController extends Application {
 						if (checkRune(clickedTile)) {
 							System.out.println("found rune");
 							initialized = false;
+							isMoving = false;
 							initializePlayMode();
 						}
 					}
