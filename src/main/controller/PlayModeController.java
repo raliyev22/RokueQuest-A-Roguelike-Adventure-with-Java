@@ -72,11 +72,8 @@ public class PlayModeController extends Application {
 				playModeGrid.copyTileMap(fireHall);
 			}
 			default -> {
-				Stage primaryStage = (Stage) view.getScene().getWindow();
-				GameOverView gameOverView = new GameOverView(primaryStage);
-				primaryStage.setScene(gameOverView.getScene());
-				//this.hallType = HallType.EARTH;
-				//playModeGrid.copyTileMap(earthHall);
+				this.hallType = HallType.EARTH;
+				playModeGrid.copyTileMap(earthHall);
 			}
 		}
 		
