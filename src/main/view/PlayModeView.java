@@ -41,9 +41,19 @@ public class PlayModeView {
 		heroView = new Rectangle(64,64);
 		initialize();
 	}
+
+	public void refresh(Grid newGrid) {
+		this.grid = newGrid;
+
+		pane.getChildren().clear();
+		initialize();
+	}
 	
-	private void initialize() {
-        scene = new Scene(pane);
+
+	public void initialize() {
+		if (scene == null) {
+			scene = new Scene(pane);
+		}
 		
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
