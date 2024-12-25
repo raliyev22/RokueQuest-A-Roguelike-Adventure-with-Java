@@ -56,7 +56,7 @@ public class PlayModeController extends Application{
     }
 
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(view.getPane(), 1536, 800);
+        Scene scene = new Scene(view.getPane(), 1400, 800);
         initialize(scene);
 
         primaryStage.setTitle("Play Example");
