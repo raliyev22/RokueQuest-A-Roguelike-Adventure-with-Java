@@ -6,6 +6,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import main.model.*;
@@ -56,12 +57,16 @@ public class PlayModeController extends Application{
     }
 
     public void start(Stage primaryStage) {
-        Scene scene = new Scene(view.getPane(), 1536, 800);
+        scene = view.getScene();
         initialize(scene);
 
         primaryStage.setTitle("Play Example");
         primaryStage.setScene(scene);
-        primaryStage.show();
+
+        primaryStage.setFullScreen(true); 
+        primaryStage.setFullScreenExitHint(""); 
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+
         startGameLoop();
     }
     
