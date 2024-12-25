@@ -14,50 +14,50 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class PlayModeView {
-    protected Pane pane;
-	public Scene scene;
-    protected int tileSize = 64;
-    protected Grid grid;
-    protected Rectangle heroView;
+	protected Pane pane;
+	protected Scene scene;
+	protected int tileSize = 64;
+	protected Grid grid;
+	protected Rectangle heroView;
 	protected final int SCENE_WIDTH = 1400;
 	protected final int SCENE_HEIGHT = 800;
-
+	
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
-
-    public PlayModeView(Grid grid) {
-        this.grid = grid;
-        this.pane = new Pane();
-        heroView = new Rectangle(64,64);
-        initialize();
-    }
-
-    private void initialize() {
-        scene = new Scene(pane);
+	
+	public PlayModeView(Grid grid) {
+		this.grid = grid;
+		this.pane = new Pane();
+		heroView = new Rectangle(64,64);
+		initialize();
+	}
+	
+	private void initialize() {
+		scene = new Scene(pane);
 		
 		ImagePattern backgroundPattern = new ImagePattern(tileImage);
 		scene.setFill(backgroundPattern);
-
-        showGrid(grid);
-        heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
-        pane.getChildren().add(heroView);
-        }
-
-    /*
-    private void showGrid(Grid grid) {
-    Image image;
-    // Draw the grid tiles
-    for (Tile tile : grid.getTileMap()) {
-        image = Images.convertCharToImage(Character.toLowerCase(tile.getTileType()));
-        if (tile.getTileType() != 'E' && tile.getTileType() != 'R'){
-            Rectangle tileRect = new Rectangle(tile.getLeftSide(), (tile.getTopSide()-1), 64+1, 64+1);
-            tileRect.setFill(new ImagePattern(image));
-            pane.getChildren().add(tileRect);
-        }
-
-        }
-    }
-		*/
-
+		
+		showGrid(grid);
+		heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
+		pane.getChildren().add(heroView);
+	}
+	
+	/*
+	private void showGrid(Grid grid) {
+	Image image;
+	// Draw the grid tiles
+	for (Tile tile : grid.getTileMap()) {
+	image = Images.convertCharToImage(Character.toLowerCase(tile.getTileType()));
+	if (tile.getTileType() != 'E' && tile.getTileType() != 'R'){
+	Rectangle tileRect = new Rectangle(tile.getLeftSide(), (tile.getTopSide()-1), 64+1, 64+1);
+	tileRect.setFill(new ImagePattern(image));
+	pane.getChildren().add(tileRect);
+	}
+	
+	}
+	}
+	*/
+	
 	private void showGrid(Grid grid) {
 		List<Tile> tiles = grid.getTileMap();
 		for (Tile tile : tiles) {
@@ -97,13 +97,17 @@ public class PlayModeView {
 		tallItem.setFill(new ImagePattern(image));
 		pane.getChildren().add(tallItem);
 	}
-
-    public void updateHeroPosition(double x, double y) {
-        heroView.setX(x);
-        heroView.setY(y);
-    }
-
-    public Pane getPane() {
-        return pane;
-    }
+	
+	public void updateHeroPosition(double x, double y) {
+		heroView.setX(x);
+		heroView.setY(y);
+	}
+	
+	public Pane getPane() {
+		return pane;
+	}
+	
+	public Scene getScene() {
+		return scene;
+	}
 }
