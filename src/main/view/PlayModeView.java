@@ -59,7 +59,7 @@ public class PlayModeView {
 		for (Tile tile : tiles) {
 			char tileType = tile.getTileType();
 
-			if (!PlayModeController.isHallObject(tileType)) {
+			if (!PlayModeController.isHallObjectTileType(tileType)) {
 				continue;
 			}
 
