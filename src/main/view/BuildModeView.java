@@ -33,6 +33,7 @@ import oldFiles.PlayTest;
 import test.TiledHall;
 
 import java.util.Random;
+import main.controller.PlayModeController;
 
 public class BuildModeView extends Application {
 
@@ -231,9 +232,13 @@ public class BuildModeView extends Application {
             }
         
             if (!hasError) {
-                BuildModeView.sharedTileMap.putAll(tileMap);
-                PlayTest playTest = new PlayTest();
-                playTest.start(primaryStage);
+				PlayModeController.earthHall = hall1.getGrid();
+				PlayModeController.airHall = hall2.getGrid();
+				PlayModeController.waterHall = hall3.getGrid();
+				PlayModeController.fireHall = hall4.getGrid();
+
+                PlayModeController playModeController = new PlayModeController();
+                playModeController.start(primaryStage);
                 return;
                 // PlayModeView2 view = new PlayModeView2(halls);
                 // view.start(primaryStage);

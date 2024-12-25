@@ -25,7 +25,7 @@ public class PlayModeController extends Application {
 	public static Grid earthHall;
 	public static Grid airHall;
 	public static Grid waterHall;
-	public static  Grid fireHall;
+	public static Grid fireHall;
 	
 	public Grid playModeGrid;
 	protected Hero hero;
@@ -46,10 +46,12 @@ public class PlayModeController extends Application {
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
 	private boolean initialized = false;
 	
+	/*
 	public PlayModeController() {
 		initializePlayMode();
 	}
-	
+	*/
+
 	private void initializePlayMode() {
 		playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
 		
@@ -102,6 +104,8 @@ public class PlayModeController extends Application {
 	}
 	
 	public void start(Stage primaryStage) {
+		initializePlayMode();
+		
 		Scene scene = view.getScene();
 		initialize(scene);
 		
@@ -449,6 +453,7 @@ public class PlayModeController extends Application {
 	}
 	
 	public static void main(String[] args) {
+		/* 
 		Grid earthHall1 = new Grid(10, 9, 64, 64, 0, 0);
 		earthHall1.changeTileWithIndex(5, 5, 'P');
 		earthHall1.changeTileWithIndex(0, 5, 'B');
@@ -481,7 +486,7 @@ public class PlayModeController extends Application {
 		fireHall1.changeTileWithIndex(7, 8, 'T');
 		fireHall1.changeTileWithIndex(7, 7, 'D');
 		PlayModeController.fireHall = fireHall1;
-		
+		*/
 		launch(args);
 	}
 	
