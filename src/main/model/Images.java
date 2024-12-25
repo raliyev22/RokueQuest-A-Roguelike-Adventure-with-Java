@@ -245,14 +245,6 @@ public class Images extends Application {
 		
 		return null;
 	}
-
-	private boolean isHallObject(char c) {
-		if (c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'G' || c == 'H'
-		 || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
-			return true;
-		 }
-		return false;
-	}
 	
 	public static void main(String[] args) {
 		for (char c = 'A'; c <= 'W'; c++) {

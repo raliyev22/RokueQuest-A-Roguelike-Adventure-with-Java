@@ -167,7 +167,7 @@ public class PlayModeController extends Application{
                 if (currentX == targetX && currentY == targetY) {
                     isMoving = false;
                     if (movingDirection != null) {
-                        hero.move(movingDirection);
+                        moveHeroDirection(movingDirection);
                         movingDirection = null;
                     }
                 }
@@ -175,6 +175,19 @@ public class PlayModeController extends Application{
         };
         gameLoop.start();
     }
+
+	public void moveHeroDirection(Directions dir) {
+		int xIndexOld = hero.getPosX();
+		int yIndexOld = hero.getPosY();
+		playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
+
+		hero.move(dir);
+
+		int xIndexNew = hero.getPosX();
+		int yIndexNew = hero.getPosY();
+		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, 'R');
+		System.out.println(playModeGrid);
+	}
     
 
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
