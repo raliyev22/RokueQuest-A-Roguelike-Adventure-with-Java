@@ -189,7 +189,7 @@ public class Grid {
 		} else {
 			int x = findXofTile(currentTile);
 			int y = findYofTile(currentTile);
-			int newY = y + 1;
+			int newY = y - 1;
 
 			Tile aboveTile = findTileWithIndex(x, newY);
 			return aboveTile;
@@ -203,7 +203,7 @@ public class Grid {
 		} else {
 			int x = findXofTile(currentTile);
 			int y = findYofTile(currentTile);
-			int newY = y - 1;
+			int newY = y + 1;
 
 			Tile belowTile = findTileWithIndex(x, newY);
 			return belowTile;

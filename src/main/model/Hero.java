@@ -1,6 +1,7 @@
 package main.model;
 
 import javafx.scene.image.Image;
+import javafx.scene.paint.ImagePattern;
 
 public class Hero {
 	public final int maxLives = 4;
@@ -79,6 +80,15 @@ public class Hero {
 		else {
 			return 'R';
 		}
+	}
+
+	public void setFacingDirection(Directions direction) {
+        this.facingDirection = direction;
+    }
+
+	public void setFill(ImagePattern imagePattern) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'setFill'");
 	}
 	
 }
