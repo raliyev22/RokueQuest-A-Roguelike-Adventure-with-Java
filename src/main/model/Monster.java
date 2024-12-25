@@ -31,4 +31,7 @@ public abstract class Monster {
             default -> throw new IllegalArgumentException("Invalid monster type");
         }
     }
+    public void moveRandomly(Grid grid){
+    }
 }
+

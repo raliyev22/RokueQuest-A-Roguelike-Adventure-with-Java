@@ -1,6 +1,7 @@
 package main.model;
 
 import java.util.Random;
+import main.utils.Grid;
 import main.utils.Tile;
 
 public class FighterMonster extends Monster{
@@ -9,24 +10,27 @@ public class FighterMonster extends Monster{
         this.y = y;
         type = MonsterType.FIGHTER;
     }
-    public void moveRandomly(){
+    public void moveRandomly(Grid grid){
         Random rand = new Random();
         int randomMove = rand.nextInt(5);
         Boolean existMovement = false;
-        if(this.grid.indexInRange(x+1,y)){
-            if(this.grid.findTileWithIndex(x+1,y).getTileType() == 'E'){
+        if(grid.indexInRange(x+1,y)){
+            if(grid.findTileWithIndex(x+1,y).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x-1,y)){
-            if(this.grid.findTileWithIndex(x-1,y).getTileType() == 'E'){
+        }
+        if(grid.indexInRange(x-1,y)){
+            if(grid.findTileWithIndex(x-1,y).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x,y+1)){
-            if(this.grid.findTileWithIndex(x,y+1).getTileType() == 'E'){
+        }
+        if(grid.indexInRange(x,y+1)){
+            if(grid.findTileWithIndex(x,y+1).getTileType() == 'E'){
                 existMovement = true;
             }
-        }else if(this.grid.indexInRange(x,y-1)){
-            if(this.grid.findTileWithIndex(x,y-1).getTileType() == 'E'){
+        }
+        if(grid.indexInRange(x,y-1)){
+            if(grid.findTileWithIndex(x,y-1).getTileType() == 'E'){
                 existMovement = true;
             }
         }
@@ -35,69 +39,69 @@ public class FighterMonster extends Monster{
             
         
             if(randomMove == 1){
-                if(this.grid.indexInRange(x+1,y)){
-                    Tile tile = this.grid.findTileWithIndex(x+1, y);
+                if(grid.indexInRange(x+1,y)){
+                    Tile tile = grid.findTileWithIndex(x+1, y);
                     if(!(tile.getTileType() == 'E')){
-                        moveRandomly();
+                        moveRandomly(grid);
                     }
                     else{
-                        this.grid.changeTileWithIndex(x, y,'E');
+                        grid.changeTileWithIndex(x, y,'E');
                         this.x = x+1;
-                        tile.changeTileType('M');
+                        tile.changeTileType('F');
                         
                     }
                 }
                 else{
-                    moveRandomly();
+                    moveRandomly(grid);
                 }
             }
             if(randomMove == 2){
-                if(this.grid.indexInRange(x-1,y)){
-                    Tile tile = this.grid.findTileWithIndex(x-1, y);
+                if(grid.indexInRange(x-1,y)){
+                    Tile tile = grid.findTileWithIndex(x-1, y);
                     if(!(tile.getTileType() == 'E')){
-                        moveRandomly();
+                        moveRandomly(grid);
                     }
                     else{
-                        this.grid.changeTileWithIndex(x, y,'E');
+                        grid.changeTileWithIndex(x, y,'E');
                         this.x = x-1;
-                        tile.changeTileType('M');
+                        tile.changeTileType('F');
 
                     }
                 }
                 else{
-                    moveRandomly();
+                    moveRandomly(grid);
                 }
             }
             if(randomMove == 3){
-                if(this.grid.indexInRange(x,y+1)){
-                    Tile tile = this.grid.findTileWithIndex(x, y+1);
+                if(grid.indexInRange(x,y+1)){
+                    Tile tile = grid.findTileWithIndex(x, y+1);
                     if(!(tile.getTileType() == 'E')){
-                        moveRandomly();
+                        moveRandomly(grid);
                     }
                     else{
-                        this.grid.changeTileWithIndex(x, y,'E');
+                        grid.changeTileWithIndex(x, y,'E');
                         this.y = y+1;
-                        tile.changeTileType('M');
+                        tile.changeTileType('F');
                     }
                 }
                 else{
-                    moveRandomly();
+                    moveRandomly(grid);
                 }
             }
             if(randomMove == 4){
-                if(this.grid.indexInRange(x,y-1)){
-                    Tile tile = this.grid.findTileWithIndex(x, y-1);
+                if(grid.indexInRange(x,y-1)){
+                    Tile tile = grid.findTileWithIndex(x, y-1);
                     if(!(tile.getTileType() == 'E')){
-                        moveRandomly();
+                        moveRandomly(grid);
                     }
                     else{
-                        this.grid.changeTileWithIndex(x, y,'E');
+                        grid.changeTileWithIndex(x, y,'E');
                         this.y = y-1;
-                        tile.changeTileType('M');
+                        tile.changeTileType('F');
                     }
                 }
                 else{
-                    moveRandomly();
+                    moveRandomly(grid);
                 }
 
             }

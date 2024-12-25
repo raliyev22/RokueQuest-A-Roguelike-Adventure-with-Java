@@ -1,5 +1,6 @@
 package main.controller;
 
+import java.lang.classfile.instruction.ThrowInstruction;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
@@ -23,7 +24,7 @@ public class PlayModeController {
 	
 	public Grid playModeGrid;
 	protected Hero hero;
-	protected ArrayList<Monster> monsters;
+	protected static ArrayList<Monster> monsters;
 	protected HallType hallType;
 	
 	protected int time;
@@ -199,6 +200,24 @@ public class PlayModeController {
 		System.out.println(playGrid.playModeGrid.findXofTile(tile));
 		System.out.println(playGrid.playModeGrid.findYofTile(tile));
 		System.out.println(playGrid.isNearHero(tile, 4));
+
+
+
+		long startTime = System.currentTimeMillis();
+		playGrid.createMonster(0,0, MonsterType.FIGHTER);
+		Monster monster = monsters.get(0);
+		
+		while(System.currentTimeMillis()-startTime < 5000){
+			System.out.println(System.currentTimeMillis());
+			monster.moveRandomly(playGrid.playModeGrid);
+			System.err.println(playGrid.playModeGrid.toString());
+			try {
+                Thread.sleep(1000); 
+            } catch (InterruptedException e) {
+                System.err.println("Sleep interrupted!");
+				
+            }
+		}
 	}
 }
 
