@@ -12,7 +12,7 @@ public class FighterMonster extends Monster{
     }
     public void moveRandomly(Grid grid){
         Random rand = new Random();
-        int randomMove = rand.nextInt(5);
+        int randomMove = rand.nextInt(4);
         Boolean existMovement = false;
         if(grid.indexInRange(x+1,y)){
             if(grid.findTileWithIndex(x+1,y).getTileType() == 'E'){
@@ -38,7 +38,7 @@ public class FighterMonster extends Monster{
         if(existMovement){
             
         
-            if(randomMove == 1){
+            if(randomMove == 0){
                 if(grid.indexInRange(x+1,y)){
                     Tile tile = grid.findTileWithIndex(x+1, y);
                     if(!(tile.getTileType() == 'E')){
@@ -55,7 +55,7 @@ public class FighterMonster extends Monster{
                     moveRandomly(grid);
                 }
             }
-            if(randomMove == 2){
+            if(randomMove == 1){
                 if(grid.indexInRange(x-1,y)){
                     Tile tile = grid.findTileWithIndex(x-1, y);
                     if(!(tile.getTileType() == 'E')){
@@ -72,7 +72,7 @@ public class FighterMonster extends Monster{
                     moveRandomly(grid);
                 }
             }
-            if(randomMove == 3){
+            if(randomMove == 2){
                 if(grid.indexInRange(x,y+1)){
                     Tile tile = grid.findTileWithIndex(x, y+1);
                     if(!(tile.getTileType() == 'E')){
@@ -88,7 +88,7 @@ public class FighterMonster extends Monster{
                     moveRandomly(grid);
                 }
             }
-            if(randomMove == 4){
+            if(randomMove == 3){
                 if(grid.indexInRange(x,y-1)){
                     Tile tile = grid.findTileWithIndex(x, y-1);
                     if(!(tile.getTileType() == 'E')){
