@@ -82,11 +82,11 @@ public class PlayModeView {
 
 		Button closeButton = new Button();
 		closeButton.setStyle("-fx-background-color: transparent;");
-		closeButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_HEART_x4)); // Replace with your close button image
+		closeButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4)); // Replace with your close button image
 
 		Button pauseButton = new Button();
 		pauseButton.setStyle("-fx-background-color: transparent;");
-		pauseButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_HEART_x4)); // Replace with your pause button image
+		pauseButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4)); // Replace with your pause button image
 
 		buttonContainer.getChildren().addAll(closeButton, pauseButton);
         
