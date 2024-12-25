@@ -9,6 +9,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import main.controller.PlayModeController;
 import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -57,6 +58,11 @@ public class PlayModeView {
 		List<Tile> tiles = grid.getTileMap();
 		for (Tile tile : tiles) {
 			char tileType = tile.getTileType();
+
+			if (!PlayModeController.isHallObject(tileType)) {
+				continue;
+			}
+
 			char lowerCaseLetter = Character.toLowerCase(tileType);
 			Image image = Images.convertCharToImage(lowerCaseLetter);
 			
