@@ -1,8 +1,12 @@
 // PlayModeView.java
 package main.view;
 
+import java.util.List;
+
+import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import main.model.Images;
@@ -10,11 +14,15 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class PlayModeView {
-    private Pane pane;
-    private int tileSize = 64;
-    private Grid grid;
-    Rectangle heroView;
+    protected Pane pane;
+	public Scene scene;
+    protected int tileSize = 64;
+    protected Grid grid;
+    protected Rectangle heroView;
+	protected final int SCENE_WIDTH = 1400;
+	protected final int SCENE_HEIGHT = 800;
 
+	protected final Image tileImage = Images.IMAGE_TILE_x4;
 
     public PlayModeView(Grid grid) {
         this.grid = grid;
@@ -24,21 +32,17 @@ public class PlayModeView {
     }
 
     private void initialize() {
-        // Create the background grid
-        for (int a = 0; a < 1536; a += tileSize) {
-            for (int b = 0; b < 800; b += tileSize) {
-                Rectangle tideRectangle = new Rectangle(a, b, tileSize, tileSize);
-                tideRectangle.setFill(new ImagePattern(Images.IMAGE_TILE_x4));
-                pane.getChildren().add(tideRectangle);
-            }
-        }
+        scene = new Scene(pane);
+		
+		ImagePattern backgroundPattern = new ImagePattern(tileImage);
+		scene.setFill(backgroundPattern);
 
         showGrid(grid);
         heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         pane.getChildren().add(heroView);
         }
 
-    
+    /*
     private void showGrid(Grid grid) {
     Image image;
     // Draw the grid tiles
@@ -51,7 +55,48 @@ public class PlayModeView {
         }
 
         }
-    }    
+    }
+		*/
+
+	private void showGrid(Grid grid) {
+		List<Tile> tiles = grid.getTileMap();
+		for (Tile tile : tiles) {
+			char tileType = tile.getTileType();
+			char lowerCaseLetter = Character.toLowerCase(tileType);
+			Image image = Images.convertCharToImage(lowerCaseLetter);
+			
+			if (image != null) {
+				if (tileType == 'P') {
+					drawTallItem(pane, tile, image);
+				} else if (tileType == 'D') {
+					drawTallItem(pane, tile, image);
+				} else if (tileType == 'E') { // For debugging purposes, print empty tile as fighter
+					image = Images.convertCharToImage('f');
+					drawNormalItem(pane, tile, image);
+				} else {
+					drawNormalItem(pane, tile, image);
+				}
+			}
+		}
+	}
+	
+	private void drawNormalItem(Pane pane, Tile tile, Image image) {
+		Rectangle normalItem = 
+		new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
+		if (image != null) {
+			normalItem.setFill(new ImagePattern(image));
+		} else {
+			normalItem.setFill(Color.GRAY);
+		}
+		pane.getChildren().add(normalItem);
+	}
+	
+	private void drawTallItem(Pane pane, Tile tile, Image image) {
+		Rectangle tallItem = 
+		new Rectangle(tile.getLeftSide(), tile.getTopSide() - tileSize, tileSize, tileSize * 2);
+		tallItem.setFill(new ImagePattern(image));
+		pane.getChildren().add(tallItem);
+	}
 
     public void updateHeroPosition(double x, double y) {
         heroView.setX(x);
