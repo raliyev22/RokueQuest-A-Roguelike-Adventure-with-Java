@@ -10,6 +10,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import main.model.*;
 import main.utils.*;
+import main.view.GameOverView;
 import main.view.PlayModeView;
 
 public class PlayModeController extends Application {
@@ -69,8 +70,11 @@ public class PlayModeController extends Application {
 				playModeGrid.copyTileMap(fireHall);
 			}
 			default -> {
-				this.hallType = HallType.FIRE;
-				playModeGrid.copyTileMap(fireHall);
+				Stage primaryStage = (Stage) view.getScene().getWindow();
+				GameOverView gameOverView = new GameOverView(primaryStage);
+				primaryStage.setScene(gameOverView.getScene());
+				//this.hallType = HallType.EARTH;
+				//playModeGrid.copyTileMap(earthHall);
 			}
 		}
 		
@@ -221,7 +225,6 @@ public class PlayModeController extends Application {
 						Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
 						
 						if (checkRune(clickedTile)) {
-							System.out.println("found rune");
 							initialized = false;
 							isMoving = false;
 							initializePlayMode();
@@ -453,7 +456,7 @@ public class PlayModeController extends Application {
 		earthHall1.changeTileWithIndex(0, 8, 'B');
 		earthHall1.changeTileWithIndex(7, 7, 'B');
 		PlayModeController.earthHall = earthHall1;
-
+		
 		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
 		airHall1.changeTileWithIndex(3, 5, 'H');
 		airHall1.changeTileWithIndex(2, 5, 'B');
@@ -461,7 +464,7 @@ public class PlayModeController extends Application {
 		airHall1.changeTileWithIndex(0, 8, 'T');
 		airHall1.changeTileWithIndex(7, 2, 'D');
 		PlayModeController.airHall = airHall1;
-
+		
 		Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
 		waterHall1.changeTileWithIndex(2, 5, 'T');
 		waterHall1.changeTileWithIndex(0, 5, 'B');
