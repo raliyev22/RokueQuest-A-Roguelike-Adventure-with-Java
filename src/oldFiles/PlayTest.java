@@ -1,4 +1,4 @@
-package test;
+package oldFiles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +18,7 @@ import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
 import main.view.BuildModeView;
+import test.TiledHall;
 
 public class PlayTest extends Application {
     private int tileSize = 64;

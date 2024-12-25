@@ -29,7 +29,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.Tile;
-import test.PlayTest;
+import oldFiles.PlayTest;
 import test.TiledHall;
 
 import java.util.Random;
