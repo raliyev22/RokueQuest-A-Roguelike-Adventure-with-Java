@@ -43,6 +43,7 @@ public class PlayModeController extends Application {
 	protected int time;
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
+	private boolean initialized = false;
 	
 	public PlayModeController() {
 		initializePlayMode();
@@ -91,7 +92,7 @@ public class PlayModeController extends Application {
 			view = new PlayModeView(playModeGrid);
 			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
 		} else {
-			view.initialize(playModeGrid);
+			view.refresh(playModeGrid);
 			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
 		}
 	}
@@ -146,7 +147,6 @@ public class PlayModeController extends Application {
 	private void startGameLoop() {
 		AnimationTimer gameLoop = new AnimationTimer() {
 			private boolean isMoving = false;
-			boolean initialized = false;
 			Directions movingDirection = null;
 			
 			@Override
@@ -222,7 +222,7 @@ public class PlayModeController extends Application {
 						
 						if (checkRune(clickedTile)) {
 							System.out.println("found rune");
-							
+							initialized = false;
 							initializePlayMode();
 						}
 					}
