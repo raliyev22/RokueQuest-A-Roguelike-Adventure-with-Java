@@ -33,19 +33,47 @@ public class PlayModeController extends Application {
 	
 	private double targetX,targetY;
 	private double currentX,currentY;
-
+	
 	private int runeXCoordinate;
 	private int runeYCoordinate;
+	private boolean mouseClicked = false;
+	private double mouseX;
+	private double mouseY;
 	
 	protected int time;
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
 	
 	public PlayModeController() {
+		initializePlayMode();
+	}
+	
+	private void initializePlayMode() {
 		playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
 		
-		hallType = HallType.EARTH;
-		playModeGrid.copyTileMap(earthHall);
+		if (null == this.hallType) {
+			this.hallType = HallType.EARTH;
+			playModeGrid.copyTileMap(earthHall);
+		} else switch (this.hallType) {
+			case EARTH -> {
+				this.hallType = HallType.AIR;
+				playModeGrid.copyTileMap(airHall);
+			}
+			case AIR -> {
+				this.hallType = HallType.WATER;
+				playModeGrid.copyTileMap(waterHall);
+			}
+			case WATER -> {
+				this.hallType = HallType.FIRE;
+				playModeGrid.copyTileMap(fireHall);
+			}
+			default -> {
+				this.hallType = HallType.FIRE;
+				playModeGrid.copyTileMap(fireHall);
+			}
+		}
+		
+		//playModeGrid.copyTileMap(earthHall);
 		
 		Tile initialHeroTile = getRandomEmptyTile();
 		int randomXCoordinate = playModeGrid.findXofTile(initialHeroTile);
@@ -54,11 +82,11 @@ public class PlayModeController extends Application {
 		hero = initializeHero(randomXCoordinate, randomYCoordinate);
 		
 		monsters = new ArrayList<>();
-
+		
 		Tile runeTile = getRandomHallObjectTile();
 		runeXCoordinate = playModeGrid.findXofTile(runeTile);
 		runeYCoordinate = playModeGrid.findYofTile(runeTile);
-
+		
 		view = new PlayModeView(playModeGrid);
 		view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
 	}
@@ -78,6 +106,11 @@ public class PlayModeController extends Application {
 	private void initialize(Scene scene) {
 		scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
 		scene.setOnKeyReleased(event -> handleKeyReleased(event.getCode()));
+		scene.setOnMouseClicked(event -> {
+			mouseClicked = true;
+			mouseX = event.getX();
+			mouseY = event.getY();
+		});
 	}
 	
 	private void handleKeyPressed(KeyCode code) {
@@ -177,9 +210,34 @@ public class PlayModeController extends Application {
 						movingDirection = null;
 					}
 				}
+				
+				if (mouseClicked) {
+					if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
+						Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
+						
+						if (checkRune(clickedTile)) {
+							System.out.println("found rune");
+							
+							initializePlayMode();
+						}
+					}
+					
+					mouseClicked = false;
+				}
 			}
 		};
 		gameLoop.start();
+	}
+	
+	public boolean checkRune(Tile tile) {
+		if ((playModeGrid.findXofTile(tile) == runeXCoordinate) 
+		&& (playModeGrid.findYofTile(tile) == runeYCoordinate)) {
+			if ((Math.abs(runeXCoordinate - hero.getPosX()) <= 1) 
+			&& (Math.abs(runeYCoordinate - hero.getPosY()) <= 1)) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public void moveHeroDirection(Directions dir) {
@@ -192,6 +250,7 @@ public class PlayModeController extends Application {
 		int xIndexNew = hero.getPosX();
 		int yIndexNew = hero.getPosY();
 		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, 'R');
+		System.out.println(playModeGrid);
 	}
 	
 	
@@ -257,11 +316,11 @@ public class PlayModeController extends Application {
 		
 		return emptyTiles;
 	}
-
+	
 	public static boolean isHallObjectTile(Tile tile) {
 		return isHallObjectTileType(tile.getTileType());
 	}
-
+	
 	public static boolean isHallObjectTileType(char c) {
 		if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
 		|| c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
@@ -269,7 +328,7 @@ public class PlayModeController extends Application {
 		}
 		return false;
 	}
-
+	
 	public ArrayList<Tile> getHallObjectTiles() {
 		ArrayList<Tile> hallObjectTiles = new ArrayList<>();
 		
@@ -278,11 +337,10 @@ public class PlayModeController extends Application {
 				hallObjectTiles.add(tile);
 			}
 		}
-		System.out.println(hallObjectTiles);
 		
 		return hallObjectTiles;
 	}
-
+	
 	public Tile getRandomHallObjectTile() {
 		SecureRandom rng = new SecureRandom();
 		ArrayList<Tile> hallObjectTiles = getHallObjectTiles();
@@ -389,6 +447,30 @@ public class PlayModeController extends Application {
 		earthHall1.changeTileWithIndex(0, 8, 'B');
 		earthHall1.changeTileWithIndex(7, 7, 'B');
 		PlayModeController.earthHall = earthHall1;
+		
+		Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		waterHall1.changeTileWithIndex(2, 5, 'T');
+		waterHall1.changeTileWithIndex(0, 5, 'B');
+		waterHall1.changeTileWithIndex(2, 3, 'J');
+		waterHall1.changeTileWithIndex(0, 8, 'S');
+		waterHall1.changeTileWithIndex(7, 7, 'B');
+		PlayModeController.waterHall = waterHall1;
+		
+		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		airHall1.changeTileWithIndex(5, 5, 'H');
+		airHall1.changeTileWithIndex(0, 5, 'B');
+		airHall1.changeTileWithIndex(0, 0, 'S');
+		airHall1.changeTileWithIndex(0, 8, 'T');
+		airHall1.changeTileWithIndex(7, 7, 'D');
+		PlayModeController.airHall = airHall1;
+		
+		Grid fireHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		fireHall1.changeTileWithIndex(2, 5, 'H');
+		fireHall1.changeTileWithIndex(0, 5, 'B');
+		fireHall1.changeTileWithIndex(9, 0, 'S');
+		fireHall1.changeTileWithIndex(7, 8, 'T');
+		fireHall1.changeTileWithIndex(7, 7, 'D');
+		PlayModeController.fireHall = fireHall1;
 		
 		launch(args);
 	}

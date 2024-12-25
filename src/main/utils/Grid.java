@@ -150,6 +150,17 @@ public class Grid {
 		return y;
 	}
 
+	public boolean twoTilesAreNeighbours(Tile firstTile, Tile secondTile) {
+		int firstTileX = findXofTile(firstTile);
+		int firstTileY = findYofTile(firstTile);
+		int secondTileX = findXofTile(secondTile);
+		int secondTileY = findYofTile(secondTile);
+		if (((firstTileX - secondTileX) <= 1) && ((firstTileY - secondTileY) <= 1)) {
+			return true;
+		}
+		return false;
+	}
+
 	public Pair<Integer, Integer> findCoordinatesofTile(Tile tile) {
 		int x = findXofTile(tile);
 		int y = findYofTile(tile);
