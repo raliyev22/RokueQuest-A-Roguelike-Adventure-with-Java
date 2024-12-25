@@ -19,9 +19,9 @@ public class PlayModeController extends Application{
     protected final int COLUMN = 9;
     protected final int tileWidth = 64;
     protected final int tileHeight = 64;
-    protected final int topLeftXCoordinate = 80;
-    protected final int topLeftYCoordinate = 80;
-    private final double speed = 5;
+    protected final int topLeftXCoordinate = 100;
+    protected final int topLeftYCoordinate = 150;
+    private final double speed = 3;
     
     public static Grid earthHall;
     public static Grid airHall;
