@@ -7,6 +7,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.Stage;
 import main.model.*;
@@ -62,6 +63,8 @@ public class PlayModeController extends Application{
 
         primaryStage.setTitle("Play Example");
         primaryStage.setScene(scene);
+        primaryStage.setFullScreen(true);
+        primaryStage.setFullScreenExitHint("");
         primaryStage.show();
         startGameLoop();
     }
