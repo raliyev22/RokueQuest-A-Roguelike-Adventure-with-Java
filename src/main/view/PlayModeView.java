@@ -1,6 +1,7 @@
 // PlayModeView.java
 package main.view;
 
+import java.awt.Rectangle;
 import java.util.List;
 
 import javafx.scene.Scene;
@@ -14,50 +15,60 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class PlayModeView {
-    protected Pane pane;
+	protected Pane pane;
 	protected Scene scene;
-    protected int tileSize = 64;
-    protected Grid grid;
-    protected Rectangle heroView;
-	protected final int SCENE_WIDTH = 1400;
-	protected final int SCENE_HEIGHT = 800;
-
+	protected int tileSize = 64;
+	protected Grid grid;
+	protected Rectangle heroView;
+	
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
-
-    public PlayModeView(Grid grid) {
-        this.grid = grid;
-        this.pane = new Pane();
-        heroView = new Rectangle(64,64);
-        initialize();
-    }
-
-    private void initialize() {
-        scene = new Scene(pane);
-
+	
+	public PlayModeView(Grid grid) {
+		this.grid = grid;
+		this.pane = new Pane();
+		heroView = new Rectangle(64,64);
+		initialize();
+	}
+	
+	private void initialize() {
+		scene = new Scene(pane);
+		
 		ImagePattern backgroundPattern = new ImagePattern(tileImage);
 		scene.setFill(backgroundPattern);
+		
+		showWalls(grid);
+		showGrid(grid);
+		heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
+		pane.getChildren().add(heroView);
+	}
+	
+	/*
+	private void showGrid(Grid grid) {
+	Image image;
+	// Draw the grid tiles
+	for (Tile tile : grid.getTileMap()) {
+	image = Images.convertCharToImage(Character.toLowerCase(tile.getTileType()));
+	if (tile.getTileType() != 'E' && tile.getTileType() != 'R'){
+	Rectangle tileRect = new Rectangle(tile.getLeftSide(), (tile.getTopSide()-1), 64+1, 64+1);
+	tileRect.setFill(new ImagePattern(image));
+	pane.getChildren().add(tileRect);
+	}
+	
+	}
+	}
+	*/
+	
+	private void showWalls(Grid grid) {
+		int wallX = grid.topLeftXCoordinate - 10;
+		int wallY = grid.topLeftYCoordinate + 10;
 
-        showGrid(grid);
-        heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
-        pane.getChildren().add(heroView);
-        }
-
-    /*
-    private void showGrid(Grid grid) {
-    Image image;
-    // Draw the grid tiles
-    for (Tile tile : grid.getTileMap()) {
-        image = Images.convertCharToImage(Character.toLowerCase(tile.getTileType()));
-        if (tile.getTileType() != 'E' && tile.getTileType() != 'R'){
-            Rectangle tileRect = new Rectangle(tile.getLeftSide(), (tile.getTopSide()-1), 64+1, 64+1);
-            tileRect.setFill(new ImagePattern(image));
-            pane.getChildren().add(tileRect);
-        }
-
-        }
-    }
-		*/
-
+		int wallLengthX = 736;
+		int wallLengthY = 680;
+		
+		//Rectangle walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
+		//walls.setFill(new ImagePattern(Images.IMAGE_WALLS_X4));
+	}
+	
 	private void showGrid(Grid grid) {
 		List<Tile> tiles = grid.getTileMap();
 		for (Tile tile : tiles) {
@@ -97,17 +108,17 @@ public class PlayModeView {
 		tallItem.setFill(new ImagePattern(image));
 		pane.getChildren().add(tallItem);
 	}
-
-    public void updateHeroPosition(double x, double y) {
-        heroView.setX(x);
-        heroView.setY(y);
-    }
-
-    public Pane getPane() {
-        return pane;
-    }
-
+	
+	public void updateHeroPosition(double x, double y) {
+		heroView.setX(x);
+		heroView.setY(y);
+	}
+	
+	public Pane getPane() {
+		return pane;
+	}
+	
 	public Scene getScene() {
-        return scene;
-    }
+		return scene;
+	}
 }

@@ -29,8 +29,10 @@ public class Images extends Application {
 	public static final Image IMAGE_SMEARED = new Image("/rokue-like_assets/SmearedTile_32_32.png");
 	public static final Image IMAGE_SMEARED_x2 = new Image("/rokue-like_assets/SmearedTile_x2_64_64.png");
 
-	public static final Image IMAGE_BACKGROUNDPNG = new Image("/rokue-like_assets/SmearedTile_x2_64_64.png");
-	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/SmearedTile_32_32.png");
+	public static final Image IMAGE_BACKGROUNDPNG = new Image("/rokue-like_assets/rokue33.png");
+	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
+
+	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
 	
 	
 	
