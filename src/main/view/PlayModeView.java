@@ -15,7 +15,7 @@ import main.utils.Tile;
 
 public class PlayModeView {
     protected Pane pane;
-	public Scene scene;
+	protected Scene scene;
     protected int tileSize = 64;
     protected Grid grid;
     protected Rectangle heroView;
@@ -33,7 +33,7 @@ public class PlayModeView {
 
     private void initialize() {
         scene = new Scene(pane);
-		
+
 		ImagePattern backgroundPattern = new ImagePattern(tileImage);
 		scene.setFill(backgroundPattern);
 
@@ -105,5 +105,9 @@ public class PlayModeView {
 
     public Pane getPane() {
         return pane;
+    }
+
+	public Scene getScene() {
+        return scene;
     }
 }
