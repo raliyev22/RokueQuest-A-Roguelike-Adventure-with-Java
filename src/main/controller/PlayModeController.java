@@ -87,8 +87,13 @@ public class PlayModeController extends Application {
 		runeXCoordinate = playModeGrid.findXofTile(runeTile);
 		runeYCoordinate = playModeGrid.findYofTile(runeTile);
 		
-		view = new PlayModeView(playModeGrid);
-		view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+		if (view == null){
+			view = new PlayModeView(playModeGrid);
+			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+		} else {
+			view.initialize(playModeGrid);
+			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+		}
 	}
 	
 	public void start(Stage primaryStage) {
@@ -447,7 +452,15 @@ public class PlayModeController extends Application {
 		earthHall1.changeTileWithIndex(0, 8, 'B');
 		earthHall1.changeTileWithIndex(7, 7, 'B');
 		PlayModeController.earthHall = earthHall1;
-		
+
+		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
+		airHall1.changeTileWithIndex(3, 5, 'H');
+		airHall1.changeTileWithIndex(2, 5, 'B');
+		airHall1.changeTileWithIndex(5, 6, 'S');
+		airHall1.changeTileWithIndex(0, 8, 'T');
+		airHall1.changeTileWithIndex(7, 2, 'D');
+		PlayModeController.airHall = airHall1;
+
 		Grid waterHall1 = new Grid(10, 9, 64, 64, 0, 0);
 		waterHall1.changeTileWithIndex(2, 5, 'T');
 		waterHall1.changeTileWithIndex(0, 5, 'B');
@@ -456,13 +469,6 @@ public class PlayModeController extends Application {
 		waterHall1.changeTileWithIndex(7, 7, 'B');
 		PlayModeController.waterHall = waterHall1;
 		
-		Grid airHall1 = new Grid(10, 9, 64, 64, 0, 0);
-		airHall1.changeTileWithIndex(5, 5, 'H');
-		airHall1.changeTileWithIndex(0, 5, 'B');
-		airHall1.changeTileWithIndex(0, 0, 'S');
-		airHall1.changeTileWithIndex(0, 8, 'T');
-		airHall1.changeTileWithIndex(7, 7, 'D');
-		PlayModeController.airHall = airHall1;
 		
 		Grid fireHall1 = new Grid(10, 9, 64, 64, 0, 0);
 		fireHall1.changeTileWithIndex(2, 5, 'H');
