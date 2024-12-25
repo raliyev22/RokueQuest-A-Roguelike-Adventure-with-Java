@@ -1,11 +1,22 @@
 // PlayModeView.java
 package main.view;
 
+import java.net.http.HttpRequest;
 import java.util.List;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -20,7 +31,8 @@ public class PlayModeView {
 	protected int tileSize = 64;
 	protected Grid grid;
 	protected Rectangle heroView;
-	
+	private VBox popupContainer; // Popup dialog container
+
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
 	public PlayModeView(Grid grid) {
@@ -31,16 +43,73 @@ public class PlayModeView {
 	}
 	
 	private void initialize() {
-		scene = new Scene(pane);
+        scene = new Scene(pane);
 		
-		ImagePattern backgroundPattern = new ImagePattern(tileImage);
-		scene.setFill(backgroundPattern);
-		
-		showWalls(grid);
+		pane.setBackground(new Background(new BackgroundImage(
+			tileImage,
+			BackgroundRepeat.REPEAT,
+			BackgroundRepeat.REPEAT,
+			BackgroundPosition.DEFAULT,
+			BackgroundSize.DEFAULT
+		)));
+
+        showWalls(grid);
 		heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
 		pane.getChildren().add(heroView);
 		showGrid(grid);
+        
+        VBox uiContainer = new VBox(10); // Aralarındaki boşluk 10 px
+        uiContainer.setStyle("-fx-background-color:#6f5459; -fx-padding: 10;");
+        uiContainer.setLayoutX(800); // Sağa kaydırma
+        uiContainer.setLayoutY(70);  // Yukarıdan başlama
+        uiContainer.setPrefWidth(200); // Genişlik
+        uiContainer.setPrefHeight(736); // Genişlik
+		// uiContainer.setAlignment(javafx.geometry.Pos.CENTER); // Merkeze hizala
+
+		HBox buttonContainer = new HBox(10); // Spacing between buttons
+		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center the buttons horizontally
+
+
+		Button closeButton = new Button();
+		closeButton.setStyle("-fx-background-color: transparent;");
+		closeButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_HEART_x4)); // Replace with your close button image
+
+		Button pauseButton = new Button();
+		pauseButton.setStyle("-fx-background-color: transparent;");
+		pauseButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_HEART_x4)); // Replace with your pause button image
+
+		buttonContainer.getChildren().addAll(closeButton, pauseButton);
+        
+	    HBox timeLabelContainer = new HBox(); // Container for timeLabel
+    	timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
+		Label timeLabel = new Label("Time:");
+    	timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
+    	timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
+
+		
+        HBox heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
+		heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
+		heartsContainer.setTranslateY(80);
+		Rectangle heart1,heart2,heart3,heart4;
+		heart1 = new Rectangle(32,32);
+        heart2 = new Rectangle(32,32);
+        heart3 = new Rectangle(32,32);
+        heart4 = new Rectangle(32,32);
+        heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+        heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+        heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+        heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+        heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
+		
+		Rectangle inventory = new Rectangle(200,400);
+		inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
+		inventory.setTranslateY(100);
+		
+        
+        uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
+        pane.getChildren().add(uiContainer);
 	}
+	
 	
 	private void showWalls(Grid grid) {
 		int wallX = grid.topLeftXCoordinate - 20;
