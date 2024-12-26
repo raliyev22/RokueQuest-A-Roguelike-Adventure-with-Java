@@ -205,6 +205,7 @@ public class PlayModeView {
 	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
 		monsterView.setX(x);
 		monsterView.setY(y);
+		System.out.println("monster moved");
 	}
 
 	public void addToPane(Rectangle monsterView){

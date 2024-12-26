@@ -6,9 +6,10 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class ArcherMonster extends Monster {
-    public ArcherMonster(int x, int y) {
+    public ArcherMonster(int x, int y,Tile mosnterTile) {
         this.x = x;
         this.y = y;
+        this.tile = mosnterTile;
         type = MonsterType.ARCHER;
     }
     public void moveRandomly(Grid grid){

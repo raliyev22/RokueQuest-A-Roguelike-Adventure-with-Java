@@ -180,9 +180,10 @@ public class PlayModeController extends Application {
 			Directions movingDirection = null;
 
 			private boolean isMonstersMoving = false;
-
+			Directions monsterMovingDirection = null;
 			private long lastMonsterSpawnTime = 0;
 			private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+			private boolean monsterInitialized = false;
 
 			private int counter = -1;
 			
@@ -281,20 +282,24 @@ public class PlayModeController extends Application {
 
 					switch (randomInt) {
 						case 0:
-							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER);
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
 							monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+							monster.setMonsterView(monsterView);
 							break;
 						case 1:
-							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER);
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
 							monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
+							monster.setMonsterView(monsterView);
 							break;
 						case 2:
-							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD);
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
 							monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+							monster.setMonsterView(monsterView);
 							break;
 						default:
-							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER);
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
 							monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+							monster.setMonsterView(monsterView);
 					}
 
 					
@@ -303,6 +308,23 @@ public class PlayModeController extends Application {
 
 					lastMonsterSpawnTime = now; 
 				}
+
+				//monster movement
+				// for(Monster monster : monsters){
+				// 	switch(monster.getType()){
+				// 		case MonsterType.FIGHTER:
+				// 			moveCharacter(monsterInitialized,monster.getTile(),monster.getTile().getLeftSide(),monster.getTile().getTopSide(),monsterMovingDirection,monster.getMonsterView(),monster);
+				// 			break;
+				// 		case MonsterType.ARCHER:
+				// 			moveCharacter(monsterInitialized,monster.getTile(),monster.getTile().getLeftSide(),monster.getTile().getTopSide(),monsterMovingDirection,monster.getMonsterView(),monster);
+				// 			break;
+				// 		case MonsterType.WIZARD:
+				// 			break;
+
+				// 	}
+				// }
+
+
 				
 				if (mouseClicked) {
 					if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -323,6 +345,88 @@ public class PlayModeController extends Application {
 			}
 		};
 		gameLoop.start();
+	}
+
+	public void moveCharacter(Boolean initialized,Tile characterTile,double currentX,double currentY,Directions movingDirection,Rectangle monsterView,Monster monster){
+		double characterViewLeftSide = characterTile.getLeftSide();
+		double characterViewTopSide = characterTile.getTopSide();
+		
+		if(!monster.getIsMoving()){
+			currentX = characterViewLeftSide;
+			currentY = characterViewTopSide;
+		}
+		
+		if (!monster.getInitialized()) {
+			monster.setTargetX((int)characterViewLeftSide);
+			monster.setInitialized(true);
+		}
+
+		int randomInt = random.nextInt(4);
+
+		
+		
+		if (!monster.getIsMoving()) {
+			switch (randomInt) {
+				case 0:
+					if (isWalkableTile(playModeGrid.findNorthTile(characterTile))) {
+						monster.setTargetY((int)(currentY - tileHeight));
+						monster.setIsMoving(true);
+						movingDirection = Directions.NORTH;
+					}
+					break;
+	
+				case 1:
+					if (isWalkableTile(playModeGrid.findSouthTile(characterTile))) {
+						monster.setTargetY((int)(currentY + tileHeight));
+						monster.setIsMoving(true);
+						movingDirection = Directions.SOUTH;
+					}
+					break;
+
+				case 2:
+					if ( isWalkableTile(playModeGrid.findWestTile(characterTile))) {
+						monster.setTargetX((int)(currentX - tileHeight));
+						monster.setIsMoving(true);
+						//hero.setFacingDirection(Directions.WEST);
+						movingDirection = Directions.WEST;
+					}
+
+				case 3:
+					if (isWalkableTile(playModeGrid.findEastTile(characterTile))) {
+						monster.setTargetX((int)(currentX + tileHeight));
+						monster.setIsMoving(true);
+						//hero.setFacingDirection(Directions.EAST);
+						movingDirection = Directions.EAST;
+					}
+
+			}
+	   
+		}
+		
+		if (currentX < monster.getTargetX()) {
+			currentX = Math.min(currentX + speed, monster.getTargetX());
+			view.updateMonsterPosition(monsterView,currentX, currentY);
+		} else if (currentX > monster.getTargetX()) {
+			currentX = Math.max(currentX - speed, monster.getTargetX());
+			view.updateMonsterPosition(monsterView,currentX, currentY);
+		}
+		
+		if (currentY < monster.getTargetY()) {
+			currentY = Math.min(currentY + speed, monster.getTargetY());
+			view.updateMonsterPosition(monsterView,currentX, currentY);
+		} else if (currentY > monster.getTargetY()) {
+			currentY = Math.max(currentY - speed, monster.getTargetY());
+			view.updateMonsterPosition(monsterView,currentX, currentY);
+		}
+		//System.out.printf("%f currentx %d targetx%n",currentX,monster.getTargetX());
+		if (currentX == monster.getTargetX() && currentY == monster.getTargetY()) {
+			System.out.println("trying to move monster");
+			monster.setIsMoving(false);
+			if (movingDirection != null) {
+				moveMonsterDirection(movingDirection,monster);
+				movingDirection = null;
+			}
+		}
 	}
 	
 	public boolean checkRune(Tile tile) {
@@ -348,6 +452,19 @@ public class PlayModeController extends Application {
 		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, 'R');
 		//System.out.println(playModeGrid);
 	}
+
+	public void moveMonsterDirection(Directions dir,Monster monster) {
+		int xIndexOld = monster.getX();
+		int yIndexOld = monster.getY();
+		playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
+		
+		monster.move(dir);
+		
+		int xIndexNew = monster.getX();
+		int yIndexNew = monster.getY();
+		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
+		System.out.println(playModeGrid);
+	}
 	
 	
 	public Hero initializeHero(int xCoordinate, int yCoordinate) {
@@ -364,17 +481,17 @@ public class PlayModeController extends Application {
 		}   
 	}
 	
-	public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type) {
+	public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
 		Monster monster = null;
 		switch (type) {
 			case MonsterType.FIGHTER -> {
-				monster = new FighterMonster(xCoordinate,yCoordinate);
+				monster = new FighterMonster(xCoordinate,yCoordinate,monsterTile);
 			}
 			case MonsterType.ARCHER -> {
-				monster = new ArcherMonster(xCoordinate,yCoordinate);
+				monster = new ArcherMonster(xCoordinate,yCoordinate,monsterTile);
 			}
 			case MonsterType.WIZARD -> {
-				monster = new WizardMonster(xCoordinate,yCoordinate);
+				monster = new WizardMonster(xCoordinate,yCoordinate,monsterTile);
 			}
 		}
 		monsters.add(monster);

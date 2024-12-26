@@ -5,9 +5,10 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class FighterMonster extends Monster{
-    public FighterMonster(int x, int y){
+    public FighterMonster(int x, int y,Tile tile){
         this.x = x;
         this.y = y;
+        this.tile = tile;
         type = MonsterType.FIGHTER;
     }
     public void moveRandomly(Grid grid){
