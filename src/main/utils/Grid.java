@@ -84,7 +84,11 @@ public class Grid {
 		}
 
 		for (int i = 0; i < this.tileMap.size(); i++) {
-			this.tileMap.get(i).changeTileType(otherGrid.tileMap.get(i).tileType);
+			char otherChar = otherGrid.tileMap.get(i).tileType;
+			if (otherChar == '!') {
+				otherChar = 'E';
+			}
+			this.tileMap.get(i).changeTileType(otherChar);
 		}
 	}
 	
