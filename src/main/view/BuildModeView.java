@@ -395,7 +395,7 @@ public class BuildModeView extends Application {
                             if (flag){
                             Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
                             if(flagTile!=null){
-                                flagTile.changeTileType('X');
+                                flagTile.changeTileType('!');
                             }
                             }
     

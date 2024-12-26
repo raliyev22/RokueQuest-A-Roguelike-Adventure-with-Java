@@ -338,7 +338,7 @@ public class PlayModeController extends Application {
 	
 	public static boolean isHallObjectTileType(char c) {
 		if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
-		|| c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T' || c == 'X'){
+		|| c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
 			return true;
 		}
 		return false;
@@ -380,7 +380,7 @@ public class PlayModeController extends Application {
 	}
 	
 	public static boolean isWalkableTileType(char c) {
-		if (c == 'E' || c == 'e' || c == 'X') {
+		if (c == 'E' || c == 'e') {
 			return true;
 		}
 		return false;
