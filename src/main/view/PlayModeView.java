@@ -201,6 +201,15 @@ public class PlayModeView {
 		heroView.setX(x);
 		heroView.setY(y);
 	}
+
+	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
+		monsterView.setX(x);
+		monsterView.setY(y);
+	}
+
+	public void addToPane(Rectangle monsterView){
+		pane.getChildren().add(monsterView);
+	}
 	
 	public Pane getPane() {
 		return pane;
@@ -212,7 +221,7 @@ public class PlayModeView {
 
 	public int updateTime(int time){
 		this.time = time;
-		timeLabel.setText("Time: " + ((time/100)+1));
+		timeLabel.setText("Time: " + time);
 		return time;
 	}
 	public void showGameOver() {

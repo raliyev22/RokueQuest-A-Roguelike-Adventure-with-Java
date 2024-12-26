@@ -214,19 +214,19 @@ public class BuildModeView extends Application {
             StringBuilder message = new StringBuilder();
             boolean hasError = false;
         
-            if (earthHall == null || earthHall.size() < 1) {
+            if (earthHall == null || earthHall.size() < 0) {
                 message.append("❌ Earth Hall: Requires at least 6 objects.\n");
                 hasError = true;
             }
-            if (airHall == null || airHall.size() < 1) {
+            if (airHall == null || airHall.size() < 0) {
                 message.append("❌ Air Hall: Requires at least 9 objects.\n");
                 hasError = true;
             }
-            if (waterHall == null || waterHall.size() < 1) {
+            if (waterHall == null || waterHall.size() < 0) {
                 message.append("❌ Water Hall: Requires at least 13 objects.\n");
                 hasError = true;
             }
-            if (fireHall == null || fireHall.size() < 1) {
+            if (fireHall == null || fireHall.size() < 0) {
                 message.append("❌ Fire Hall: Requires at least 17 objects.\n");
                 hasError = true;
             }
@@ -236,6 +236,11 @@ public class BuildModeView extends Application {
 				PlayModeController.airHall = hall2.getGrid();
 				PlayModeController.waterHall = hall3.getGrid();
 				PlayModeController.fireHall = hall4.getGrid();
+
+                PlayModeController.earthHallObjectCount = tileMap.get(hall1).size();
+                PlayModeController.airHallObjectCount = tileMap.get(hall2).size();
+                PlayModeController.waterHallObjectCount = tileMap.get(hall3).size();
+                PlayModeController.fireHallObjectCount = tileMap.get(hall4).size();
 
                 PlayModeController playModeController = new PlayModeController();
 				Stage newStage = new Stage();

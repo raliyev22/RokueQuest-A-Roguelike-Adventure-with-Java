@@ -2,11 +2,14 @@ package main.controller;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.model.*;
 import main.utils.*;
@@ -26,6 +29,11 @@ public class PlayModeController extends Application {
 	public static Grid airHall;
 	public static Grid waterHall;
 	public static Grid fireHall;
+
+	public static int earthHallObjectCount;
+	public static int airHallObjectCount;
+	public static int waterHallObjectCount;
+	public static int fireHallObjectCount;
 	
 	public Grid playModeGrid;
 	protected Hero hero;
@@ -41,11 +49,17 @@ public class PlayModeController extends Application {
 	private double mouseX;
 	private double mouseY;
 	
-	protected int time = 1000;//this number divided by 100 means gives how many seconds left
+	protected int time;
+	private long lastUpdateTime = 0; // Tracks the last time the timer was updated
+	private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
+
+
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
 	private boolean initialized = false;
 	public boolean isPaused = false;
+
+	private Random random=new Random();
 	
 	/*
 	public PlayModeController() {
@@ -59,22 +73,27 @@ public class PlayModeController extends Application {
 		if (null == this.hallType) {
 			this.hallType = HallType.EARTH;
 			playModeGrid.copyTileMap(earthHall);
+			this.time = PlayModeController.earthHallObjectCount*5;
 		} else switch (this.hallType) {
 			case EARTH -> {
 				this.hallType = HallType.AIR;
 				playModeGrid.copyTileMap(airHall);
+				this.time = PlayModeController.airHallObjectCount*5;
 			}
 			case AIR -> {
 				this.hallType = HallType.WATER;
 				playModeGrid.copyTileMap(waterHall);
+				this.time = PlayModeController.waterHallObjectCount*5;
 			}
 			case WATER -> {
 				this.hallType = HallType.FIRE;
 				playModeGrid.copyTileMap(fireHall);
+				this.time = PlayModeController.fireHallObjectCount*5;
 			}
 			default -> {
 				this.hallType = HallType.EARTH;
 				playModeGrid.copyTileMap(earthHall);
+				this.time = PlayModeController.earthHallObjectCount*5;
 			}
 		}
 		
@@ -130,14 +149,14 @@ public class PlayModeController extends Application {
     }
 	
 	private void handleKeyPressed(KeyCode code) {
-        System.out.println("Key Pressed: " + code); // Debugging statement
+        //System.out.println("Key Pressed: " + code); // Debugging statement
 		switch (code) {
 			case UP, W -> upPressed = true;
 			case DOWN, S -> downPressed = true;
 			case LEFT, A -> leftPressed = true;
 			case RIGHT, D -> rightPressed = true;
 			default -> {
-				System.out.println("Unhandled Key Pressed: " + code);
+				//System.out.println("Unhandled Key Pressed: " + code);
 			}
 		}
 	}
@@ -149,7 +168,7 @@ public class PlayModeController extends Application {
 			case LEFT, A -> leftPressed = false;
 			case RIGHT, D -> rightPressed = false;
 			default -> {
-				System.out.println("Unhandled Key Released: " + code);
+				//System.out.println("Unhandled Key Released: " + code);
 			}
 		}
 	}
@@ -159,6 +178,15 @@ public class PlayModeController extends Application {
 		AnimationTimer gameLoop = new AnimationTimer() {
 			private boolean isMoving = false;
 			Directions movingDirection = null;
+
+			private boolean isMonstersMoving = false;
+
+			private long lastMonsterSpawnTime = 0;
+			private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+
+			private int counter = -1;
+			
+
 			
 			@Override
 			public void handle(long now) {
@@ -167,9 +195,13 @@ public class PlayModeController extends Application {
                     this.stop();
                     return;
                 }
-				time = view.updateTime(time-1);
-				if (hero == null) {
-					return;
+
+
+				if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
+        			view.updateTime(time); // Update the view
+					time--;
+        			lastUpdateTime = now;
+					counter++;
 				}
 				
 				Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
@@ -232,6 +264,45 @@ public class PlayModeController extends Application {
 						movingDirection = null;
 					}
 				}
+
+				//monster spawn logic
+				if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter>=8) {
+
+					int randomInt = random.nextInt(3);
+
+					Monster monster = null;
+					Tile initialMonsterTile = getRandomEmptyTile();
+
+					int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
+					int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
+					Tile monsterTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
+
+					Rectangle monsterView = new Rectangle(64,64);
+
+					switch (randomInt) {
+						case 0:
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER);
+							monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+							break;
+						case 1:
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER);
+							monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
+							break;
+						case 2:
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD);
+							monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+							break;
+						default:
+							monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER);
+							monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+					}
+
+					
+					view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
+					view.addToPane(monsterView);
+
+					lastMonsterSpawnTime = now; 
+				}
 				
 				if (mouseClicked) {
 					if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -240,7 +311,9 @@ public class PlayModeController extends Application {
 						if (checkRune(clickedTile)) {
 							initialized = false;
 							isMoving = false;
+							counter=-1;
 							initializePlayMode();
+							
 						}
 					}
 					
@@ -273,7 +346,7 @@ public class PlayModeController extends Application {
 		int xIndexNew = hero.getPosX();
 		int yIndexNew = hero.getPosY();
 		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, 'R');
-		System.out.println(playModeGrid);
+		//System.out.println(playModeGrid);
 	}
 	
 	
