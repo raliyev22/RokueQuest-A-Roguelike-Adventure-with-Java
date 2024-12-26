@@ -41,10 +41,11 @@ public class PlayModeController extends Application {
 	private double mouseX;
 	private double mouseY;
 	
-	protected int time;
+	protected int time = 1000;//this number divided by 100 means one second for AnimationTimer
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
 	private boolean initialized = false;
+	public boolean isPaused = false;
 	
 	/*
 	public PlayModeController() {
@@ -92,10 +93,10 @@ public class PlayModeController extends Application {
 		runeYCoordinate = playModeGrid.findYofTile(runeTile);
 		
 		if (view == null){
-			view = new PlayModeView(playModeGrid);
+			view = new PlayModeView(playModeGrid, time);
 			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
 		} else {
-			view.refresh(playModeGrid);
+			view.refresh(playModeGrid, time);
 			view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
 		}
 	}
@@ -161,6 +162,12 @@ public class PlayModeController extends Application {
 			
 			@Override
 			public void handle(long now) {
+				if (time < 0) {
+                    view.showGameOver();
+                    this.stop();
+                    return;
+                }
+				time = view.updateTime(time-1);
 				if (hero == null) {
 					return;
 				}
@@ -239,6 +246,7 @@ public class PlayModeController extends Application {
 					
 					mouseClicked = false;
 				}
+				
 			}
 		};
 		gameLoop.start();

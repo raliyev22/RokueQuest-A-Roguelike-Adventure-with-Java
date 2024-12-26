@@ -5,7 +5,10 @@ import java.net.http.HttpRequest;
 import java.util.List;
 
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import main.controller.PlayModeController;
 import main.model.Images;
 import main.utils.Grid;
@@ -32,19 +36,23 @@ public class PlayModeView {
 	protected int tileSize = 64;
 	protected Grid grid;
 	protected Rectangle heroView;
+	protected int time;
+	protected Label timeLabel;
 	private VBox popupContainer; // Popup dialog container
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
-	public PlayModeView(Grid grid) {
+	public PlayModeView(Grid grid, int time) {
 		this.grid = grid;
+		this.time = time;
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		initialize();
 	}
 
-	public void refresh(Grid newGrid) {
+	public void refresh(Grid newGrid, int time) {
 		this.grid = newGrid;
+		this.time = time;
 		pane.getChildren().clear();
 		initialize();
 	}
@@ -104,7 +112,7 @@ public class PlayModeView {
         
 	    HBox timeLabelContainer = new HBox(); // Container for timeLabel
     	timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
-		Label timeLabel = new Label("Time:");
+		timeLabel = new Label("Time: " + time);
     	timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
     	timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
 
@@ -200,5 +208,14 @@ public class PlayModeView {
 	
 	public Scene getScene() {
 		return scene;
+	}
+
+	public int updateTime(int time){
+		this.time = time;
+		timeLabel.setText("Time: " + ((time/100)+1));
+		return time;
+	}
+	public void showGameOver() {
+		
 	}
 }
