@@ -41,7 +41,7 @@ public class PlayModeController extends Application {
 	private double mouseX;
 	private double mouseY;
 	
-	protected int time = 1000;//this number divided by 100 means one second for AnimationTimer
+	protected int time = 1000;//this number divided by 100 means gives how many seconds left
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
 	private boolean initialized = false;
