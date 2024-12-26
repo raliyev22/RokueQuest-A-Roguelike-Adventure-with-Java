@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
@@ -44,7 +45,6 @@ public class PlayModeView {
 
 	public void refresh(Grid newGrid) {
 		this.grid = newGrid;
-
 		pane.getChildren().clear();
 		initialize();
 	}
@@ -68,25 +68,37 @@ public class PlayModeView {
 		pane.getChildren().add(heroView);
 		showGrid(grid);
         
-        VBox uiContainer = new VBox(10); // Aralarındaki boşluk 10 px
+        VBox uiContainer = new VBox(10);
         uiContainer.setStyle("-fx-background-color:#6f5459; -fx-padding: 10;");
-        uiContainer.setLayoutX(800); // Sağa kaydırma
-        uiContainer.setLayoutY(70);  // Yukarıdan başlama
-        uiContainer.setPrefWidth(200); // Genişlik
-        uiContainer.setPrefHeight(736); // Genişlik
-		// uiContainer.setAlignment(javafx.geometry.Pos.CENTER); // Merkeze hizala
+        uiContainer.setLayoutX(800);
+        uiContainer.setLayoutY(70);
+        uiContainer.setPrefWidth(200);
+        uiContainer.setPrefHeight(736);
 
-		HBox buttonContainer = new HBox(10); // Spacing between buttons
-		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center the buttons horizontally
-
+		HBox buttonContainer = new HBox(10);
+		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
 		Button closeButton = new Button();
 		closeButton.setStyle("-fx-background-color: transparent;");
-		closeButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4)); // Replace with your close button image
+
+		ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
+		exitImageView.setFitWidth(40);
+		exitImageView.setFitHeight(40);
+
+		closeButton.setGraphic(exitImageView);
+		closeButton.setPrefWidth(40);
+		closeButton.setPrefHeight(40);
 
 		Button pauseButton = new Button();
-		pauseButton.setStyle("-fx-background-color: transparent;");
-		pauseButton.setGraphic(new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4)); // Replace with your pause button image
+		pauseButton.setStyle("-fx-background-color: transparent;"); 
+
+		ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
+		pauseImageView.setFitWidth(40);
+		pauseImageView.setFitHeight(40);
+
+		pauseButton.setGraphic(pauseImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
 
 		buttonContainer.getChildren().addAll(closeButton, pauseButton);
         
