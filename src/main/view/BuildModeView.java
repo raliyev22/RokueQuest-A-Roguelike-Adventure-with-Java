@@ -214,19 +214,19 @@ public class BuildModeView extends Application {
             StringBuilder message = new StringBuilder();
             boolean hasError = false;
         
-            if (earthHall == null || earthHall.size() < 2) {
+            if (earthHall == null || earthHall.size() < 1) {
                 message.append("❌ Earth Hall: Requires at least 6 objects.\n");
                 hasError = true;
             }
-            if (airHall == null || airHall.size() < 0) {
+            if (airHall == null || airHall.size() < 1) {
                 message.append("❌ Air Hall: Requires at least 9 objects.\n");
                 hasError = true;
             }
-            if (waterHall == null || waterHall.size() < 0) {
+            if (waterHall == null || waterHall.size() < 1) {
                 message.append("❌ Water Hall: Requires at least 13 objects.\n");
                 hasError = true;
             }
-            if (fireHall == null || fireHall.size() < 0) {
+            if (fireHall == null || fireHall.size() < 1) {
                 message.append("❌ Fire Hall: Requires at least 17 objects.\n");
                 hasError = true;
             }
