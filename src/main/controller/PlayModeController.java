@@ -274,6 +274,8 @@ public class PlayModeController extends Application {
 					}
 				}
 
+				
+
 				//monster spawn logic
 				if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter>=8) {
 
@@ -468,8 +470,22 @@ public class PlayModeController extends Application {
 		
 		int xIndexNew = hero.getPosX();
 		int yIndexNew = hero.getPosY();
-		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, 'R');
+		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, getHeroCharType());
 		//System.out.println(playModeGrid);
+	}
+
+	public char getHeroCharType() {
+		return this.hero.getCharType();
+	}
+
+	public Image getHeroImage() {
+		if (getHeroCharType() == 'R') {
+			return Images.IMAGE_PLAYERRIGHT_x4;
+		} else if (getHeroCharType() == 'L') {
+			return Images.IMAGE_PLAYERLEFT_x4;
+		}else {
+			return null;
+		}
 	}
 
 	public void moveMonsterDirection(Directions dir,Monster monster) {
