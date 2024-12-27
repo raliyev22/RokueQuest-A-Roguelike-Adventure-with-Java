@@ -53,6 +53,9 @@ public class PlayModeController extends Application {
 	private long lastUpdateTime = 0; // Tracks the last time the timer was updated
 	private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
 
+	private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
+    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
+
 
 	private PlayModeView view;
 	private boolean upPressed, downPressed, leftPressed, rightPressed;
@@ -179,8 +182,7 @@ public class PlayModeController extends Application {
 			private boolean isMoving = false;
 			Directions movingDirection = null;
 
-			private boolean isMonstersMoving = false;
-			Directions monsterMovingDirection = null;
+			
 			private long lastMonsterSpawnTime = 0;
 			private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 			private boolean monsterInitialized = false;
@@ -192,6 +194,12 @@ public class PlayModeController extends Application {
 			@Override
 			public void handle(long now) {
 				if (time < 0) {
+                    view.showGameOver();
+                    this.stop();
+                    return;
+                }
+
+				if (hero.getLiveCount() == 0) {
                     view.showGameOver();
                     this.stop();
                     return;
@@ -309,20 +317,29 @@ public class PlayModeController extends Application {
 					lastMonsterSpawnTime = now; 
 				}
 
-				//monster movement
-				// for(Monster monster : monsters){
-				// 	switch(monster.getType()){
-				// 		case MonsterType.FIGHTER:
-				// 			moveCharacter(monsterInitialized,monster.getTile(),monster.getTile().getLeftSide(),monster.getTile().getTopSide(),monsterMovingDirection,monster.getMonsterView(),monster);
-				// 			break;
-				// 		case MonsterType.ARCHER:
-				// 			moveCharacter(monsterInitialized,monster.getTile(),monster.getTile().getLeftSide(),monster.getTile().getTopSide(),monsterMovingDirection,monster.getMonsterView(),monster);
-				// 			break;
-				// 		case MonsterType.WIZARD:
-				// 			break;
+				if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
+					for(Monster monster : monsters){
+						switch(monster.getType()){
+							case MonsterType.FIGHTER:
+								moveCharacter(monster);
+								break;
+							case MonsterType.ARCHER:
+								moveCharacter(monster);
+								break;
+							case MonsterType.WIZARD:
+								break;
+	
+						}
+					}
+					lastMonsterUpdateTime = now;
+				}
 
-				// 	}
-				// }
+
+				
+				
+
+				//monster movement
+				
 
 
 				
@@ -347,87 +364,89 @@ public class PlayModeController extends Application {
 		gameLoop.start();
 	}
 
-	public void moveCharacter(Boolean initialized,Tile characterTile,double currentX,double currentY,Directions movingDirection,Rectangle monsterView,Monster monster){
-		double characterViewLeftSide = characterTile.getLeftSide();
-		double characterViewTopSide = characterTile.getTopSide();
-		
-		if(!monster.getIsMoving()){
-			currentX = characterViewLeftSide;
-			currentY = characterViewTopSide;
-		}
-		
-		if (!monster.getInitialized()) {
-			monster.setTargetX((int)characterViewLeftSide);
-			monster.setInitialized(true);
-		}
+	private double calculateDistance(int x1, int y1, int x2, int y2) {
+		return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+	}
 
-		int randomInt = random.nextInt(4);
-
-		
-		
-		if (!monster.getIsMoving()) {
-			switch (randomInt) {
-				case 0:
-					if (isWalkableTile(playModeGrid.findNorthTile(characterTile))) {
-						monster.setTargetY((int)(currentY - tileHeight));
-						monster.setIsMoving(true);
-						movingDirection = Directions.NORTH;
-					}
-					break;
+	private void attackHeroIfInRange(Monster monster) {
+		double distance = calculateDistance(hero.getPosX(), hero.getPosY(), monster.getX(), monster.getY());
 	
-				case 1:
-					if (isWalkableTile(playModeGrid.findSouthTile(characterTile))) {
-						monster.setTargetY((int)(currentY + tileHeight));
-						monster.setIsMoving(true);
-						movingDirection = Directions.SOUTH;
-					}
-					break;
-
-				case 2:
-					if ( isWalkableTile(playModeGrid.findWestTile(characterTile))) {
-						monster.setTargetX((int)(currentX - tileHeight));
-						monster.setIsMoving(true);
-						//hero.setFacingDirection(Directions.WEST);
-						movingDirection = Directions.WEST;
-					}
-
-				case 3:
-					if (isWalkableTile(playModeGrid.findEastTile(characterTile))) {
-						monster.setTargetX((int)(currentX + tileHeight));
-						monster.setIsMoving(true);
-						//hero.setFacingDirection(Directions.EAST);
-						movingDirection = Directions.EAST;
-					}
-
-			}
-	   
+		// FIGHTER attacks if adjacent
+		if (monster.getType() == MonsterType.FIGHTER && distance <= 1) {
+			hero.decreaseLives();
+			view.updateHeroLife(hero.getLiveCount());
 		}
-		
-		if (currentX < monster.getTargetX()) {
-			currentX = Math.min(currentX + speed, monster.getTargetX());
-			view.updateMonsterPosition(monsterView,currentX, currentY);
-		} else if (currentX > monster.getTargetX()) {
-			currentX = Math.max(currentX - speed, monster.getTargetX());
-			view.updateMonsterPosition(monsterView,currentX, currentY);
+	
+		// ARCHER attacks if within 3 tiles
+		if (monster.getType() == MonsterType.ARCHER && distance <= 3) {
+			hero.decreaseLives();
+			view.updateHeroLife(hero.getLiveCount());
 		}
-		
-		if (currentY < monster.getTargetY()) {
-			currentY = Math.min(currentY + speed, monster.getTargetY());
-			view.updateMonsterPosition(monsterView,currentX, currentY);
-		} else if (currentY > monster.getTargetY()) {
-			currentY = Math.max(currentY - speed, monster.getTargetY());
-			view.updateMonsterPosition(monsterView,currentX, currentY);
+	
+		// Game over check
+		// if (hero.getLiveCount() <= 0) {
+		// 	view.showGameOver();
+		// 	System.out.println("Game Over!");
+		// }
+	}
+	
+
+	public void moveCharacter(Monster monster) {
+		if (!monster.getIsMoving()) {
+			// Determine a new direction
+			Directions newDirection = getRandomDirection(monster);
+			monster.setMovingDirection(newDirection);
+			monster.setIsMoving(true);
 		}
-		//System.out.printf("%f currentx %d targetx%n",currentX,monster.getTargetX());
-		if (currentX == monster.getTargetX() && currentY == monster.getTargetY()) {
-			System.out.println("trying to move monster");
-			monster.setIsMoving(false);
-			if (movingDirection != null) {
-				moveMonsterDirection(movingDirection,monster);
-				movingDirection = null;
+	
+		// Move the monster based on its current direction
+		Directions direction = monster.getMovingDirection();
+		if (direction != null) {
+			Tile currentTile = playModeGrid.findTileWithIndex(monster.getX(), monster.getY());
+			Tile targetTile = getTargetTile(currentTile, direction);
+	
+			if (isWalkableTile(targetTile)) {
+				updateMonsterPosition(monster, targetTile);
+				attackHeroIfInRange(monster);
+			} else {
+				monster.setIsMoving(false); // Reset movement if the target is not walkable
 			}
 		}
 	}
+
+	private Directions getRandomDirection(Monster monster) {
+		Random random = new Random();
+		Directions[] directions = Directions.values();
+		return directions[random.nextInt(directions.length)];
+	}
+
+	private Tile getTargetTile(Tile currentTile, Directions direction) {
+		return switch (direction) {
+			case NORTH -> playModeGrid.findNorthTile(currentTile);
+			case SOUTH -> playModeGrid.findSouthTile(currentTile);
+			case EAST -> playModeGrid.findEastTile(currentTile);
+			case WEST -> playModeGrid.findWestTile(currentTile);
+		};
+	}
+
+	private void updateMonsterPosition(Monster monster, Tile targetTile) {
+		int targetX = playModeGrid.findXofTile(targetTile);
+		int targetY = playModeGrid.findYofTile(targetTile);
+	
+		// Update the grid and monster position
+		playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), 'E'); // Clear old position
+		playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Set new position
+		monster.setX(targetX);
+		monster.setY(targetY);
+	
+		// Update the view
+		Rectangle monsterView = monster.getMonsterView();
+		view.updateMonsterPosition(monsterView, targetTile.getLeftSide(), targetTile.getTopSide());
+	
+		// Mark movement as completed
+		monster.setIsMoving(false);
+	}
+	
 	
 	public boolean checkRune(Tile tile) {
 		if ((playModeGrid.findXofTile(tile) == runeXCoordinate) 

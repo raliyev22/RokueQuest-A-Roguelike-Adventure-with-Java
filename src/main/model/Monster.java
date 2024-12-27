@@ -1,4 +1,5 @@
 package main.model;
+import javafx.scene.control.skin.TextInputControlSkin.Direction;
 import javafx.scene.shape.Rectangle;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -12,26 +13,19 @@ public abstract class Monster {
     Grid grid;
     Tile tile;
     Rectangle monsterView;
-    Boolean initialized=false;
-
-    int targetX;
-    int targetY;
+    Directions movingDirection=null;
 
     Boolean isMoving=false;
 
-    public Boolean getIsMoving(){return this.isMoving;}
-    public void setIsMoving(Boolean bool){this.isMoving = bool;}
+    public void setMovingDirection(Directions dir){this.movingDirection = dir;}
 
-    public int getTargetX(){
-        return this.targetX;
+    public Directions getMovingDirection(){return this.movingDirection;}
+
+    public Boolean getIsMoving(){
+        return this.isMoving;
     }
-
-    public int getTargetY(){
-        return this.targetY;
-    }
-
-    public boolean getInitialized(){
-        return this.initialized;
+    public void setIsMoving(Boolean bool){
+        this.isMoving = bool;
     }
     
     public int getX(){
@@ -39,6 +33,12 @@ public abstract class Monster {
     }
     public int getY(){
         return y;
+    }
+    public void setY(int y){
+        this.y = y;
+    }
+    public void setX(int x){
+        this.x = x;
     }
     public MonsterType getType(){
         return type;
@@ -52,15 +52,7 @@ public abstract class Monster {
     public void setMonsterView(Rectangle monsterView){
         this.monsterView = monsterView;
     }
-    public void setTargetX(int x){
-        this.targetX = x;
-    }
-    public void setTargetY(int y){
-        this.targetY = y;
-    }
-    public void setInitialized(Boolean bool){
-        this.initialized = bool;
-    }
+
     public char getCharType(){
         switch (type){
             case MonsterType.FIGHTER -> {

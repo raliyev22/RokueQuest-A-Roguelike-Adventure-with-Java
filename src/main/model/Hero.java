@@ -58,7 +58,10 @@ public class Hero {
 	}
 	
 	public void decreaseLives() {
-		remainingLives--;
+		if(remainingLives>0){
+			remainingLives--;
+		}
+		
 	}
 	
 	public int getLiveCount(){

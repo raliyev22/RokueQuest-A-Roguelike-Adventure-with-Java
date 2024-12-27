@@ -39,6 +39,7 @@ public class PlayModeView {
 	protected int time;
 	protected Label timeLabel;
 	private VBox popupContainer; // Popup dialog container
+	private HBox heartsContainer;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -117,7 +118,7 @@ public class PlayModeView {
     	timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
 
 		
-        HBox heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
+        heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
 		heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
 		heartsContainer.setTranslateY(80);
 		Rectangle heart1,heart2,heart3,heart4;
@@ -205,7 +206,7 @@ public class PlayModeView {
 	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
 		monsterView.setX(x);
 		monsterView.setY(y);
-		System.out.println("monster moved");
+		//System.out.println("monster moved");
 	}
 
 	public void addToPane(Rectangle monsterView){
@@ -224,6 +225,16 @@ public class PlayModeView {
 		this.time = time;
 		timeLabel.setText("Time: " + time);
 		return time;
+	}
+
+	public void updateHeroLife(int life) {
+		// Example: Update hearts container based on remaining life
+		heartsContainer.getChildren().clear();
+		for (int i = 0; i < life; i++) {
+			Rectangle heart = new Rectangle(32, 32);
+			heart.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+			heartsContainer.getChildren().add(heart);
+		}
 	}
 	public void showGameOver() {
 		
