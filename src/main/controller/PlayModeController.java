@@ -7,6 +7,7 @@ import java.util.Random;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
@@ -249,6 +250,8 @@ public class PlayModeController extends Application {
 						movingDirection = Directions.EAST;
 					}
 				}
+				
+				view.changeHeroSprite(getHeroImage());
 				
 				if (currentX < targetX) {
 					currentX = Math.min(currentX + speed, targetX);
