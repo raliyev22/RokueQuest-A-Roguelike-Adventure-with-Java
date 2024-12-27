@@ -179,6 +179,11 @@ public class PlayModeView {
 			}
 		}
 	}
+
+	public void changeHeroSprite(Image img) {
+		ImagePattern patt = new ImagePattern(img);
+		heroView.setFill(patt);
+	}
 	
 	private void drawNormalItem(Pane pane, Tile tile, Image image) {
 		Rectangle normalItem = 
