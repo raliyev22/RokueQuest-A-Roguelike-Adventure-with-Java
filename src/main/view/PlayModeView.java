@@ -154,7 +154,7 @@ public class PlayModeView {
 		pane.getChildren().add(walls);
 	}
 	
-	private void showGrid(Grid grid) {
+	public void showGrid(Grid grid) {
 		List<Tile> tiles = grid.getTileMap();
 		for (Tile tile : tiles) {
 			char tileType = tile.getTileType();

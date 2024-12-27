@@ -64,6 +64,7 @@ public class PlayModeController extends Application {
 	public boolean isPaused = false;
 
 	private Random random=new Random();
+	private int wizardCount = 0;
 	
 	/*
 	public PlayModeController() {
@@ -186,6 +187,8 @@ public class PlayModeController extends Application {
 			
 			private long lastMonsterSpawnTime = 0;
 			private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+			private long lastRuneTeleportation = 0;
+			private static final long RUNE_TELEPORT_INTERVAL = 5_000_000_000L;
 			private boolean monsterInitialized = false;
 
 			private int counter = -1;
@@ -250,7 +253,7 @@ public class PlayModeController extends Application {
 						movingDirection = Directions.EAST;
 					}
 				}
-				
+
 				view.changeHeroSprite(getHeroImage());
 				
 				if (currentX < targetX) {
@@ -280,7 +283,7 @@ public class PlayModeController extends Application {
 				
 
 				//monster spawn logic
-				if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter>=8) {
+				if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter >= 8) {
 
 					int randomInt = random.nextInt(3);
 
@@ -319,6 +322,8 @@ public class PlayModeController extends Application {
 					view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
 					view.addToPane(monsterView);
 
+					view.showGrid(playModeGrid);
+
 					lastMonsterSpawnTime = now; 
 				}
 
@@ -332,6 +337,7 @@ public class PlayModeController extends Application {
 								moveCharacter(monster);
 								break;
 							case MonsterType.WIZARD:
+								wizardCount++;
 								break;
 	
 						}
@@ -339,15 +345,15 @@ public class PlayModeController extends Application {
 					lastMonsterUpdateTime = now;
 				}
 
-
-				
-				
+				if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
+					for (int i = 0; i < wizardCount; i++) {
+						teleportRune();
+					}
+					lastRuneTeleportation = now;
+				}
 
 				//monster movement
-				
 
-
-				
 				if (mouseClicked) {
 					if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
 						Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
@@ -371,6 +377,20 @@ public class PlayModeController extends Application {
 
 	private double calculateDistance(int x1, int y1, int x2, int y2) {
 		return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+	}
+
+	private void teleportRune() {
+		SecureRandom rng = new SecureRandom();
+		ArrayList<Tile> hallObjects = getHallObjectTiles();
+
+		int luckyHallObjectIndex = rng.nextInt(hallObjects.size());
+		Tile luckyHallObjectTile = hallObjects.get(luckyHallObjectIndex);
+
+		int newRuneX = playModeGrid.findXofTile(luckyHallObjectTile);
+		int newRuneY = playModeGrid.findYofTile(luckyHallObjectTile);
+
+		runeXCoordinate = newRuneX;
+		runeYCoordinate = newRuneY;
 	}
 
 	private void attackHeroIfInRange(Monster monster) {
@@ -501,7 +521,6 @@ public class PlayModeController extends Application {
 		int xIndexNew = monster.getX();
 		int yIndexNew = monster.getY();
 		playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
-		System.out.println(playModeGrid);
 	}
 	
 	
