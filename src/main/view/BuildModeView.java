@@ -237,11 +237,6 @@ public class BuildModeView extends Application {
 				PlayModeController.waterHall = hall3.getGrid();
 				PlayModeController.fireHall = hall4.getGrid();
 
-                PlayModeController.earthHallObjectCount = tileMap.get(hall1).size();
-                PlayModeController.airHallObjectCount = tileMap.get(hall2).size();
-                PlayModeController.waterHallObjectCount = tileMap.get(hall3).size();
-                PlayModeController.fireHallObjectCount = tileMap.get(hall4).size();
-
                 PlayModeController playModeController = new PlayModeController();
 				Stage newStage = new Stage();
                 playModeController.start(newStage);

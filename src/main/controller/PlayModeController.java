@@ -24,25 +24,16 @@ public class PlayModeController extends Application {
     protected final int tileHeight = 64;
     protected final int topLeftXCoordinate = 100;
     protected final int topLeftYCoordinate = 150;
-    private final double speed = 3;
     
     public static Grid earthHall;
     public static Grid airHall;
     public static Grid waterHall;
     public static Grid fireHall;
     
-    public static int earthHallObjectCount;
-    public static int airHallObjectCount;
-    public static int waterHallObjectCount;
-    public static int fireHallObjectCount;
-    
     public Grid playModeGrid;
     protected Hero hero;
     protected ArrayList<Monster> monsters;
     protected HallType hallType;
-    
-    private double targetX,targetY;
-    private double currentX,currentY;
     
     private int runeXCoordinate;
     private int runeYCoordinate;
@@ -64,10 +55,9 @@ public class PlayModeController extends Application {
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
-    private boolean initialized = false;
     public boolean isPaused = false;
     
-    private Random random=new Random();
+    private Random random = new Random();
     private int wizardCount = 0;
     
     /*
@@ -84,27 +74,27 @@ public class PlayModeController extends Application {
         if (null == this.hallType) {
             this.hallType = HallType.EARTH;
             playModeGrid.copyTileMap(earthHall);
-            this.time = PlayModeController.earthHallObjectCount * hallTimeMultiplier;
+            this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
         } else switch (this.hallType) {
             case EARTH -> {
                 this.hallType = HallType.AIR;
                 playModeGrid.copyTileMap(airHall);
-                this.time = PlayModeController.airHallObjectCount * hallTimeMultiplier;
+                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case AIR -> {
                 this.hallType = HallType.WATER;
                 playModeGrid.copyTileMap(waterHall);
-                this.time = PlayModeController.waterHallObjectCount * hallTimeMultiplier;
+                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case WATER -> {
                 this.hallType = HallType.FIRE;
                 playModeGrid.copyTileMap(fireHall);
-                this.time = PlayModeController.fireHallObjectCount * hallTimeMultiplier;
+                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             default -> {
                 this.hallType = HallType.EARTH;
                 playModeGrid.copyTileMap(earthHall);
-                this.time = PlayModeController.earthHallObjectCount * hallTimeMultiplier;
+                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
         }
         
@@ -193,14 +183,10 @@ public class PlayModeController extends Application {
     
     private void startGameLoop() {
         AnimationTimer gameLoop = new AnimationTimer() {
-            private boolean isMoving = false;
-            Directions movingDirection = null;
-            
             private long lastMonsterSpawnTime = 0;
             private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
             private long lastRuneTeleportation = 0;
             private static final long RUNE_TELEPORT_INTERVAL = 5_000_000_000L;
-            private boolean monsterInitialized = false;
 
             private int counter = -1;
             
