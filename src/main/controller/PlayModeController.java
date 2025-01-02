@@ -135,8 +135,8 @@ public class PlayModeController extends Application {
         
         primaryStage.setTitle("Play Example");
         primaryStage.setScene(scene);
-        primaryStage.setFullScreen(true);
-        primaryStage.setFullScreenExitHint("");
+        //primaryStage.setFullScreen(true);
+        //primaryStage.setFullScreenExitHint("");
         primaryStage.show();
         
         startGameLoop();
