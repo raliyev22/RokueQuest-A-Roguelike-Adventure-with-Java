@@ -24,7 +24,7 @@ public class PlayModeController extends Application {
     protected final int tileHeight = 64;
     protected final int topLeftXCoordinate = 100;
     protected final int topLeftYCoordinate = 150;
-    private final double speed = 30;
+    private final double speed = 3;
     
     public static Grid earthHall;
     public static Grid airHall;
@@ -57,7 +57,10 @@ public class PlayModeController extends Application {
     
     private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
     private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
-    
+
+	private static final int TARGET_FPS = 240;
+	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
+	private long lastFrameTime = 0;
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
@@ -198,121 +201,126 @@ public class PlayModeController extends Application {
             private long lastRuneTeleportation = 0;
             private static final long RUNE_TELEPORT_INTERVAL = 5_000_000_000L;
             private boolean monsterInitialized = false;
-            
+
             private int counter = -1;
             
             
-            
+
             @Override
             public void handle(long now) {
-                if (time < 0) {
-                    view.showGameOver();
-                    this.stop();
-                    return;
-                }
-                
-                if (hero.getLiveCount() == 0) {
-                    view.showGameOver();
-                    this.stop();
-                    return;
-                }
-                
-                if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
-                    view.updateTime(time); // Update the view
-                    time--;
-                    lastUpdateTime = now;
-                    counter++;
-                }
-                moveHero();
-                
-                view.changeHeroSprite(getHeroImage());
-                
-                //monster spawn logic
-                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter >= 8) {
-                    
-                    int randomInt = random.nextInt(3);
-                    
-                    Monster monster = null;
-                    Tile initialMonsterTile = getRandomEmptyTile();
-                    
-                    int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
-                    int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
-                    Tile monsterTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
-                    
-                    Rectangle monsterView = new Rectangle(64,64);
-                    
-                    switch (randomInt) {
-                        case 0:
-                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                        monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                        monster.setMonsterView(monsterView);
-                        break;
-                        case 1:
-                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
-                        monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
-                        monster.setMonsterView(monsterView);
-                        break;
-                        case 2:
-                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
-                        monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
-                        monster.setMonsterView(monsterView);
-                        break;
-                        default:
-                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                        monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                        monster.setMonsterView(monsterView);
+				if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
+					return;
+				}
+				lastFrameTime = now;
+
+                    if (time < 0) {
+                        view.showGameOver();
+                        this.stop();
+                        return;
                     }
                     
-                    
-                    view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
-                    view.addToPane(monsterView);
-                    
-                    view.showGrid(playModeGrid);
-                    
-                    lastMonsterSpawnTime = now; 
-                }
-                
-                if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
-                    for(Monster monster : monsters){
-                        switch(monster.getType()){
-                            case MonsterType.FIGHTER:
-                            moveCharacter(monster);
-                            break;
-                            case MonsterType.ARCHER:
-                            moveCharacter(monster);
-                            break;
-                            case MonsterType.WIZARD:
-                            wizardCount++;
-                            break;
-                            
-                        }
+                    if (hero.getLiveCount() == 0) {
+                        view.showGameOver();
+                        this.stop();
+                        return;
                     }
-                    lastMonsterUpdateTime = now;
-                }
-                
-                if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
-                    for (int i = 0; i < wizardCount; i++) {
-                        teleportRune();
+                    
+                    if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
+                        view.updateTime(time); // Update the view
+                        time--;
+                        lastUpdateTime = now;
+                        counter++;
                     }
-                    lastRuneTeleportation = now;
-                }
-                
-                //monster movement
-                
-                if (mouseClicked) {
-                    if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
-                        Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
+                    moveHero();
+                    
+                    view.changeHeroSprite(getHeroImage());
+                    
+                    //monster spawn logic
+                    if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter >= 8) {
                         
-                        if (checkRune(clickedTile)) {
-                            hero.isMoving = false;
-                            counter=-1;
-                            initializePlayMode();
-                            
+                        int randomInt = random.nextInt(3);
+                        
+                        Monster monster = null;
+                        Tile initialMonsterTile = getRandomEmptyTile();
+                        
+                        int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
+                        int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
+                        Tile monsterTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
+                        
+                        Rectangle monsterView = new Rectangle(64,64);
+                        
+                        switch (randomInt) {
+                            case 0:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                            monster.setMonsterView(monsterView);
+                            break;
+                            case 1:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
+                            monster.setMonsterView(monsterView);
+                            break;
+                            case 2:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+                            monster.setMonsterView(monsterView);
+                            break;
+                            default:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                            monster.setMonsterView(monsterView);
                         }
+                        
+                        
+                        view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
+                        view.addToPane(monsterView);
+                        
+                        view.showGrid(playModeGrid);
+                        
+                        lastMonsterSpawnTime = now; 
                     }
                     
-                    mouseClicked = false;
-                }
+                    if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
+                        for(Monster monster : monsters){
+                            switch(monster.getType()){
+                                case MonsterType.FIGHTER:
+                                moveCharacter(monster);
+                                break;
+                                case MonsterType.ARCHER:
+                                moveCharacter(monster);
+                                break;
+                                case MonsterType.WIZARD:
+                                wizardCount++;
+                                break;
+                                
+                            }
+                        }
+                        lastMonsterUpdateTime = now;
+                    }
+                    
+                    if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
+                        for (int i = 0; i < wizardCount; i++) {
+                            teleportRune();
+                        }
+                        lastRuneTeleportation = now;
+                    }
+                    
+                    //monster movement
+                    
+                    if (mouseClicked) {
+                        if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
+                            Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
+                            
+                            if (checkRune(clickedTile)) {
+                                hero.isMoving = false;
+                                counter=-1;
+                                initializePlayMode();
+                                
+                            }
+                        }
+                        
+                        mouseClicked = false;
+                    }
                 
             }
         };
