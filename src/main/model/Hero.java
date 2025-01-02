@@ -1,37 +1,34 @@
 package main.model;
 
-import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 
 public class Hero {
 	public final int maxLives = 4;
-	private int posX, posY, remainingLives;
-	private Image img;
+    public int speed = 5;
+
+	private int posX, posY;
+    private int remainingLives;
+
+    public int targetX, targetY;
+    public int currentX, currentY;
+    public Rectangle heroView;
+
 	public boolean isMoving;
 	public boolean isTakingDamage;
+    public Directions movingDirection;
 	public Directions facingDirection;
 	
 	
-	public Hero(int posX, int posY, Image img) {
+	public Hero(int posX, int posY) {
 		this.posX = posX;
 		this.posY = posY;
-		this.img = img;
 		this.remainingLives = 4;
 		this.isMoving = false;
 		this.isTakingDamage = false;
 		this.facingDirection = Directions.EAST;
 	}
 
-	public Hero(int posX, int posY) {
-		this.posX = posX;
-		this.posY = posY;
-		this.img = null;
-		this.remainingLives = 4;
-		this.isMoving = false;
-		this.isTakingDamage = false;
-		this.facingDirection = Directions.EAST;
-	}
-	
 	public void move(Directions direction) {
 		switch (direction) {
 			case Directions.NORTH -> {
@@ -84,10 +81,6 @@ public class Hero {
 			return 'R';
 		}
 	}
-
-	public void setFacingDirection(Directions direction) {
-        this.facingDirection = direction;
-    }
 
 	public void setFill(ImagePattern imagePattern) {
 		// TODO Auto-generated method stub

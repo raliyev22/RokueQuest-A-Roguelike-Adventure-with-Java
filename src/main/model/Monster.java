@@ -1,5 +1,5 @@
 package main.model;
-import javafx.scene.control.skin.TextInputControlSkin.Direction;
+
 import javafx.scene.shape.Rectangle;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -67,9 +67,6 @@ public abstract class Monster {
             default -> throw new IllegalArgumentException("Invalid monster type");
         }
     }
-    public void moveRandomly(Grid grid){
-    }
-
 
     public void move(Directions direction) {
 		switch (direction) {
