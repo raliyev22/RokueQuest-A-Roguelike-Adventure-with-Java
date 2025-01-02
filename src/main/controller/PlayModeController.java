@@ -42,6 +42,7 @@ public class PlayModeController extends Application {
     private double mouseY;
     
     protected int time;
+    
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
@@ -91,7 +92,7 @@ public class PlayModeController extends Application {
                 playModeGrid.copyTileMap(fireHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
-            default -> {
+            default -> { // Add game over screen here
                 this.hallType = HallType.EARTH;
                 playModeGrid.copyTileMap(earthHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
@@ -394,6 +395,29 @@ public class PlayModeController extends Application {
             }
         }
     }
+
+    public void moveHeroDirection(Directions dir) {
+        int xIndexOld = hero.getPosX();
+        int yIndexOld = hero.getPosY();
+        playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
+        
+        hero.move(dir);
+        
+        int xIndexNew = hero.getPosX();
+        int yIndexNew = hero.getPosY();
+        playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, hero.getCharType());
+        //System.out.println(playModeGrid);
+    }
+    
+    public Image getHeroImage() {
+        if (hero.getCharType() == 'R') {
+            return Images.IMAGE_PLAYERRIGHT_x4;
+        } else if (hero.getCharType() == 'L') {
+            return Images.IMAGE_PLAYERLEFT_x4;
+        }else {
+            return null;
+        }
+    }
     
     private double calculateDistance(int x1, int y1, int x2, int y2) {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -502,33 +526,6 @@ public class PlayModeController extends Application {
             }
         }
         return false;
-    }
-    
-    public void moveHeroDirection(Directions dir) {
-        int xIndexOld = hero.getPosX();
-        int yIndexOld = hero.getPosY();
-        playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
-        
-        hero.move(dir);
-        
-        int xIndexNew = hero.getPosX();
-        int yIndexNew = hero.getPosY();
-        playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, getHeroCharType());
-        //System.out.println(playModeGrid);
-    }
-    
-    public char getHeroCharType() {
-        return this.hero.getCharType();
-    }
-    
-    public Image getHeroImage() {
-        if (getHeroCharType() == 'R') {
-            return Images.IMAGE_PLAYERRIGHT_x4;
-        } else if (getHeroCharType() == 'L') {
-            return Images.IMAGE_PLAYERLEFT_x4;
-        }else {
-            return null;
-        }
     }
     
     public void moveMonsterDirection(Directions dir,Monster monster) {
@@ -659,62 +656,6 @@ public class PlayModeController extends Application {
             return true;
         }
         return false;
-    }
-    
-    public boolean checkHeroDirection(Directions dir) {
-        boolean canWalk = false;
-        Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
-        
-        switch (dir) {
-            case Directions.NORTH -> {
-                Tile aboveTile = playModeGrid.findNorthTile(heroTile);
-                if (aboveTile != null) {
-                    if (isWalkableTileType(aboveTile.getTileType())) {
-                        canWalk = true;
-                        return true;
-                    }
-                }
-            }
-            case Directions.EAST -> {
-                Tile rightTile = playModeGrid.findEastTile(heroTile);
-                if (rightTile != null) {
-                    if (isWalkableTileType(rightTile.getTileType())) {
-                        canWalk = true;
-                        return true;
-                    }
-                }
-            }
-            case Directions.SOUTH -> {
-                Tile belowTile = playModeGrid.findSouthTile(heroTile);
-                if (belowTile != null) {
-                    if (isWalkableTileType(belowTile.getTileType())) {
-                        canWalk = true;
-                        return true;
-                    }
-                }
-            }
-            case Directions.WEST -> {
-                Tile leftTile = playModeGrid.findWestTile(heroTile);
-                if (leftTile != null) {
-                    if (isWalkableTileType(leftTile.getTileType())) {
-                        canWalk = true;
-                        return true;
-                    }
-                }
-            }
-            default -> throw new AssertionError();
-        }
-        
-        return canWalk;
-    }
-    
-    public Grid updateGrid() {
-        this.playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
-        for (Monster monster : monsters) {
-            this.playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
-        }
-        this.playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
-        return this.playModeGrid;
     }
     
     public Grid getPlayModeGrid() {
