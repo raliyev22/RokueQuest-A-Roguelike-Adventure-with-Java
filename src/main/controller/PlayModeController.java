@@ -24,7 +24,7 @@ public class PlayModeController extends Application {
     protected final int tileHeight = 64;
     protected final int topLeftXCoordinate = 100;
     protected final int topLeftYCoordinate = 150;
-    private final double speed = 3;
+    private final double speed = 30;
     
     public static Grid earthHall;
     public static Grid airHall;
