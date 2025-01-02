@@ -217,6 +217,7 @@ public class PlayModeController extends Application {
                         lastUpdateTime = now;
                         counter++;
                     }
+
                     moveHero();
                     
                     view.changeHeroSprite(getHeroImage());
@@ -325,19 +326,43 @@ public class PlayModeController extends Application {
         
         if (!hero.isMoving) {
             if (upPressed && isWalkableTile(playModeGrid.findNorthTile(heroTile))) {
+                heroTile.changeTileType('?');
+                Tile northTile = playModeGrid.findNorthTile(heroTile);
+                if (northTile != null) {
+                    northTile.changeTileType('?');
+                }
+
                 hero.targetY = hero.currentY - tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.NORTH;
             } else if (downPressed && isWalkableTile(playModeGrid.findSouthTile(heroTile))) {
+                heroTile.changeTileType('?');
+                Tile southTile = playModeGrid.findSouthTile(heroTile);
+                if (southTile != null) {
+                    southTile.changeTileType('?');
+                }
+
                 hero.targetY = hero.currentY + tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.SOUTH;
             } else if (leftPressed && isWalkableTile(playModeGrid.findWestTile(heroTile))) {
+                heroTile.changeTileType('?');
+                Tile westTile = playModeGrid.findWestTile(heroTile);
+                if (westTile != null) {
+                    westTile.changeTileType('?');
+                }
+
                 hero.targetX = hero.currentX - tileHeight;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
             } else if (rightPressed && isWalkableTile(playModeGrid.findEastTile(heroTile))) {
+                heroTile.changeTileType('?');
+                Tile eastTile = playModeGrid.findEastTile(heroTile);
+                if (eastTile != null) {
+                    eastTile.changeTileType('?');
+                }
+
                 hero.targetX = hero.currentX + tileHeight;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
