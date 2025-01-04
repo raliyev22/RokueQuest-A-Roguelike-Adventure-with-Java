@@ -76,7 +76,7 @@ public class Main extends Application {
         primaryStage.setFullScreen(false);
 
         soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
-        soundPlayer.setVolume("background", -25);   
+        soundPlayer.setVolume("background", -30);   
         soundPlayer.loopSoundEffect("background");
 
         primaryStage.show();
