@@ -41,7 +41,7 @@ public class PlayModeController extends Application {
     private double mouseX;
     private double mouseY;
     
-    protected int time;
+    public int time;
     
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
@@ -60,14 +60,16 @@ public class PlayModeController extends Application {
     
     private Random random = new Random();
     private int wizardCount = 0;
+
+    private AnimationTimer gameLoop;
+    private boolean isRunning = false;
     
-    /*
-    public PlayModeController() {
-    initializePlayMode();
-    }
-    */
+
+    // public PlayModeController() {
+    //     initializePlayMode();
+    // }
     
-    private void initializePlayMode() {
+    public void initializePlayMode() {
         // Create a new empty grid
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
         
@@ -92,10 +94,9 @@ public class PlayModeController extends Application {
                 playModeGrid.copyTileMap(fireHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
-            default -> { // Add game over screen here
-                this.hallType = HallType.EARTH;
-                playModeGrid.copyTileMap(earthHall);
-                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
+            case FIRE -> { // Add game over screen here
+                stopGameLoop();
+                view.showGameOverPopup(true);
             }
         }
         
@@ -117,19 +118,19 @@ public class PlayModeController extends Application {
         Tile runeTile = getRandomHallObjectTile();
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
-        
+    }
+    
+    public void start(Stage primaryStage) {
+        initializePlayMode();
         // If view is null (which means we are in the first hall), create a new one
+        Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         if (view == null){
-            view = new PlayModeView(playModeGrid, time);
+            view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         } else { // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         }
-    }
-    
-    public void start(Stage primaryStage) {
-        initializePlayMode();
         
         Scene scene = view.getScene();
         initialize(scene);
@@ -143,7 +144,7 @@ public class PlayModeController extends Application {
         startGameLoop();
     }
     
-    private void initialize(Scene scene) {
+    public void initialize(Scene scene) {
         scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
         scene.getRoot().requestFocus();
         scene.setOnKeyReleased(event -> handleKeyReleased(event.getCode()));
@@ -182,8 +183,10 @@ public class PlayModeController extends Application {
     }
     
     
-    private void startGameLoop() {
-        AnimationTimer gameLoop = new AnimationTimer() {
+    public void startGameLoop() {
+        if (isRunning) return;
+        isRunning = true;
+        gameLoop = new AnimationTimer() {
             private long lastMonsterSpawnTime = 0;
             private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
             private long lastRuneTeleportation = 0;
@@ -201,13 +204,13 @@ public class PlayModeController extends Application {
 				lastFrameTime = now;
 
                     if (time < 0) {
-                        view.showGameOver();
+                        view.showGameOverPopup(false);
                         this.stop();
                         return;
                     }
                     
                     if (hero.getLiveCount() == 0) {
-                        view.showGameOver();
+                        view.showGameOverPopup(false);
                         this.stop();
                         return;
                     }
@@ -313,6 +316,15 @@ public class PlayModeController extends Application {
             }
         };
         gameLoop.start();
+    }
+
+    private void stopGameLoop() {
+        if (!isRunning) return;
+        isRunning = false;
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+        System.out.println("Game loop stopped.");
     }
 
     public void moveHero() {

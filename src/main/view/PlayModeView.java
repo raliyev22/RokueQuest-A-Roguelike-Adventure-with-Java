@@ -4,6 +4,8 @@ package main.view;
 import java.net.http.HttpRequest;
 import java.util.List;
 
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -25,6 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import main.Main;
 import main.controller.PlayModeController;
 import main.model.Images;
 import main.utils.Grid;
@@ -40,14 +43,16 @@ public class PlayModeView {
 	protected Label timeLabel;
 	private VBox popupContainer; // Popup dialog container
 	private HBox heartsContainer;
+	private Stage primaryStage;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
-	public PlayModeView(Grid grid, int time) {
+	public PlayModeView(Grid grid, int time, Stage primaryStage) {
 		this.grid = grid;
 		this.time = time;
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
+		this.primaryStage = primaryStage;
 		initialize();
 	}
 
@@ -241,7 +246,43 @@ public class PlayModeView {
 			heartsContainer.getChildren().add(heart);
 		}
 	}
-	public void showGameOver() {
-		
+
+	public void showGameOverPopup(boolean isWin) {
+		Platform.runLater(() -> {
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Game Over");
+	
+			if (isWin) {
+				alert.setHeaderText("Congratulations!");
+				alert.setContentText("You have successfully completed the game!");
+			} else {
+				alert.setHeaderText("Game Over");
+				alert.setContentText("You failed to complete the game.");
+			}
+	
+			// Ana menüye dön, tekrar başla ve oyundan çık butonları
+			ButtonType mainMenuButton = new ButtonType("Return to Menu");
+			ButtonType exitButton = new ButtonType("Exit the Game");
+	
+			alert.getButtonTypes().setAll(mainMenuButton, exitButton);
+	
+			DialogPane dialogPane = alert.getDialogPane();
+			dialogPane.setStyle("-fx-font-size: 16px; -fx-background-color: #222; -fx-text-fill: black;");
+	
+			// Kullanıcı seçimlerine göre işlem yapma
+			alert.showAndWait().ifPresent(response -> {
+				if (response == mainMenuButton) {
+					Main mainPage = new Main();
+					primaryStage.close();
+					mainPage.start(primaryStage);
+				} else if (response == exitButton) {
+					System.exit(0); // Oyundan çık
+				}	
+			});
+		});
 	}
+	
+
+	
+	
 }
