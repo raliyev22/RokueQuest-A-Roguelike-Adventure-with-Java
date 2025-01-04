@@ -84,16 +84,19 @@ public class PlayModeController extends Application {
             this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
         } else switch (this.hallType) {
             case EARTH -> {
+                wizardCount = 0;
                 this.hallType = HallType.AIR;
                 playModeGrid.copyTileMap(airHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case AIR -> {
+                wizardCount = 0;
                 this.hallType = HallType.WATER;
                 playModeGrid.copyTileMap(waterHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case WATER -> {
+                wizardCount = 0;
                 this.hallType = HallType.FIRE;
                 playModeGrid.copyTileMap(fireHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
