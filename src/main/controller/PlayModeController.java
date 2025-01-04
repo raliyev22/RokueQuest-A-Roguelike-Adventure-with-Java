@@ -75,8 +75,10 @@ public class PlayModeController extends Application {
     
     public void initializePlayMode() {
         // Create a new empty grid
+
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
         
+        wizardCount = 0;        
         // Populate the grid with the objects stored in the static variables
         if (null == this.hallType) {
             this.hallType = HallType.EARTH;
@@ -84,19 +86,16 @@ public class PlayModeController extends Application {
             this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
         } else switch (this.hallType) {
             case EARTH -> {
-                wizardCount = 0;
                 this.hallType = HallType.AIR;
                 playModeGrid.copyTileMap(airHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case AIR -> {
-                wizardCount = 0;
                 this.hallType = HallType.WATER;
                 playModeGrid.copyTileMap(waterHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
             case WATER -> {
-                wizardCount = 0;
                 this.hallType = HallType.FIRE;
                 playModeGrid.copyTileMap(fireHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
