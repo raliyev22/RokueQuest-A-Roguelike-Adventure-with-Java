@@ -163,7 +163,9 @@ public class PlayModeController extends Application {
         soundPlayer.setVolume("gameLoser", -15);
         soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
         soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
+        soundPlayer.setVolume("fighter", -10);
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
+        soundPlayer.setVolume("wizard", -10);
     }
     
     public void initialize(Scene scene) {
