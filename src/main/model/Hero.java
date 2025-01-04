@@ -5,7 +5,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Hero {
 	public final int maxLives = 4;
-    public int speed = 5;
+    public int speed = 4;
 
 	private int posX, posY;
     private int remainingLives;

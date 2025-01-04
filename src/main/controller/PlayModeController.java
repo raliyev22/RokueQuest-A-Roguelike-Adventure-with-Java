@@ -1,8 +1,12 @@
 package main.controller;
 
+import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -14,7 +18,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.model.*;
 import main.utils.*;
-import main.view.GameOverView;
 import main.view.PlayModeView;
 
 public class PlayModeController extends Application {
@@ -63,7 +66,8 @@ public class PlayModeController extends Application {
 
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
-    
+    private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
+
 
     // public PlayModeController() {
     //     initializePlayMode();
@@ -127,8 +131,9 @@ public class PlayModeController extends Application {
     
     public void start(Stage primaryStage) {
         initializePlayMode();
-        // If view is null (which means we are in the first hall), create a new one
+        initializeSoundEffects();
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+        // If view is null (which means we are in the first hall), create a new one
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
@@ -137,13 +142,27 @@ public class PlayModeController extends Application {
         Scene scene = view.getScene();
         initialize(scene);
         
-        primaryStage.setTitle("Play Example");
+        primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
-        //primaryStage.setFullScreen(true);
-        //primaryStage.setFullScreenExitHint("");
+        // primaryStage.setFullScreen(true);
+        // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
-        
+
         startGameLoop();
+    }
+
+    private void initializeSoundEffects() {
+        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
+        soundPlayer.setVolume("step", -10);
+        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
+        soundPlayer.setVolume("door", -10);
+        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
+        soundPlayer.setVolume("gameWinner", -15);
+        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
+        soundPlayer.setVolume("gameLoser", -15);
+        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
+        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
+        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
     }
     
     public void initialize(Scene scene) {
@@ -158,6 +177,7 @@ public class PlayModeController extends Application {
         });
         scene.getRoot().requestFocus();
     }
+    
     
     private void handleKeyPressed(KeyCode code) {
         //System.out.println("Key Pressed: " + code); // Debugging statement
@@ -207,13 +227,15 @@ public class PlayModeController extends Application {
 
                     if (time < 0) {
                         view.showGameOverPopup(false);
-                        this.stop();
+                        playSoundEffectInThread("gameLoser");
+                        stopGameLoop();
                         return;
                     }
                     
                     if (hero.getLiveCount() == 0) {
                         view.showGameOverPopup(false);
-                        this.stop();
+                        playSoundEffectInThread("gameLoser");
+                        stopGameLoop();
                         return;
                     }
                     
@@ -294,6 +316,7 @@ public class PlayModeController extends Application {
                     if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
                         for (int i = 0; i < wizardCount; i++) {
                             teleportRune();
+                            playSoundEffectInThread("wizard");        
                         }
                         lastRuneTeleportation = now;
                     }
@@ -305,10 +328,22 @@ public class PlayModeController extends Application {
                             Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
                             
                             if (checkRune(clickedTile)) {
+                                stopGameLoop();
                                 hero.isMoving = false;
                                 counter=-1;
+                                if(hallType == HallType.FIRE){
+                                    playSoundEffectInThread("gameWinner");
+                                }
+                                else{
+                                    playSoundEffectInThread("door");
+                                    try {
+                                        Thread.sleep(1500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 initializePlayMode();
-                                
+                                startGameLoop();
                             }
                         }
                         
@@ -329,11 +364,16 @@ public class PlayModeController extends Application {
         System.out.println("Game loop stopped.");
     }
 
+    public Hero initializeHero(int xCoordinate, int yCoordinate) {
+        Hero hero = new Hero(xCoordinate, yCoordinate);
+        playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
+        return hero;
+    }
     public void moveHero() {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         int heroViewLeftSide = heroTile.getLeftSide();
         int heroViewTopSide = heroTile.getTopSide();
-        
+
         if(!hero.isMoving){
             hero.currentX = heroViewLeftSide;
             hero.currentY = heroViewTopSide;
@@ -346,42 +386,46 @@ public class PlayModeController extends Application {
                 if (northTile != null) {
                     northTile.changeTileType('?');
                 }
-
                 hero.targetY = hero.currentY - tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.NORTH;
+
+                playSoundEffectInThread("step");        
             } else if (downPressed && isWalkableTile(playModeGrid.findSouthTile(heroTile))) {
                 heroTile.changeTileType('?');
                 Tile southTile = playModeGrid.findSouthTile(heroTile);
                 if (southTile != null) {
                     southTile.changeTileType('?');
                 }
-
                 hero.targetY = hero.currentY + tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.SOUTH;
+
+                playSoundEffectInThread("step");        
             } else if (leftPressed && isWalkableTile(playModeGrid.findWestTile(heroTile))) {
                 heroTile.changeTileType('?');
                 Tile westTile = playModeGrid.findWestTile(heroTile);
                 if (westTile != null) {
                     westTile.changeTileType('?');
                 }
-
                 hero.targetX = hero.currentX - tileHeight;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
+
+                playSoundEffectInThread("step");        
             } else if (rightPressed && isWalkableTile(playModeGrid.findEastTile(heroTile))) {
                 heroTile.changeTileType('?');
                 Tile eastTile = playModeGrid.findEastTile(heroTile);
                 if (eastTile != null) {
                     eastTile.changeTileType('?');
                 }
-
                 hero.targetX = hero.currentX + tileHeight;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
                 hero.movingDirection = Directions.EAST;
+
+                playSoundEffectInThread("step");        
             }
         }
 
@@ -437,7 +481,7 @@ public class PlayModeController extends Application {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
     
-    private void teleportRune() {
+    private void  teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();
         
@@ -458,12 +502,14 @@ public class PlayModeController extends Application {
         if (monster.getType() == MonsterType.FIGHTER && distance <= 1) {
             hero.decreaseLives();
             view.updateHeroLife(hero.getLiveCount());
+            playSoundEffectInThread("fighter");        
         }
         
         // ARCHER attacks if within 3 tiles
         if (monster.getType() == MonsterType.ARCHER && distance <= 3) {
             hero.decreaseLives();
             view.updateHeroLife(hero.getLiveCount());
+            playSoundEffectInThread("archer");        
         }
         
         // Game over check
@@ -496,6 +542,12 @@ public class PlayModeController extends Application {
             }
         }
     }
+
+    public void playSoundEffectInThread(String label) {
+        new Thread(() -> {
+            soundPlayer.playSoundEffect(label);
+        }).start();
+    }    
     
     private Directions getRandomDirection(Monster monster) {
         Random random = new Random();
@@ -552,13 +604,6 @@ public class PlayModeController extends Application {
         int xIndexNew = monster.getX();
         int yIndexNew = monster.getY();
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
-    }
-    
-    
-    public Hero initializeHero(int xCoordinate, int yCoordinate) {
-        Hero hero = new Hero(xCoordinate, yCoordinate);
-        playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
-        return hero;
     }
     
     public void setHeroDirection(Directions direction) {

@@ -4,9 +4,7 @@ import javafx.animation.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,11 +14,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import main.utils.SoundEffects;
 import main.view.BuildModeView;
 //import main.view.CustomAlertView;
 import main.view.HelpView;
 
 public class Main extends Application {
+    SoundEffects soundPlayer = SoundEffects.getInstance();
+
+
     @Override
     public void start(Stage primaryStage) {
         // Main layout
@@ -71,7 +73,12 @@ public class Main extends Application {
         // Set up the main stage in the center of the screen
         primaryStage.setX((screenBounds1.getWidth() - 600) / 2); // Replace 600 with the width of the mainPage scene
         primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
-    
+        primaryStage.setFullScreen(false);
+
+        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
+        soundPlayer.setVolume("background", -25);   
+        soundPlayer.loopSoundEffect("background");
+
         primaryStage.show();
     }
 
@@ -170,9 +177,10 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch(args);     
     }
     private void showExitConfirmation(Stage primaryStage) {
+        System.exit(0);
         // CustomAlertView.showAlert(
         //     primaryStage,
         //     "Exit Confirmation",

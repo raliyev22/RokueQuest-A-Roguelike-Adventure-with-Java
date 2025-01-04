@@ -1,10 +1,6 @@
-// PlayModeView.java
 package main.view;
 
-import java.net.http.HttpRequest;
 import java.util.List;
-
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -19,7 +15,6 @@ import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -41,7 +36,6 @@ public class PlayModeView {
 	protected Rectangle heroView;
 	protected int time;
 	protected Label timeLabel;
-	private VBox popupContainer; // Popup dialog container
 	private HBox heartsContainer;
 	private Stage primaryStage;
 
@@ -249,38 +243,65 @@ public class PlayModeView {
 
 	public void showGameOverPopup(boolean isWin) {
 		Platform.runLater(() -> {
-			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			Alert alert = new Alert(Alert.AlertType.NONE);
 			alert.setTitle("Game Over");
 	
-			if (isWin) {
-				alert.setHeaderText("Congratulations!");
-				alert.setContentText("You have successfully completed the game!");
-			} else {
-				alert.setHeaderText("Game Over");
-				alert.setContentText("You failed to complete the game.");
-			}
+			Label headerLabel = new Label(isWin ? "Congratulations!" : "Try Again");
+			headerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
+			headerLabel.setAlignment(javafx.geometry.Pos.CENTER);
+			headerLabel.setMaxWidth(Double.MAX_VALUE);
 	
-			// Ana menüye dön, tekrar başla ve oyundan çık butonları
-			ButtonType mainMenuButton = new ButtonType("Return to Menu");
-			ButtonType exitButton = new ButtonType("Exit the Game");
+			Label contentLabel = new Label(isWin 
+				? "You have successfully completed the game!" 
+				: "You failed to complete the game.");
+			contentLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
 	
-			alert.getButtonTypes().setAll(mainMenuButton, exitButton);
+			VBox contentBox = new VBox(10, headerLabel, contentLabel);
+			contentBox.setAlignment(javafx.geometry.Pos.CENTER);
+			contentBox.setStyle("-fx-background-color: transparent; -fx-padding: 10;");
+	
+			// Butonları elle oluştur ve ortala
+			Button mainMenuButton = new Button("Return to Menu");
+			Button exitButton = new Button("Exit the Game");
+			mainMenuButton.setPrefWidth(150);
+			exitButton.setPrefWidth(150);
+	
+			mainMenuButton.setOnAction(e -> {
+				
+				Main mainPage = new Main();
+				primaryStage.close();
+				mainPage.start(primaryStage);
+				alert.close();
+			});
+	
+			exitButton.setOnAction(e -> {
+				System.exit(0);
+			});
+	
+			HBox buttonBox = new HBox(20, mainMenuButton, exitButton);
+			buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
+	
+			VBox dialogContent = new VBox(20, contentBox, buttonBox);
+			dialogContent.setAlignment(javafx.geometry.Pos.CENTER);
+			dialogContent.setStyle("-fx-background-color: #222; -fx-padding: 20;");
 	
 			DialogPane dialogPane = alert.getDialogPane();
-			dialogPane.setStyle("-fx-font-size: 16px; -fx-background-color: #222; -fx-text-fill: black;");
+			dialogPane.setContent(dialogContent);
+			dialogPane.setStyle("-fx-background-color: #222;");
 	
-			// Kullanıcı seçimlerine göre işlem yapma
-			alert.showAndWait().ifPresent(response -> {
-				if (response == mainMenuButton) {
-					Main mainPage = new Main();
-					primaryStage.close();
-					mainPage.start(primaryStage);
-				} else if (response == exitButton) {
-					System.exit(0); // Oyundan çık
-				}	
-			});
+			Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+			alertStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+			alertStage.setResizable(false);
+			alertStage.setAlwaysOnTop(true);
+	
+			// Arkadaki ekranı kilitlemek için initOwner ile ana pencereyi belirle
+			alertStage.initOwner(primaryStage); // Ana sahneyi sahip olarak belirle
+			alertStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+	
+			alert.showAndWait();
 		});
 	}
+	
 	
 
 	
