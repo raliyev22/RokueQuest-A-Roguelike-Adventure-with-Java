@@ -118,6 +118,11 @@ public class PlayModeController extends Application {
         Tile runeTile = getRandomHallObjectTile();
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
+
+        if(view!=null){ // Else we have already come from another grid, which means we only need to refresh the view
+            view.refresh(playModeGrid, time);
+            view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+        }
     }
     
     public void start(Stage primaryStage) {
@@ -126,9 +131,6 @@ public class PlayModeController extends Application {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
-            view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-        } else { // Else we have already come from another grid, which means we only need to refresh the view
-            view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         }
         
