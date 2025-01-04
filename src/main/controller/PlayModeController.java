@@ -75,7 +75,6 @@ public class PlayModeController extends Application {
     
     public void initializePlayMode() {
         // Create a new empty grid
-
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
         
         wizardCount = 0;        
@@ -281,6 +280,7 @@ public class PlayModeController extends Application {
                             monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
                             monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
                             monster.setMonsterView(monsterView);
+                            wizardCount++;
                             break;
                             default:
                             monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
@@ -307,7 +307,7 @@ public class PlayModeController extends Application {
                                 moveCharacter(monster);
                                 break;
                                 case MonsterType.WIZARD:
-                                wizardCount++;
+                                // wizardCount++;
                                 break;
                                 
                             }
