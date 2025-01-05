@@ -1,12 +1,5 @@
 package main.model;
 
-import main.utils.Grid;
-import main.utils.Tile;
-import main.controller.PlayModeController;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 public class ExtraTimeEnchantment extends Enchantment {
 
     private final int extraTime; // Eklenecek süre miktarı (saniye)

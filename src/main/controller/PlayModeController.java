@@ -37,12 +37,6 @@ public class PlayModeController extends Application {
     protected Hero hero;
     protected ArrayList<Monster> monsters;
     protected HallType hallType;
-    protected Inventory inventory; // To store enchantments
-    protected ArrayList<Enchantment> enchantments; // Active enchantments
-
-    private long lastEnchantmentSpawnTime = 0; // Track enchantment spawn timing
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 10_000_000_000L; // Spawn every 10 seconds
-
     
     private int runeXCoordinate;
     private int runeYCoordinate;
@@ -115,11 +109,6 @@ public class PlayModeController extends Application {
         int randomYCoordinate = playModeGrid.findYofTile(initialHeroTile);
         Tile heroTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
         hero = initializeHero(randomXCoordinate, randomYCoordinate);
-
-        inventory = new Inventory();
-        enchantments = new ArrayList<>();
-        // Add enchantments to the grid
-        spawnRandomEnchantment();
         
         hero.targetX = heroTile.getLeftSide();
         hero.targetY = heroTile.getTopSide();
@@ -231,12 +220,6 @@ public class PlayModeController extends Application {
             
             @Override
             public void handle(long now) {
-                if (now - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
-                    spawnRandomEnchantment();
-                    lastEnchantmentSpawnTime = now;
-                }
-            
-                checkEnchantmentCollision();
 				if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
 					return;
 				}
@@ -375,49 +358,6 @@ public class PlayModeController extends Application {
         };
         gameLoop.start();
     }
-
-
-    private void spawnRandomEnchantment() {
-        Enchantment enchantment = getRandomEnchantment();
-        enchantments.add(enchantment);
-        addEnchantmentToGrid(enchantment);
-    }
-    
-    // Add this helper function
-    private Enchantment getRandomEnchantment() {
-        int x = random.nextInt(ROW);
-        int y = random.nextInt(COLUMN);
-        return switch (random.nextInt(4)) {
-            case 0 -> new ExtraLifeEnchantment(x, y);
-            case 1 -> new RevealEnchantment(x, y);
-            case 2 -> new CloakOfProtectionEnchantment(x, y);
-            default -> new ExtraTimeEnchantment(x, y);
-        };
-    }
-    
-    // Add this function to update enchantments in the grid
-    private void addEnchantmentToGrid(Enchantment enchantment) {
-        Tile tile = playModeGrid.findTileWithIndex(enchantment.getX(), enchantment.getY());
-        if (tile != null) {
-            tile.changeTileType('E'); // Represent enchantment visually on the grid
-        }
-        view.addEnchantmentToPane(enchantment);
-    }
-    
-    // Add this function to check for collisions
-    private void checkEnchantmentCollision() {
-        Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
-        enchantments.removeIf(enchantment -> {
-            if (heroTile.getX() == enchantment.getX() && heroTile.getY() == enchantment.getY()) {
-                inventory.addEnchantment(enchantment); // Add to inventory
-                playModeGrid.changeTileWithIndex(enchantment.getX(), enchantment.getY(), 'E'); // Clear tile
-                view.removeEnchantmentFromPane(enchantment); // Remove visual
-                return true;
-            }
-            return false;
-        });
-    }
-
 
     private void stopGameLoop() {
         if (!isRunning) return;

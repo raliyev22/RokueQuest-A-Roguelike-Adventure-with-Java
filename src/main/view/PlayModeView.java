@@ -1,6 +1,5 @@
 package main.view;
 
-import java.awt.Rectangle;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -27,7 +26,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import main.Main;
 import main.controller.PlayModeController;
-import main.model.Enchantment;
 import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
@@ -99,10 +97,6 @@ public class PlayModeView {
 		ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
 		exitImageView.setFitWidth(40);
 		exitImageView.setFitHeight(40);
-
-		for (Enchantment enchantment : ((PlayModeController) primaryStage.getUserData()).enchantments) {
-			addEnchantmentToPane(enchantment);
-		}
 
 		closeButton.setGraphic(exitImageView);
 		closeButton.setPrefWidth(40);
@@ -287,22 +281,6 @@ public class PlayModeView {
 		timeLabel.setText("Time: " + time);
 		return time;
 	}
-
-	public void addEnchantmentToPane(Enchantment enchantment) {
-    Rectangle enchantmentView = new Rectangle(tileSize, tileSize);
-    enchantmentView.setFill(new ImagePattern(Images.convertCharToImage(enchantment.getCharType())));
-    enchantmentView.setLayoutX(enchantment.getX() * tileSize + grid.topLeftXCoordinate);
-    enchantmentView.setLayoutY(enchantment.getY() * tileSize + grid.topLeftYCoordinate);
-    pane.getChildren().add(enchantmentView);
-}
-
-// Add this method to remove enchantments from the pane
-public void removeEnchantmentFromPane(Enchantment enchantment) {
-    pane.getChildren().removeIf(node ->
-        node.getLayoutX() == enchantment.getX() * tileSize + grid.topLeftXCoordinate &&
-        node.getLayoutY() == enchantment.getY() * tileSize + grid.topLeftYCoordinate
-    );
-}
 
 	public void updateHeroLife(int life) {
 		// Example: Update hearts container based on remaining life

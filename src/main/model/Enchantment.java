@@ -1,11 +1,9 @@
 package main.model;
-import main.controller.PlayModeController;
-import main.utils.Grid;
 
 public abstract class Enchantment {
-    protected int x; // Enchantment's x position
-    protected int y; // Enchantment's y position
-    protected boolean isActive; // Whether the enchantment is active
+    protected int x; // Enchantment'ın x pozisyonu
+    protected int y; // Enchantment'ın y pozisyonu
+    protected boolean isActive; // Enchantment'ın aktif olup olmadığı
     protected String name;
 
     public Enchantment(int x, int y, String name) {
@@ -32,21 +30,8 @@ public abstract class Enchantment {
     }
 
     public void deactivate() {
-        this.isActive = false; // Enchantment becomes inactive when collected
+        this.isActive = false; // Enchantment toplandığında devre dışı kalır
     }
 
-    public abstract void applyEffect(Hero hero, Grid grid, PlayModeController controller); // Subclasses implement this method
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Enchantment that = (Enchantment) obj;
-        return name.equals(that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
+    public abstract void applyEffect(Hero hero); // Alt sınıflar bu metodu uygulayacak
 }
