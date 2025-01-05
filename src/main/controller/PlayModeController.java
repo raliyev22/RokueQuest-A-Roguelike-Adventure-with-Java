@@ -163,7 +163,6 @@ public class PlayModeController extends Application {
         soundPlayer.setVolume("gameLoser", -15);
         soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
         soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
-        soundPlayer.setVolume("fighter", -10);
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
         soundPlayer.setVolume("wizard", -10);
     }
@@ -282,6 +281,7 @@ public class PlayModeController extends Application {
                             monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
                             monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
                             monster.setMonsterView(monsterView);
+                            monster.setLastRuneTeleportation(now);
                             wizardCount++;
                             break;
                             default:
@@ -309,21 +309,24 @@ public class PlayModeController extends Application {
                                 moveCharacter(monster);
                                 break;
                                 case MonsterType.WIZARD:
-                                // wizardCount++;
+                                if (now >= monster.getLastRuneTeleportation() && now - monster.getLastRuneTeleportation() >= RUNE_TELEPORT_INTERVAL) {
+                                    teleportRune();
+                                    playSoundEffectInThread("wizard");
+                                    monster.setLastRuneTeleportation(now);
+                                }                                
                                 break;
-                                
                             }
                         }
                         lastMonsterUpdateTime = now;
                     }
                     
-                    if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
-                        for (int i = 0; i < wizardCount; i++) {
-                            teleportRune();
-                            playSoundEffectInThread("wizard");        
-                        }
-                        lastRuneTeleportation = now;
-                    }
+                    // if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
+                    //     for (int i = 0; i < wizardCount; i++) {
+                    //         teleportRune();
+                    //         playSoundEffectInThread("wizard");        
+                    //     }
+                    //     lastRuneTeleportation = now;
+                    // }
                     
                     //monster movement
                     

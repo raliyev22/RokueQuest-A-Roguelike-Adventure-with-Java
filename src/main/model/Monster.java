@@ -14,6 +14,7 @@ public abstract class Monster {
     Tile tile;
     Rectangle monsterView;
     Directions movingDirection=null;
+    private long lastRuneTeleportation = 0;
 
     Boolean isMoving=false;
 
@@ -85,5 +86,13 @@ public abstract class Monster {
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
+
+    public long getLastRuneTeleportation() {
+        return lastRuneTeleportation;
+    }
+
+    public void setLastRuneTeleportation(long time) {
+        this.lastRuneTeleportation = time;
+    }
 }
 
