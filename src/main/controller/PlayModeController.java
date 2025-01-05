@@ -373,7 +373,6 @@ public class PlayModeController extends Application {
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
-            view.resumeButton.setOnAction(e -> togglePause());
         }
         else {
             startGameLoop();

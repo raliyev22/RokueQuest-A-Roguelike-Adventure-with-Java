@@ -43,6 +43,7 @@ public class PlayModeView {
 	private StackPane pauseOverlay;
 	public Button pauseButton;
 	public Button resumeButton;
+	private HBox buttonContainer;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -88,7 +89,7 @@ public class PlayModeView {
         uiContainer.setPrefWidth(200);
         uiContainer.setPrefHeight(736);
 
-		HBox buttonContainer = new HBox(10);
+		buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
 		Button closeButton = new Button();
@@ -148,48 +149,65 @@ public class PlayModeView {
 	}
 
     private void initializePauseOverlay() {
-        // Create a semi-transparent overlay
-        Rectangle background = new Rectangle();
-        background.setFill(Color.rgb(0, 0, 0, 0.5));
-        background.widthProperty().bind(pane.widthProperty());
-        background.heightProperty().bind(pane.heightProperty());
 
         // Create a "Paused" text
         Label pauseText = new Label("Game Paused");
         pauseText.setFont(Font.font(36));
         pauseText.setTextFill(Color.WHITE);
 
-        // Create buttons for overlay
-        resumeButton = new Button("Resume");
-        Button saveButton = new Button("Save Game");
-        Button exitButton = new Button("Exit Game");
-
-        resumeButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-        saveButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-        exitButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
-
-        // saveButton.setOnAction(e -> saveGame()); // Call saveGame method
-        exitButton.setOnAction(e -> Platform.exit()); // Exit the game
-
-        VBox buttonContainer = new VBox(10, resumeButton, saveButton, exitButton);
-        buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
-
-        VBox overlayContent = new VBox(20, pauseText, buttonContainer);
+        VBox overlayContent = new VBox(20, pauseText);
         overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+		overlayContent.setTranslateY(400);
+		overlayContent.setTranslateX(300);
 
         // Add elements to a stack pane
-        pauseOverlay = new StackPane(background, overlayContent);
+        pauseOverlay = new StackPane(overlayContent);
         pauseOverlay.setVisible(false);
         pane.getChildren().add(pauseOverlay);
     }
 
 	public void showPauseGame() {
         pauseOverlay.setVisible(true);
+		// Setup for save button
+		ImageView saveImageView = new ImageView(Images.IMAGE_SAVEBUTTON_x4);
+		saveImageView.setFitHeight(40);
+		saveImageView.setFitWidth(40);
+
+		Button saveButton = new Button();
+		saveButton.setStyle("-fx-background-color: transparent;");
+		saveButton.setGraphic(saveImageView);
+		saveButton.setPrefWidth(40);
+		saveButton.setPrefHeight(40);
+		saveButton.setOnAction(e -> saveGame());
+		//Added to first index of button container
+		buttonContainer.getChildren().add(1, saveButton);
+		//Changing pause button's image to play button image
+		ImageView resumeImageView = new ImageView(Images.IMAGE_PLAYBUTTON_x4);
+		resumeImageView.setFitHeight(40);
+		resumeImageView.setFitWidth(40);
+
+		pauseButton.setGraphic(resumeImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
     }
 
 	public void hidePauseGame() {
         pauseOverlay.setVisible(false);
+		//Removing save button from button container
+		buttonContainer.getChildren().remove(1);
+		//Changing pause button's image to pause button image
+		ImageView pauseImageView = new ImageView(Images.IMAGE_PAUSEBUTTON_x4);
+		pauseImageView.setFitWidth(40);
+		pauseImageView.setFitHeight(40);
+		
+		pauseButton.setGraphic(pauseImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
     }
+
+	public void saveGame() {
+		System.out.println("Game Saved!");
+	}
 	
 	
 	private void showWalls(Grid grid) {
