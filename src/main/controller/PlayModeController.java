@@ -273,6 +273,8 @@ public class PlayModeController extends Application {
                         if (checkRune(clickedTile)) {
                             stopGameLoop();
                             hero.isMoving = false;
+                            lastMonsterSpawnTime = 0;
+                            lastUpdateTime = 0;
                             
                             if(hallType == HallType.FIRE){
                                 playSoundEffectInThread("gameWinner");
