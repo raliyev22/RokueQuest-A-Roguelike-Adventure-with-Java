@@ -126,6 +126,8 @@ public class PlayModeController extends Application {
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         }
+
+        MonsterManager monsterManager = new MonsterManager(playModeGrid);
     }
     
     public void start(Stage primaryStage) {
@@ -452,13 +454,13 @@ public class PlayModeController extends Application {
         if (hero.currentX == hero.targetX && hero.currentY == hero.targetY) {
             hero.isMoving = false;
             if (hero.movingDirection != null) {
-                moveHeroDirection(hero.movingDirection);
+                moveHeroOnGrid(hero.movingDirection);
                 hero.movingDirection = null;
             }
         }
     }
 
-    public void moveHeroDirection(Directions dir) {
+    public void moveHeroOnGrid(Directions dir) {
         int xIndexOld = hero.getPosX();
         int yIndexOld = hero.getPosY();
         playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');

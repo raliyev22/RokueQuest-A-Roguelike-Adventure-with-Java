@@ -29,11 +29,15 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class PlayModeView {
+	protected final int tileSize = 64;
+
 	protected Pane pane;
 	protected Scene scene;
-	protected int tileSize = 64;
+
 	protected Grid grid;
 	protected Rectangle heroView;
+    protected List<Rectangle> monsterViews;
+
 	protected int time;
 	protected Label timeLabel;
 	private HBox heartsContainer;

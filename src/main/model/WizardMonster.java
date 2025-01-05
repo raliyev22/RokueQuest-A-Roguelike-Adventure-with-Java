@@ -1,11 +1,9 @@
 package main.model;
-import main.utils.Tile;
 
 public class WizardMonster extends Monster {
-    public WizardMonster(int x, int y,Tile monsterTile){
-        this.x = x;
-        this.y = y;
-        this.tile = monsterTile;
+    public WizardMonster(int x, int y){
+        this.posX = x;
+        this.posY = y;
         this.type = MonsterType.WIZARD;
     }
 }

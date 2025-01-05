@@ -1,38 +1,33 @@
 package main.model;
 
-
-import java.util.Random;
-import main.utils.Grid;
-import main.utils.Tile;
-
 public class ArcherMonster extends Monster {
-    public ArcherMonster(int x, int y,Tile mosnterTile) {
-        this.x = x;
-        this.y = y;
-        this.tile = mosnterTile;
+    public ArcherMonster(int x, int y) {
+        this.posX = x;
+        this.posY = y;
         type = MonsterType.ARCHER;
     }
+    /*
     public void moveRandomly(Grid grid){
         Random rand = new Random();
         int randomMove = rand.nextInt(4);
         Boolean existMovement = false;
-        if(grid.indexInRange(x+1,y)){
-            if(grid.findTileWithIndex(x+1,y).getTileType() == 'E'){
+        if(grid.indexInRange(posX+1,posY)){
+            if(grid.findTileWithIndex(posX+1,posY).getTileType() == 'E'){
                 existMovement = true;
             }
         }
-        if(grid.indexInRange(x-1,y)){
-            if(grid.findTileWithIndex(x-1,y).getTileType() == 'E'){
+        if(grid.indexInRange(posX-1,posY)){
+            if(grid.findTileWithIndex(posX-1,posY).getTileType() == 'E'){
                 existMovement = true;
             }
         }
-        if(grid.indexInRange(x,y+1)){
-            if(grid.findTileWithIndex(x,y+1).getTileType() == 'E'){
+        if(grid.indexInRange(posX,posY+1)){
+            if(grid.findTileWithIndex(posX,posY+1).getTileType() == 'E'){
                 existMovement = true;
             }
         }
-        if(grid.indexInRange(x,y-1)){
-            if(grid.findTileWithIndex(x,y-1).getTileType() == 'E'){
+        if(grid.indexInRange(posX,posY-1)){
+            if(grid.findTileWithIndex(posX,posY-1).getTileType() == 'E'){
                 existMovement = true;
             }
         }
@@ -41,14 +36,14 @@ public class ArcherMonster extends Monster {
             
         
             if(randomMove == 0){
-                if(grid.indexInRange(x+1,y)){
-                    Tile tile = grid.findTileWithIndex(x+1, y);
+                if(grid.indexInRange(posX+1,posY)){
+                    Tile tile = grid.findTileWithIndex(posX+1, posY);
                     if(!(tile.getTileType() == 'E')){
                         moveRandomly(grid);
                     }
                     else{
-                        grid.changeTileWithIndex(x, y,'E');
-                        this.x = x+1;
+                        grid.changeTileWithIndex(posX, posY,'E');
+                        this.posX = posX+1;
                         tile.changeTileType('A');
                         
                     }
@@ -58,14 +53,14 @@ public class ArcherMonster extends Monster {
                 }
             }
             if(randomMove == 1){
-                if(grid.indexInRange(x-1,y)){
-                    Tile tile = grid.findTileWithIndex(x-1, y);
+                if(grid.indexInRange(posX-1,posY)){
+                    Tile tile = grid.findTileWithIndex(posX-1, posY);
                     if(!(tile.getTileType() == 'E')){
                         moveRandomly(grid);
                     }
                     else{
-                        grid.changeTileWithIndex(x, y,'E');
-                        this.x = x-1;
+                        grid.changeTileWithIndex(posX, posY,'E');
+                        this.posX = posX-1;
                         tile.changeTileType('A');
 
                     }
@@ -75,14 +70,14 @@ public class ArcherMonster extends Monster {
                 }
             }
             if(randomMove == 2){
-                if(grid.indexInRange(x,y+1)){
-                    Tile tile = grid.findTileWithIndex(x, y+1);
+                if(grid.indexInRange(posX,posY+1)){
+                    Tile tile = grid.findTileWithIndex(posX, posY+1);
                     if(!(tile.getTileType() == 'E')){
                         moveRandomly(grid);
                     }
                     else{
-                        grid.changeTileWithIndex(x, y,'E');
-                        this.y = y+1;
+                        grid.changeTileWithIndex(posX, posY,'E');
+                        this.posY = posY+1;
                         tile.changeTileType('A');
                     }
                 }
@@ -91,14 +86,14 @@ public class ArcherMonster extends Monster {
                 }
             }
             if(randomMove == 3){
-                if(grid.indexInRange(x,y-1)){
-                    Tile tile = grid.findTileWithIndex(x, y-1);
+                if(grid.indexInRange(posX,posY-1)){
+                    Tile tile = grid.findTileWithIndex(posX, posY-1);
                     if(!(tile.getTileType() == 'E')){
                         moveRandomly(grid);
                     }
                     else{
-                        grid.changeTileWithIndex(x, y,'E');
-                        this.y = y-1;
+                        grid.changeTileWithIndex(posX, posY,'E');
+                        this.posY = posY-1;
                         tile.changeTileType('A');
                     }
                 }
@@ -112,5 +107,6 @@ public class ArcherMonster extends Monster {
 
 
     }
+        */
 
 }
