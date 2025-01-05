@@ -62,7 +62,6 @@ public class PlayModeController extends Application {
     public boolean isPaused = false;
     
     private Random random = new Random();
-    private int wizardCount = 0;
 
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
@@ -77,7 +76,6 @@ public class PlayModeController extends Application {
         // Create a new empty grid
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
         
-        wizardCount = 0;        
         // Populate the grid with the objects stored in the static variables
         if (null == this.hallType) {
             this.hallType = HallType.EARTH;
@@ -282,7 +280,6 @@ public class PlayModeController extends Application {
                             monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
                             monster.setMonsterView(monsterView);
                             monster.setLastRuneTeleportation(now);
-                            wizardCount++;
                             break;
                             default:
                             monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
