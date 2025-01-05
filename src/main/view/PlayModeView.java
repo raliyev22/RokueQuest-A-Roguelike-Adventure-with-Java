@@ -41,7 +41,7 @@ public class PlayModeView {
 	protected Rectangle heroView;
     protected List<Rectangle> monsterViews;
 
-	protected int time;
+	public int time;
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
@@ -194,8 +194,8 @@ public class PlayModeView {
         monsterView.setFill(new ImagePattern(MonsterManager.getMonsterImage(monster)));
 		pane.getChildren().add(monsterView);
         
-        updateMonsterPosition(monsterView, monster.currentX, monster.currentY);
         monsterViews.add(monsterView);
+        updateMonsterPosition(monsterView, monster.currentX, monster.currentY);
 
         return monsterView;
     }

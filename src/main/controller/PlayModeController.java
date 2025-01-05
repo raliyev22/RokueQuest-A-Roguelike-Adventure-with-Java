@@ -50,9 +50,6 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
-    private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
-    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (300ms)
-    
     private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
     
@@ -267,36 +264,7 @@ public class PlayModeController extends Application {
                     lastMonsterSpawnTime = now; 
                 }
                 
-                // if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
-                //     for(Monster monster : monsters){
-                //         switch(monster.getType()){
-                //             case MonsterType.FIGHTER:
-                //             moveCharacter(monster);
-                //             break;
-                //             case MonsterType.ARCHER:
-                //             moveCharacter(monster);
-                //             break;
-                //             case MonsterType.WIZARD:
-                //             if (now >= monster.getLastRuneTeleportation() && now - monster.getLastRuneTeleportation() >= RUNE_TELEPORT_INTERVAL) {
-                //                 teleportRune();
-                //                 playSoundEffectInThread("wizard");
-                //                 monster.setLastRuneTeleportation(now);
-                //             }                                
-                //             break;
-                //         }
-                //     }
-                //     lastMonsterUpdateTime = now;
-                // }
-                
-                // if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
-                //     for (int i = 0; i < wizardCount; i++) {
-                //         teleportRune();
-                //         playSoundEffectInThread("wizard");        
-                //     }
-                //     lastRuneTeleportation = now;
-                // }
-                
-                //monster movement
+                monsterManager.moveAllMonsters(now);
                 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {

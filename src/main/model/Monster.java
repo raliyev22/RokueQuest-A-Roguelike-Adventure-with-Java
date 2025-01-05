@@ -13,6 +13,7 @@ public abstract class Monster {
     public Boolean isMoving = false;
 
     private long lastRuneTeleportation = 0; // For wizard monster
+    public long lastMovedTime = 0;
     
     public MonsterType getType(){
         return type;
