@@ -167,13 +167,13 @@ public class PlayModeView {
 			
 			if (image != null) {
 				if (tileType == 'P') {
-					drawTallItem(pane, tile, image);
+					drawTallItem(tile, image);
 				} else if (tileType == 'D') {
-					drawTallItem(pane, tile, image);
+					drawTallItem(tile, image);
 				} else if (tileType == 'E') {
 					continue;
 				} else {
-					drawNormalItem(pane, tile, image);
+					drawNormalItem(tile, image);
 				}
 			}
 		}
@@ -184,18 +184,18 @@ public class PlayModeView {
 		heroView.setFill(patt);
 	}
 	
-	private void drawNormalItem(Pane pane, Tile tile, Image image) {
-		Rectangle normalItem = 
-		new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
+	private void drawNormalItem(Tile tile, Image image) {
+		Rectangle normalItem = new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
 		if (image != null) {
-			normalItem.setFill(new ImagePattern(image));
+            ImagePattern patt = new ImagePattern(image);
+			normalItem.setFill(patt);
 		} else {
 			normalItem.setFill(Color.GRAY);
 		}
 		pane.getChildren().add(normalItem);
 	}
 	
-	private void drawTallItem(Pane pane, Tile tile, Image image) {
+	private void drawTallItem(Tile tile, Image image) {
 		Rectangle tallItem = 
 		new Rectangle(tile.getLeftSide(), tile.getTopSide() - tileSize, tileSize, tileSize * 2);
 		tallItem.setFill(new ImagePattern(image));

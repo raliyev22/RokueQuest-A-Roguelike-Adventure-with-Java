@@ -333,7 +333,7 @@ public class BuildModeView extends Application {
         createDraggableObject(objectStartX, positionsY[4], Cube_IMAGE, root, 32, 32, halls, 'G');
         createDraggableObject(objectStartX, positionsY[5], Skull_IMAGE, root, 32, 32, halls, 'S');
 
-        createDraggableObject(objectStartX, positionsY[6], CHEST, root, 32, 32, halls, 'C');
+        createDraggableObject(objectStartX, positionsY[6], CHEST, root, 32, 32, halls, 'H');
 
 
         // createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');

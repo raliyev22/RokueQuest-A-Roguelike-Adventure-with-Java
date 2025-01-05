@@ -188,7 +188,7 @@ public class Images extends Application {
 				return IMAGE_BOX_x4;
 			}
 			case 'c' -> {
-				return IMAGE_CUBE_x4;
+				return IMAGE_CHESTCLOSED_x4;
 			}
 			case 'd' -> {
 				return IMAGE_BOXONBOX_x4;

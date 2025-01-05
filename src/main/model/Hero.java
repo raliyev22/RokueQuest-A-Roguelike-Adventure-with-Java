@@ -1,8 +1,5 @@
 package main.model;
 
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
-
 public class Hero {
 	public final int maxLives = 4;
     public int speed = 4;
@@ -12,7 +9,6 @@ public class Hero {
 
     public int targetX, targetY;
     public int currentX, currentY;
-    public Rectangle heroView;
 
 	public boolean isMoving;
 	public boolean isTakingDamage;
@@ -81,10 +77,4 @@ public class Hero {
 			return 'R';
 		}
 	}
-
-	public void setFill(ImagePattern imagePattern) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'setFill'");
-	}
-	
 }
