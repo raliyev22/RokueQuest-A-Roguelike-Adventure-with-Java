@@ -14,6 +14,8 @@ public class Hero {
 	public boolean isTakingDamage;
     public Directions movingDirection;
 	public Directions facingDirection;
+
+	private boolean isTeleported=false;
 	
 	
 	public Hero(int posX, int posY) {
@@ -68,6 +70,12 @@ public class Hero {
 	public int getPosY() {
 		return posY;
 	}
+	public void setPosY(int pos){
+		this.posY= pos;
+	}
+	public void setPosX(int pos){
+		this.posX = pos;
+	}
 	
 	public char getCharType() {
 		if (this.facingDirection == Directions.WEST) {
@@ -76,5 +84,13 @@ public class Hero {
 		else {
 			return 'R';
 		}
+	}
+
+	public Boolean getIsTeleported(){
+		return this.isTeleported;
+	}
+
+	public void setIsTeleported(Boolean bool){
+		this.isTeleported = bool;
 	}
 }

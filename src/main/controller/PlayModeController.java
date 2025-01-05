@@ -3,6 +3,7 @@ package main.controller;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.sound.sampled.AudioSystem;
@@ -36,6 +37,7 @@ public class PlayModeController extends Application {
     public Grid playModeGrid;
     protected Hero hero;
     protected ArrayList<Monster> monsters;
+    protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
     
     private int runeXCoordinate;
@@ -44,9 +46,10 @@ public class PlayModeController extends Application {
     private double mouseX;
     private double mouseY;
     
-    public int time;
+    public static double time;
+    public static double totalTime;
     
-    protected int hallTimeMultiplier = 500;
+    protected int hallTimeMultiplier = 5;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
@@ -102,6 +105,7 @@ public class PlayModeController extends Application {
                 view.showGameOverPopup(true);
             }
         }
+        this.totalTime = time;
         
         //playModeGrid.copyTileMap(earthHall);
         // Find the first random tile that the hero will spawn on
@@ -245,8 +249,10 @@ public class PlayModeController extends Application {
                         lastUpdateTime = now;
                         counter++;
                     }
-
-                    moveHero();
+                    if(!hero.getIsTeleported()){
+                        moveHero();
+                    }
+                    
                     
                     view.changeHeroSprite(getHeroImage());
                     
@@ -264,28 +270,32 @@ public class PlayModeController extends Application {
                         
                         Rectangle monsterView = new Rectangle(64,64);
                         
-                        switch (randomInt) {
-                            case 0:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                            monster.setMonsterView(monsterView);
-                            break;
-                            case 1:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
-                            monster.setMonsterView(monsterView);
-                            break;
-                            case 2:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
-                            monster.setMonsterView(monsterView);
-                            monster.setLastRuneTeleportation(now);
-                            break;
-                            default:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                            monster.setMonsterView(monsterView);
-                        }
+                        // switch (randomInt) {
+                        //     case 0:
+                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                        //     monster.setMonsterView(monsterView);
+                        //     break;
+                        //     case 1:
+                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
+                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
+                        //     monster.setMonsterView(monsterView);
+                        //     break;
+                        //     case 2:
+                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
+                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+                        //     monster.setMonsterView(monsterView);
+                        //     monster.setLastRuneTeleportation(now);
+                        //     break;
+                        //     default:
+                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                        //     monster.setMonsterView(monsterView);
+                        // }
+                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
+                        monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+                        monster.setMonsterView(monsterView);
+                        monster.setLastRuneTeleportation(now);
                         
                         
                         view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
@@ -297,7 +307,12 @@ public class PlayModeController extends Application {
                     }
                     
                     if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
-                        for(Monster monster : monsters){
+
+                        monsterIterator = monsters.iterator();
+
+                        while (monsterIterator.hasNext()) {
+                            Monster monster = monsterIterator.next();
+
                             switch(monster.getType()){
                                 case MonsterType.FIGHTER:
                                 moveCharacter(monster);
@@ -306,14 +321,29 @@ public class PlayModeController extends Application {
                                 moveCharacter(monster);
                                 break;
                                 case MonsterType.WIZARD:
-                                if (now >= monster.getLastRuneTeleportation() && now - monster.getLastRuneTeleportation() >= RUNE_TELEPORT_INTERVAL) {
-                                    teleportRune();
-                                    playSoundEffectInThread("wizard");
-                                    monster.setLastRuneTeleportation(now);
-                                }                                
+                                if (monster instanceof WizardMonster wizardMonster) {
+                                    wizardMonster.act(PlayModeController.this); 
+                                }                              
                                 break;
                             }
+                            
                         }
+
+                        // for(Monster monster : monsters){
+                        //     switch(monster.getType()){
+                        //         case MonsterType.FIGHTER:
+                        //         moveCharacter(monster);
+                        //         break;
+                        //         case MonsterType.ARCHER:
+                        //         moveCharacter(monster);
+                        //         break;
+                        //         case MonsterType.WIZARD:
+                        //         if (monster instanceof WizardMonster wizardMonster) {
+                        //             wizardMonster.act(PlayModeController.this); // Execute wizard behavior dynamically
+                        //         }                              
+                        //         break;
+                        //     }
+                        // }
                         lastMonsterUpdateTime = now;
                     }
                     
@@ -485,7 +515,7 @@ public class PlayModeController extends Application {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
     
-    private void  teleportRune() {
+    public void  teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();
         
@@ -617,6 +647,13 @@ public class PlayModeController extends Application {
             hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         }   
     }
+
+    public void removeMonster(Monster monster) {
+        //monsters.remove(monster);
+        monsterIterator.remove();
+        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), 'E');
+        view.removeFromPane(monster.getMonsterView());
+    }
     
     public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
         Monster monster = null;
@@ -732,6 +769,15 @@ public class PlayModeController extends Application {
     public int getTopLeftYCoordinate() {
         return this.topLeftYCoordinate;
     }
+
+    public Hero getHero(){
+        return this.hero;
+    }
+    public PlayModeView getView(){
+        return this.view;
+    }
+
+
 }
 
 
