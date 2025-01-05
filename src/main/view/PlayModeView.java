@@ -1,6 +1,6 @@
 package main.view;
 
-import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -69,6 +69,8 @@ public class PlayModeView {
 		if (scene == null) {
 			scene = new Scene(pane);
 		}
+
+        monsterViews = new ArrayList<>();
 		
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
@@ -186,13 +188,16 @@ public class PlayModeView {
 		}
 	}
 
-    public void createMonsterView(Monster monster) {
+    public Rectangle createMonsterView(Monster monster) {
         Rectangle monsterView = new Rectangle(monster.currentX, monster.currentY, tileSize, tileSize);
         
         monsterView.setFill(new ImagePattern(MonsterManager.getMonsterImage(monster)));
 		pane.getChildren().add(monsterView);
-
+        
+        updateMonsterPosition(monsterView, monster.currentX, monster.currentY);
         monsterViews.add(monsterView);
+
+        return monsterView;
     }
 
 	public void changeHeroSprite(Image img) {
@@ -225,6 +230,12 @@ public class PlayModeView {
 
 	public void updateMonsterPosition(int monsterID, double x, double y) {
         Rectangle monsterView = monsterViews.get(monsterID);
+        
+		monsterView.setX(x);
+		monsterView.setY(y);
+	}
+
+    public void updateMonsterPosition(Rectangle monsterView, double x, double y) {
 		monsterView.setX(x);
 		monsterView.setY(y);
 	}

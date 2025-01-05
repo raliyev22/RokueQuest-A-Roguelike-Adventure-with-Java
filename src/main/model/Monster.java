@@ -1,11 +1,5 @@
 package main.model;
 
-import javafx.scene.shape.Rectangle;
-import main.utils.Grid;
-import main.utils.Tile;
-
-
-
 public abstract class Monster {
     public final int speed = 5;
     public MonsterType type;

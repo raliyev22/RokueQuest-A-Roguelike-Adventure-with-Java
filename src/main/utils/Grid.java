@@ -473,7 +473,10 @@ public class Grid {
     public Tile getRandomEmptyTile() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> emptyTiles = getEmptyTiles();
-        
+
+        if (emptyTiles.size() <= 0) {
+            System.err.println("No empty tiles according to getRandomEmptyTile in Grid");
+        }
         int luckyTileInd = rng.nextInt(emptyTiles.size());
         
         return emptyTiles.get(luckyTileInd);
@@ -567,32 +570,5 @@ public class Grid {
 			str += "\n";
 		}
 		return str;
-	}
-	
-	public static void main(String[] args) {
-		Grid myGrid = new Grid(8, 9, 20, 10, 3, 11);
-		System.out.println(myGrid);
-
-		Tile mytile0 = myGrid.findTileWithIndex(2,4);
-
-		System.out.println("---------------------");
-
-		for (Tile elem : myGrid.findNxNSquare(mytile0, 2)) {
-			System.out.println(myGrid.findCoordinatesofTile(elem));
-		}
-		/*
-		Tile mytile1 = myGrid.findTileWithIndex(1,2);
-		System.out.println(mytile1);
-		Tile mytile2 = myGrid.findTileWithIndex(2,1);
-		System.out.println(mytile2);
-		
-		mytile1.changeTileType('A');
-		System.out.println(mytile1);
-		System.out.println(myGrid);
-		System.out.println(myGrid.findAdjacentTilesWithIndex(1,0));
-		System.out.println(mytile1);
-		System.out.println(myGrid.findNorthTile(mytile1));
-		System.out.println(myGrid.findSouthTile(mytile1));
-		*/
 	}
 }
