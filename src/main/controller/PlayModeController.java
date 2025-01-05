@@ -313,49 +313,17 @@ public class PlayModeController extends Application {
                         while (monsterIterator.hasNext()) {
                             Monster monster = monsterIterator.next();
 
-                            switch(monster.getType()){
-                                case MonsterType.FIGHTER:
-                                moveCharacter(monster);
-                                break;
-                                case MonsterType.ARCHER:
-                                moveCharacter(monster);
-                                break;
-                                case MonsterType.WIZARD:
-                                if (monster instanceof WizardMonster wizardMonster) {
-                                    wizardMonster.act(PlayModeController.this); 
-                                }                              
-                                break;
+                            if (monster instanceof WizardMonster wizardMonster) {
+                                wizardMonster.act(PlayModeController.this); // Execute wizard behavior
+                            } else {
+                                moveCharacter(monster); // Default monster movement
                             }
                             
                         }
 
-                        // for(Monster monster : monsters){
-                        //     switch(monster.getType()){
-                        //         case MonsterType.FIGHTER:
-                        //         moveCharacter(monster);
-                        //         break;
-                        //         case MonsterType.ARCHER:
-                        //         moveCharacter(monster);
-                        //         break;
-                        //         case MonsterType.WIZARD:
-                        //         if (monster instanceof WizardMonster wizardMonster) {
-                        //             wizardMonster.act(PlayModeController.this); // Execute wizard behavior dynamically
-                        //         }                              
-                        //         break;
-                        //     }
-                        // }
                         lastMonsterUpdateTime = now;
                     }
                     
-                    // if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
-                    //     for (int i = 0; i < wizardCount; i++) {
-                    //         teleportRune();
-                    //         playSoundEffectInThread("wizard");        
-                    //     }
-                    //     lastRuneTeleportation = now;
-                    // }
-                    
-                    //monster movement
                     
                     if (mouseClicked) {
                         if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {

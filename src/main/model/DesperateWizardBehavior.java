@@ -18,8 +18,10 @@ public class DesperateWizardBehavior implements WizardBehavior {
         grid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), 'E');
         hero.setPosX(controller.playModeGrid.findXofTile(randomTile));
         hero.setPosY(controller.playModeGrid.findYofTile(randomTile));
-        controller.getView().updateHeroPosition(randomTile.getLeftSide(), randomTile.getTopSide());
+
+
         grid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
+        controller.getView().updateHeroPosition(randomTile.getLeftSide(), randomTile.getTopSide());
 
         hero.setIsTeleported(false);
         controller.removeMonster(wizard); // Wizard disappears after this action
