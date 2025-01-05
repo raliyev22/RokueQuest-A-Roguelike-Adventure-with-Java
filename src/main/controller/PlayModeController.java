@@ -53,7 +53,7 @@ public class PlayModeController extends Application {
     private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
     private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
 
-	private static final int TARGET_FPS = 240;
+	private static final int TARGET_FPS = 120;
 	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
 	private long lastFrameTime = 0;
     
