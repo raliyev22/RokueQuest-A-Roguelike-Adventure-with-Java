@@ -14,7 +14,7 @@ public class MonsterManager {
     // How much of the time monster stays in place, i.e. if it is 0.1,
     // monster does not move 90 percent of the time. Note that a monster 
     // cannot shoot while moving, so we want for them to stay still for some time.
-    protected final double MONSTER_STAY_RATE = 1;
+    protected final double MONSTER_STAY_RATE = 0.8;
     protected final double MONSTER_MOVE_INTERVAL = 1_000_000_000L;
     
     protected Grid playModeGrid;
@@ -188,7 +188,7 @@ public class MonsterManager {
         List<Directions> moveableDirections = playModeGrid.findWalkableDirections(monsterTile);
         int moveableDirectionCount = moveableDirections.size();
         
-        if (moveableDirectionCount >= 0) {
+        if (moveableDirectionCount > 0) {
             int luckyDirectionIndex = rng.nextInt(moveableDirectionCount);
             return moveableDirections.get(luckyDirectionIndex);
         }
