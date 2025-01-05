@@ -65,7 +65,6 @@ public class PlayModeController extends Application {
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
-    public boolean isPaused = false;
     
     private Random random = new Random();
 
@@ -151,7 +150,7 @@ public class PlayModeController extends Application {
         
         Scene scene = view.getScene();
         initialize(scene);
-        
+        view.pauseButton.setOnAction(e -> togglePause());
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
@@ -197,6 +196,7 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = true;
             case LEFT, A -> leftPressed = true;
             case RIGHT, D -> rightPressed = true;
+            case ESCAPE -> togglePause();
             default -> {
                 //System.out.println("Unhandled Key Pressed: " + code);
             }
@@ -228,7 +228,7 @@ public class PlayModeController extends Application {
             private int counter = -1;
             
             
-
+            
             @Override
             public void handle(long now) {
                 if (now - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
@@ -426,6 +426,19 @@ public class PlayModeController extends Application {
             gameLoop.stop();
         }
         System.out.println("Game loop stopped.");
+    }
+
+
+    private void togglePause() {
+        if (isRunning){
+            stopGameLoop();
+            view.showPauseGame();
+            view.resumeButton.setOnAction(e -> togglePause());
+        }
+        else {
+            startGameLoop();
+            view.hidePauseGame();
+        }
     }
 
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
