@@ -7,6 +7,7 @@ import main.utils.Tile;
 
 
 public abstract class Monster {
+    public final int speed = 5;
     public MonsterType type;
 
     public int posX, posY; // position on grid

@@ -122,12 +122,12 @@ public class PlayModeController extends Application {
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
 
-        if(view!=null){ // Else we have already come from another grid, which means we only need to refresh the view
+        if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         }
 
-        MonsterManager monsterManager = new MonsterManager(playModeGrid);
+        MonsterManager monsterManager = new MonsterManager(playModeGrid, view);
     }
     
     public void start(Stage primaryStage) {
@@ -414,7 +414,7 @@ public class PlayModeController extends Application {
                 if (westTile != null) {
                     westTile.changeTileType('?');
                 }
-                hero.targetX = hero.currentX - tileHeight;
+                hero.targetX = hero.currentX - tileWidth;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
@@ -426,7 +426,7 @@ public class PlayModeController extends Application {
                 if (eastTile != null) {
                     eastTile.changeTileType('?');
                 }
-                hero.targetX = hero.currentX + tileHeight;
+                hero.targetX = hero.currentX + tileWidth;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
                 hero.movingDirection = Directions.EAST;
@@ -619,78 +619,28 @@ public class PlayModeController extends Application {
             hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         }   
     }
-    
-    public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
-        Monster monster = null;
-        switch (type) {
-            case MonsterType.FIGHTER -> {
-                monster = new FighterMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.ARCHER -> {
-                monster = new ArcherMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.WIZARD -> {
-                monster = new WizardMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-        }
-        monsters.add(monster);
-        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
-        return monster;
-    }
-    
-    public boolean isNearHero(Tile otherTile, int n) {
-        int otherTileX = playModeGrid.findXofTile(otherTile);
-        int otherTileY = playModeGrid.findYofTile(otherTile);
-        double euclideanDistance = 
-        Math.sqrt((hero.getPosX() - otherTileX) * (hero.getPosX() - otherTileX) + 
-        (hero.getPosY() - otherTileY) * (hero.getPosY() - otherTileY));
-        
-        return (euclideanDistance <= n);
-    }
+
+    // All of the things below (rightfully) refer to Grid class.
+    // You may replace all of these in the code, I didn't bother.
     
     public Tile getRandomEmptyTile() {
-        SecureRandom rng = new SecureRandom();
-        ArrayList<Tile> emptyTiles = getEmptyTiles();
-        
-        int luckyTileInd = rng.nextInt(emptyTiles.size());
-        
-        return emptyTiles.get(luckyTileInd);
+        return playModeGrid.getRandomEmptyTile();
     }
     
     public ArrayList<Tile> getEmptyTiles() {
-        ArrayList<Tile> emptyTiles = new ArrayList<>();
-        
-        for (Tile tile: playModeGrid.getTileMap()) {
-            if (isEmptyTileType(tile.getTileType())){
-                emptyTiles.add(tile);
-            }
-        }
-        
-        return emptyTiles;
+        return playModeGrid.getEmptyTiles();
     }
     
     public static boolean isHallObjectTile(Tile tile) {
-        return isHallObjectTileType(tile.getTileType());
+        return Grid.isHallObjectTile(tile);
     }
     
     public static boolean isHallObjectTileType(char c) {
-        if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
-        || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
-            return true;
-        }
-        return false;
+        return Grid.isHallObjectTileType(c);
     }
     
     public ArrayList<Tile> getHallObjectTiles() {
-        ArrayList<Tile> hallObjectTiles = new ArrayList<>();
-        
-        for (Tile tile: playModeGrid.getTileMap()) {
-            if (isHallObjectTile(tile)){
-                hallObjectTiles.add(tile);
-            }
-        }
-        
-        return hallObjectTiles;
+        return playModeGrid.getHallObjectTiles();
     }
     
     public Tile getRandomHallObjectTile() {
@@ -703,25 +653,18 @@ public class PlayModeController extends Application {
     }
     
     public static boolean isEmptyTileType(char c) {
-        if (c == 'E' || c == 'e') {
-            return true;
-        }
-        return false;
+        Grid.isEmptyTileType(c);
     }
     
     public boolean isWalkableTile(Tile tile){
-        if(tile == null){
-            return false;
-        }
-        return isWalkableTileType(tile.getTileType());
+        return Grid.isWalkableTile(tile);
     }
     
     public static boolean isWalkableTileType(char c) {
-        if (c == 'E' || c == 'e') {
-            return true;
-        }
-        return false;
+        return Grid.isWalkableTileType(c);
     }
+
+    //
     
     public Grid getPlayModeGrid() {
         return this.playModeGrid;

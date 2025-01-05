@@ -1,5 +1,6 @@
 package main.view;
 
+import java.awt.Rectangle;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -23,8 +24,10 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.Main;
+import main.controller.MonsterManager;
 import main.controller.PlayModeController;
 import main.model.Images;
+import main.model.Monster;
 import main.utils.Grid;
 import main.utils.Tile;
 
@@ -183,6 +186,15 @@ public class PlayModeView {
 		}
 	}
 
+    public void createMonsterView(Monster monster) {
+        Rectangle monsterView = new Rectangle(monster.currentX, monster.currentY, tileSize, tileSize);
+        
+        monsterView.setFill(new ImagePattern(MonsterManager.getMonsterImage(monster)));
+		pane.getChildren().add(monsterView);
+
+        monsterViews.add(monsterView);
+    }
+
 	public void changeHeroSprite(Image img) {
 		ImagePattern patt = new ImagePattern(img);
 		heroView.setFill(patt);
@@ -211,10 +223,10 @@ public class PlayModeView {
 		heroView.setY(y);
 	}
 
-	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
+	public void updateMonsterPosition(int monsterID, double x, double y) {
+        Rectangle monsterView = monsterViews.get(monsterID);
 		monsterView.setX(x);
 		monsterView.setY(y);
-		//System.out.println("monster moved");
 	}
 
 	public void addToPane(Rectangle monsterView){
