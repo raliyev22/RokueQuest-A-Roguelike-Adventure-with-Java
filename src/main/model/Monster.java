@@ -1,57 +1,22 @@
 package main.model;
 
-import javafx.scene.shape.Rectangle;
-import main.utils.Grid;
-import main.utils.Tile;
-
-
-
 public abstract class Monster {
-    int x;
-    int y;
-    MonsterType type;
-    Grid grid;
-    Tile tile;
-    Rectangle monsterView;
-    Directions movingDirection=null;
-    private long lastRuneTeleportation = 0;
+    public final int speed = 5;
+    public MonsterType type;
 
-    Boolean isMoving=false;
+    public int posX, posY; // position on grid
 
-    public void setMovingDirection(Directions dir){this.movingDirection = dir;}
+    public int targetX, targetY; // location of where the monsterView will go to
+    public int currentX, currentY; // location of where the monsterView is currently drawn
 
-    public Directions getMovingDirection(){return this.movingDirection;}
+    public Directions movingDirection = null;
+    public Boolean isMoving = false;
 
-    public Boolean getIsMoving(){
-        return this.isMoving;
-    }
-    public void setIsMoving(Boolean bool){
-        this.isMoving = bool;
-    }
+    private long lastRuneTeleportation = 0; // For wizard monster
+    public long lastMovedTime = 0;
     
-    public int getX(){
-        return x;
-    }
-    public int getY(){
-        return y;
-    }
-    public void setY(int y){
-        this.y = y;
-    }
-    public void setX(int x){
-        this.x = x;
-    }
     public MonsterType getType(){
         return type;
-    }
-    public Tile getTile(){
-        return tile;
-    }
-    public Rectangle getMonsterView(){
-        return this.monsterView;
-    }
-    public void setMonsterView(Rectangle monsterView){
-        this.monsterView = monsterView;
     }
 
     public char getCharType(){
@@ -72,16 +37,16 @@ public abstract class Monster {
     public void move(Directions direction) {
 		switch (direction) {
 			case Directions.NORTH -> {
-				y--;
+				posY--;
 			}
 			case Directions.SOUTH -> {
-				y++;
+				posY++;
 			}
 			case Directions.EAST -> {
-				x++;
+				posX++;
 			}
 			case Directions.WEST -> {
-				x--;
+				posX--;
 			}
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}

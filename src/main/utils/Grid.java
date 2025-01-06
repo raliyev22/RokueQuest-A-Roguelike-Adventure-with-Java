@@ -253,31 +253,66 @@ public class Grid {
 		}
 	}
 
-	// Finds which directions we can go to, only considering out of bounds.
-	public Set<Directions> findAvailableDirections(Tile tile) {
-		HashSet<Directions> adjacentTiles = new HashSet<>();
+    // Finds walkable directions
+    public List<Directions> findWalkableDirections(Tile tile) {
+        ArrayList<Directions> walkableDirections = new ArrayList<>();
 		
 		Tile aboveTile = findNorthTile(tile);
 		if (aboveTile != null) {
-			adjacentTiles.add(Directions.NORTH);
+            if (isWalkableTile(aboveTile)) {
+                walkableDirections.add(Directions.NORTH);
+            }
 		}
 
 		Tile belowTile = findSouthTile(tile);
 		if (belowTile != null) {
-			adjacentTiles.add(Directions.SOUTH);
+            if (isWalkableTile(belowTile)) {
+			    walkableDirections.add(Directions.SOUTH);
+            }
 		}
 
 		Tile rightTile = findEastTile(tile);
 		if (rightTile != null) {
-			adjacentTiles.add(Directions.EAST);
+            if (isWalkableTile(rightTile)) {
+			    walkableDirections.add(Directions.EAST);
+            }
 		}
 		
 		Tile leftTile = findWestTile(tile);
 		if (leftTile != null) {
-			adjacentTiles.add(Directions.WEST);
+            if (isWalkableTile(leftTile)) {
+			    walkableDirections.add(Directions.WEST);
+            }
 		}
 
-		return adjacentTiles;
+		return walkableDirections;
+    }
+
+	// Finds which directions we can go to, only considering out of bounds.
+	public Set<Directions> findAvailableDirections(Tile tile) {
+		HashSet<Directions> availableDirections = new HashSet<>();
+		
+		Tile aboveTile = findNorthTile(tile);
+		if (aboveTile != null) {
+			availableDirections.add(Directions.NORTH);
+		}
+
+		Tile belowTile = findSouthTile(tile);
+		if (belowTile != null) {
+			availableDirections.add(Directions.SOUTH);
+		}
+
+		Tile rightTile = findEastTile(tile);
+		if (rightTile != null) {
+			availableDirections.add(Directions.EAST);
+		}
+		
+		Tile leftTile = findWestTile(tile);
+		if (leftTile != null) {
+			availableDirections.add(Directions.WEST);
+		}
+
+		return availableDirections;
 	}
 
 	public Set<Directions> findAvailableDirectionsWithIndex(int x, int y) {
@@ -435,10 +470,86 @@ public class Grid {
 		return findTileWithIndex((int) tileX, (int) tileY);
 	}
 
+    public Tile getRandomEmptyTile() {
+        SecureRandom rng = new SecureRandom();
+        ArrayList<Tile> emptyTiles = getEmptyTiles();
+
+        if (emptyTiles.size() <= 0) {
+            System.err.println("No empty tiles according to getRandomEmptyTile in Grid");
+        }
+        int luckyTileInd = rng.nextInt(emptyTiles.size());
+        
+        return emptyTiles.get(luckyTileInd);
+    }
+
+    public ArrayList<Tile> getEmptyTiles() {
+        ArrayList<Tile> emptyTiles = new ArrayList<>();
+        
+        for (Tile tile: this.getTileMap()) {
+            if (isEmptyTileType(tile.getTileType())){
+                emptyTiles.add(tile);
+            }
+        }
+        
+        return emptyTiles;
+    }
+
+    public static boolean isWalkableTile(Tile tile){
+        if(tile == null){
+            return false;
+        }
+        return isWalkableTileType(tile.getTileType());
+    }
+    
+    public static boolean isWalkableTileType(char c) {
+        if (c == 'E' || c == 'e') {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isEmptyTileType(char c) {
+        if (c == 'E' || c == 'e') {
+            return true;
+        }
+        return false;
+    }
 
 	public List<Tile> getTileMap() {
 		return this.tileMap;
 	}
+
+    public static boolean isHallObjectTile(Tile tile) {
+        return isHallObjectTileType(tile.getTileType());
+    }
+    
+    public static boolean isHallObjectTileType(char c) {
+        if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
+        || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
+            return true;
+        }
+        return false;
+    }
+    
+    public ArrayList<Tile> getHallObjectTiles() {
+        ArrayList<Tile> hallObjectTiles = new ArrayList<>();
+        
+        for (Tile tile: this.getTileMap()) {
+            if (isHallObjectTile(tile)){
+                hallObjectTiles.add(tile);
+            }
+        }
+        
+        return hallObjectTiles;
+    }
+
+    public int getTileHeight() {
+        return tileHeight;
+    }
+
+    public int getTileWidth() {
+        return tileWidth;
+    }
 	
 	@Override
 	public String toString() {
@@ -459,32 +570,5 @@ public class Grid {
 			str += "\n";
 		}
 		return str;
-	}
-	
-	public static void main(String[] args) {
-		Grid myGrid = new Grid(8, 9, 20, 10, 3, 11);
-		System.out.println(myGrid);
-
-		Tile mytile0 = myGrid.findTileWithIndex(2,4);
-
-		System.out.println("---------------------");
-
-		for (Tile elem : myGrid.findNxNSquare(mytile0, 2)) {
-			System.out.println(myGrid.findCoordinatesofTile(elem));
-		}
-		/*
-		Tile mytile1 = myGrid.findTileWithIndex(1,2);
-		System.out.println(mytile1);
-		Tile mytile2 = myGrid.findTileWithIndex(2,1);
-		System.out.println(mytile2);
-		
-		mytile1.changeTileType('A');
-		System.out.println(mytile1);
-		System.out.println(myGrid);
-		System.out.println(myGrid.findAdjacentTilesWithIndex(1,0));
-		System.out.println(mytile1);
-		System.out.println(myGrid.findNorthTile(mytile1));
-		System.out.println(myGrid.findSouthTile(mytile1));
-		*/
 	}
 }
