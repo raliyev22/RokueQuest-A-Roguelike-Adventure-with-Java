@@ -18,10 +18,12 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import main.Main;
 import main.controller.MonsterManager;
@@ -32,54 +34,53 @@ import main.utils.Grid;
 import main.utils.Tile;
 
 public class PlayModeView {
-    protected final int tileSize = 64;
-    
-    protected Pane pane;
-    protected Scene scene;
-    
-    protected Grid grid;
-    protected Rectangle heroView;
-    protected List<Rectangle> monsterViews;
-    
-    public int time;
-    protected Label timeLabel;
-    private HBox heartsContainer;
-    private Stage primaryStage;
-    
-    protected final Image tileImage = Images.IMAGE_TILE_x4;
-    
-    public PlayModeView(Grid grid, int time, Stage primaryStage) {
-        this.grid = grid;
-        this.time = time;
-        this.pane = new Pane();
-        heroView = new Rectangle(64,64);
-        this.primaryStage = primaryStage;
-        initialize();
-    }
-    
-    public void refresh(Grid newGrid, int time) {
-        this.grid = newGrid;
-        this.time = time;
-        pane.getChildren().clear();
-        initialize();
-    }
-    
-    
-    public void initialize() {
-        if (scene == null) {
-            scene = new Scene(pane);
-        }
-        
-        monsterViews = new ArrayList<>();
-        
-        pane.setBackground(new Background(new BackgroundImage(
-        tileImage,
-        BackgroundRepeat.REPEAT,
-        BackgroundRepeat.REPEAT,
-        BackgroundPosition.DEFAULT,
-        BackgroundSize.DEFAULT
-        )));
-        
+	protected Pane pane;
+	protected Scene scene;
+	protected int tileSize = 64;
+	protected Grid grid;
+	protected Rectangle heroView;
+	protected int time;
+  protected List<Rectangle> monsterViews;
+	protected Label timeLabel;
+	private HBox heartsContainer;
+	private Stage primaryStage;
+	private StackPane pauseOverlay;
+	public Button pauseButton;
+	public Button resumeButton;
+	private HBox buttonContainer;
+
+	protected final Image tileImage = Images.IMAGE_TILE_x4;
+	
+	public PlayModeView(Grid grid, int time, Stage primaryStage) {
+		this.grid = grid;
+		this.time = time;
+		this.pane = new Pane();
+		heroView = new Rectangle(64,64);
+		this.primaryStage = primaryStage;
+		initialize();
+	}
+
+	public void refresh(Grid newGrid, int time) {
+		this.grid = newGrid;
+		this.time = time;
+		pane.getChildren().clear();
+		initialize();
+	}
+	
+
+	public void initialize() {
+		if (scene == null) {
+			scene = new Scene(pane);
+		}
+		
+		pane.setBackground(new Background(new BackgroundImage(
+			tileImage,
+			BackgroundRepeat.REPEAT,
+			BackgroundRepeat.REPEAT,
+			BackgroundPosition.DEFAULT,
+			BackgroundSize.DEFAULT
+		)));
+
         showWalls(grid);
         heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         pane.getChildren().add(heroView);
@@ -91,6 +92,33 @@ public class PlayModeView {
         uiContainer.setLayoutY(70);
         uiContainer.setPrefWidth(200);
         uiContainer.setPrefHeight(736);
+
+		buttonContainer = new HBox(10);
+		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+
+		Button closeButton = new Button();
+		closeButton.setStyle("-fx-background-color: transparent;");
+
+		ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
+		exitImageView.setFitWidth(40);
+		exitImageView.setFitHeight(40);
+
+		closeButton.setGraphic(exitImageView);
+		closeButton.setPrefWidth(40);
+		closeButton.setPrefHeight(40);
+
+		pauseButton = new Button();
+		pauseButton.setStyle("-fx-background-color: transparent;"); 
+
+		ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
+		pauseImageView.setFitWidth(40);
+		pauseImageView.setFitHeight(40);
+
+		pauseButton.setGraphic(pauseImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
+
+		buttonContainer.getChildren().addAll(closeButton, pauseButton);
         
         HBox buttonContainer = new HBox(10);
         buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
@@ -147,47 +175,110 @@ public class PlayModeView {
         
         uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
         pane.getChildren().add(uiContainer);
+
+		initializePauseOverlay();
+	}
+
+    private void initializePauseOverlay() {
+
+        // Create a "Paused" text
+        Label pauseText = new Label("Game Paused");
+        pauseText.setFont(Font.font(36));
+        pauseText.setTextFill(Color.WHITE);
+
+        VBox overlayContent = new VBox(20, pauseText);
+        overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+		overlayContent.setTranslateY(400);
+		overlayContent.setTranslateX(300);
+
+        // Add elements to a stack pane
+        pauseOverlay = new StackPane(overlayContent);
+        pauseOverlay.setVisible(false);
+        pane.getChildren().add(pauseOverlay);
     }
-    
-    
-    private void showWalls(Grid grid) {
-        int wallX = grid.topLeftXCoordinate - 20;
-        int wallY = grid.topLeftYCoordinate - 80;
-        
-        int wallLengthX = 680;
-        int wallLengthY = 736;
-        
-        Rectangle walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
-        walls.setFill(new ImagePattern(Images.IMAGE_WALLS_X4));
-        pane.getChildren().add(walls);
+
+	public void showPauseGame() {
+        pauseOverlay.setVisible(true);
+		// Setup for save button
+		ImageView saveImageView = new ImageView(Images.IMAGE_SAVEBUTTON_x4);
+		saveImageView.setFitHeight(40);
+		saveImageView.setFitWidth(40);
+
+		Button saveButton = new Button();
+		saveButton.setStyle("-fx-background-color: transparent;");
+		saveButton.setGraphic(saveImageView);
+		saveButton.setPrefWidth(40);
+		saveButton.setPrefHeight(40);
+		saveButton.setOnAction(e -> saveGame());
+		//Added to first index of button container
+		buttonContainer.getChildren().add(1, saveButton);
+		//Changing pause button's image to play button image
+		ImageView resumeImageView = new ImageView(Images.IMAGE_PLAYBUTTON_x4);
+		resumeImageView.setFitHeight(40);
+		resumeImageView.setFitWidth(40);
+
+		pauseButton.setGraphic(resumeImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
     }
-    
-    public void showGrid(Grid grid) {
-        List<Tile> tiles = grid.getTileMap();
-        for (Tile tile : tiles) {
-            char tileType = tile.getTileType();
-            
-            if (!PlayModeController.isHallObjectTileType(tileType)) {
-                continue;
-            }
-            
-            char lowerCaseLetter = Character.toLowerCase(tileType);
-            Image image = Images.convertCharToImage(lowerCaseLetter);
-            
-            if (image != null) {
-                if (tileType == 'P') {
-                    drawTallItem(tile, image);
-                } else if (tileType == 'D') {
-                    drawTallItem(tile, image);
-                } else if (tileType == 'E') {
-                    continue;
-                } else {
-                    drawNormalItem(tile, image);
-                }
-            }
-        }
+
+	public void hidePauseGame() {
+        pauseOverlay.setVisible(false);
+		//Removing save button from button container
+		buttonContainer.getChildren().remove(1);
+		//Changing pause button's image to pause button image
+		ImageView pauseImageView = new ImageView(Images.IMAGE_PAUSEBUTTON_x4);
+		pauseImageView.setFitWidth(40);
+		pauseImageView.setFitHeight(40);
+		
+		pauseButton.setGraphic(pauseImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
     }
-    
+
+	public void saveGame() {
+		System.out.println("Game Saved!");
+	}
+	
+	
+	private void showWalls(Grid grid) {
+		int wallX = grid.topLeftXCoordinate - 20;
+		int wallY = grid.topLeftYCoordinate - 80;
+
+		int wallLengthX = 680;
+		int wallLengthY = 736;
+		
+		Rectangle walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
+		walls.setFill(new ImagePattern(Images.IMAGE_WALLS_X4));
+		pane.getChildren().add(walls);
+	}
+	
+	public void showGrid(Grid grid) {
+		List<Tile> tiles = grid.getTileMap();
+		for (Tile tile : tiles) {
+			char tileType = tile.getTileType();
+
+			if (!PlayModeController.isHallObjectTileType(tileType)) {
+				continue;
+			}
+
+			char lowerCaseLetter = Character.toLowerCase(tileType);
+			Image image = Images.convertCharToImage(lowerCaseLetter);
+			
+			if (image != null) {
+				if (tileType == 'P') {
+					drawTallItem(tile, image);
+				} else if (tileType == 'D') {
+					drawTallItem(tile, image);
+				} else if (tileType == 'E') {
+					continue;
+				} else {
+					drawNormalItem(tile, image);
+				}
+			}
+		}
+	}
+
     public void redrawTallItems() {
         List<Tile> tiles = grid.getTileMap();
         for (Tile tile : tiles) {
@@ -221,138 +312,128 @@ public class PlayModeView {
         
         return monsterView;
     }
-    
-    public void changeHeroSprite(Image img) {
-        ImagePattern patt = new ImagePattern(img);
-        heroView.setFill(patt);
-    }
-    
-    private void drawNormalItem(Tile tile, Image image) {
-        Rectangle normalItem = new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
-        if (image != null) {
+
+	public void changeHeroSprite(Image img) {
+		ImagePattern patt = new ImagePattern(img);
+		heroView.setFill(patt);
+	}
+	
+	private void drawNormalItem(Tile tile, Image image) {
+		Rectangle normalItem = new Rectangle(tile.getLeftSide(), tile.getTopSide(), tileSize, tileSize);
+		if (image != null) {
             ImagePattern patt = new ImagePattern(image);
-            normalItem.setFill(patt);
-        } else {
-            normalItem.setFill(Color.GRAY);
-        }
-        pane.getChildren().add(normalItem);
-    }
-    
-    private void drawTallItem(Tile tile, Image image) {
-        Rectangle tallItem = 
-        new Rectangle(tile.getLeftSide(), tile.getTopSide() - tileSize, tileSize, tileSize * 2);
-        tallItem.setFill(new ImagePattern(image));
-        pane.getChildren().add(tallItem);
-    }
-    
-    public void updateHeroPosition(double x, double y) {
-        heroView.setX(x);
-        heroView.setY(y);
-    }
-    
-    public void updateMonsterPosition(int monsterID, double x, double y) {
-        Rectangle monsterView = monsterViews.get(monsterID);
-        
-        monsterView.setX(x);
-        monsterView.setY(y);
-    }
-    
-    public void updateMonsterPosition(Rectangle monsterView, double x, double y) {
-        monsterView.setX(x);
-        monsterView.setY(y);
-    }
-    
-    public void addToPane(Rectangle monsterView){
-        pane.getChildren().add(monsterView);
-    }
-    
-    public Pane getPane() {
-        return pane;
-    }
-    
-    public Scene getScene() {
-        return scene;
-    }
-    
-    public int updateTime(int time){
-        this.time = time;
-        timeLabel.setText("Time: " + time);
-        return time;
-    }
-    
-    public void updateHeroLife(int life) {
-        // Example: Update hearts container based on remaining life
-        heartsContainer.getChildren().clear();
-        for (int i = 0; i < life; i++) {
-            Rectangle heart = new Rectangle(32, 32);
-            heart.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-            heartsContainer.getChildren().add(heart);
-        }
-    }
-    
-    public void showGameOverPopup(boolean isWin) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.setTitle("Game Over");
-            
-            Label headerLabel = new Label(isWin ? "Congratulations!" : "Try Again");
-            headerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
-            headerLabel.setAlignment(javafx.geometry.Pos.CENTER);
-            headerLabel.setMaxWidth(Double.MAX_VALUE);
-            
-            Label contentLabel = new Label(isWin 
-            ? "You have successfully completed the game!" 
-            : "You failed to complete the game.");
-            contentLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
-            
-            VBox contentBox = new VBox(10, headerLabel, contentLabel);
-            contentBox.setAlignment(javafx.geometry.Pos.CENTER);
-            contentBox.setStyle("-fx-background-color: transparent; -fx-padding: 10;");
-            
-            // Butonları elle oluştur ve ortala
-            Button mainMenuButton = new Button("Return to Menu");
-            Button exitButton = new Button("Exit the Game");
-            mainMenuButton.setPrefWidth(150);
-            exitButton.setPrefWidth(150);
-            
-            mainMenuButton.setOnAction(e -> {
-                
-                Main mainPage = new Main();
-                primaryStage.close();
-                mainPage.start(primaryStage);
-                alert.close();
-            });
-            
-            exitButton.setOnAction(e -> {
-                System.exit(0);
-            });
-            
-            HBox buttonBox = new HBox(20, mainMenuButton, exitButton);
-            buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
-            
-            VBox dialogContent = new VBox(20, contentBox, buttonBox);
-            dialogContent.setAlignment(javafx.geometry.Pos.CENTER);
-            dialogContent.setStyle("-fx-background-color: #222; -fx-padding: 20;");
-            
-            DialogPane dialogPane = alert.getDialogPane();
-            dialogPane.setContent(dialogContent);
-            dialogPane.setStyle("-fx-background-color: #222;");
-            
-            Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
-            alertStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
-            alertStage.setResizable(false);
-            alertStage.setAlwaysOnTop(true);
-            
-            // Arkadaki ekranı kilitlemek için initOwner ile ana pencereyi belirle
-            alertStage.initOwner(primaryStage); // Ana sahneyi sahip olarak belirle
-            alertStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            
-            alert.showAndWait();
-        });
-    }
-    
-    
-    
-    
-    
+			normalItem.setFill(patt);
+		} else {
+			normalItem.setFill(Color.GRAY);
+		}
+		pane.getChildren().add(normalItem);
+	}
+	
+	private void drawTallItem(Tile tile, Image image) {
+		Rectangle tallItem = 
+		new Rectangle(tile.getLeftSide(), tile.getTopSide() - tileSize, tileSize, tileSize * 2);
+		tallItem.setFill(new ImagePattern(image));
+		pane.getChildren().add(tallItem);
+	}
+	
+	public void updateHeroPosition(double x, double y) {
+		heroView.setX(x);
+		heroView.setY(y);
+	}
+
+	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
+		monsterView.setX(x);
+		monsterView.setY(y);
+		//System.out.println("monster moved");
+	}
+
+	public void addToPane(Rectangle monsterView){
+		pane.getChildren().add(monsterView);
+	}
+	
+	public Pane getPane() {
+		return pane;
+	}
+	
+	public Scene getScene() {
+		return scene;
+	}
+
+	public int updateTime(int time){
+		this.time = time;
+		timeLabel.setText("Time: " + time);
+		return time;
+	}
+
+	public void updateHeroLife(int life) {
+		// Example: Update hearts container based on remaining life
+		heartsContainer.getChildren().clear();
+		for (int i = 0; i < life; i++) {
+			Rectangle heart = new Rectangle(32, 32);
+			heart.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+			heartsContainer.getChildren().add(heart);
+		}
+	}
+
+
+	public void showGameOverPopup(boolean isWin) {
+		Platform.runLater(() -> {
+			Alert alert = new Alert(Alert.AlertType.NONE);
+			alert.setTitle("Game Over");
+	
+			Label headerLabel = new Label(isWin ? "Congratulations!" : "Try Again");
+			headerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
+			headerLabel.setAlignment(javafx.geometry.Pos.CENTER);
+			headerLabel.setMaxWidth(Double.MAX_VALUE);
+	
+			Label contentLabel = new Label(isWin 
+				? "You have successfully completed the game!" 
+				: "You failed to complete the game.");
+			contentLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
+	
+			VBox contentBox = new VBox(10, headerLabel, contentLabel);
+			contentBox.setAlignment(javafx.geometry.Pos.CENTER);
+			contentBox.setStyle("-fx-background-color: transparent; -fx-padding: 10;");
+	
+			// Butonları elle oluştur ve ortala
+			Button mainMenuButton = new Button("Return to Menu");
+			Button exitButton = new Button("Exit the Game");
+			mainMenuButton.setPrefWidth(150);
+			exitButton.setPrefWidth(150);
+	
+			mainMenuButton.setOnAction(e -> {
+				
+				Main mainPage = new Main();
+				primaryStage.close();
+				mainPage.start(primaryStage);
+				alert.close();
+			});
+	
+			exitButton.setOnAction(e -> {
+				System.exit(0);
+			});
+	
+			HBox buttonBox = new HBox(20, mainMenuButton, exitButton);
+			buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
+	
+			VBox dialogContent = new VBox(20, contentBox, buttonBox);
+			dialogContent.setAlignment(javafx.geometry.Pos.CENTER);
+			dialogContent.setStyle("-fx-background-color: #222; -fx-padding: 20;");
+	
+			DialogPane dialogPane = alert.getDialogPane();
+			dialogPane.setContent(dialogContent);
+			dialogPane.setStyle("-fx-background-color: #222;");
+	
+			Stage alertStage = (Stage) alert.getDialogPane().getScene().getWindow();
+			alertStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+			alertStage.setResizable(false);
+			alertStage.setAlwaysOnTop(true);
+	
+			// Arkadaki ekranı kilitlemek için initOwner ile ana pencereyi belirle
+			alertStage.initOwner(primaryStage); // Ana sahneyi sahip olarak belirle
+			alertStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+	
+			alert.showAndWait();
+		});
+	}
 }

@@ -59,15 +59,15 @@ public class PlayModeController extends Application {
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
-    public boolean isPaused = false;
     
     private Random random = new Random();
     
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
-    
-    
+
+    private boolean escPressedFlag = false; 
+
     // public PlayModeController() {
     //     initializePlayMode();
     // }
@@ -145,7 +145,7 @@ public class PlayModeController extends Application {
         
         Scene scene = view.getScene();
         initialize(scene);
-        
+        view.pauseButton.setOnAction(e -> togglePause());
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
@@ -191,7 +191,13 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = true;
             case LEFT, A -> leftPressed = true;
             case RIGHT, D -> rightPressed = true;
-            default -> {
+            case ESCAPE -> {
+                if (!escPressedFlag) {
+                    togglePause();
+                    escPressedFlag = true; 
+                }   
+            }         
+                default -> {
                 //System.out.println("Unhandled Key Pressed: " + code);
             }
         }
@@ -203,6 +209,7 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = false;
             case LEFT, A -> leftPressed = false;
             case RIGHT, D -> rightPressed = false;
+            case ESCAPE -> escPressedFlag = false;
             default -> {
                 //System.out.println("Unhandled Key Released: " + code);
             }
@@ -308,7 +315,18 @@ public class PlayModeController extends Application {
         }
         System.out.println("Game loop stopped.");
     }
-    
+
+    private void togglePause() {
+        if (isRunning){
+            stopGameLoop();
+            view.showPauseGame();
+        }
+        else {
+            startGameLoop();
+            view.hidePauseGame();
+        }
+    }
+
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
         Hero hero = new Hero(xCoordinate, yCoordinate);
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
@@ -552,13 +570,13 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
     
-    public void setHeroDirection(Directions direction) {
-        if (direction.equals(Directions.WEST)) {
-            hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4));
-        } else if (direction.equals(Directions.EAST)) {
-            hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
-        }   
-    }
+    // public void setHeroDirection(Directions direction) {
+    //     if (direction.equals(Directions.WEST)) {
+    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4));
+    //     } else if (direction.equals(Directions.EAST)) {
+    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
+    //     }   
+    // }
     
     // All of the things below (rightfully) refer to Grid class.
     // You may replace all of these in the code, I didn't bother.

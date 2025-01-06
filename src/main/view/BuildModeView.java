@@ -126,7 +126,7 @@ public class BuildModeView extends Application {
         "-fx-background-color: #303843; " +
         "-fx-text-fill: white; " +
         "-fx-font-size: 18px; " +
-        "-fx-padding: 10px 20px; " +
+        "-fx-padding: 10px 27px; " +
         "-fx-background-radius: 10; " +
         "-fx-border-color: #FFFFFF; " +
         "-fx-border-width: 1px; " +

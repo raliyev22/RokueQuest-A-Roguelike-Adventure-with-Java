@@ -73,7 +73,7 @@ public class Main extends Application {
         // Set up the main stage in the center of the screen
         primaryStage.setX((screenBounds1.getWidth() - 600) / 2); // Replace 600 with the width of the mainPage scene
         primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
-        primaryStage.setFullScreen(false);
+        primaryStage.setResizable(false);
 
         soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
         soundPlayer.setVolume("background", -30);   
