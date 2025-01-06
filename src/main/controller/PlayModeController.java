@@ -65,6 +65,7 @@ public class PlayModeController extends Application {
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
+    private boolean escPressedFlag = false; 
 
 
     // public PlayModeController() {
@@ -185,8 +186,13 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = true;
             case LEFT, A -> leftPressed = true;
             case RIGHT, D -> rightPressed = true;
-            case ESCAPE -> togglePause();
-            default -> {
+            case ESCAPE -> {
+                if (!escPressedFlag) {
+                    togglePause();
+                    escPressedFlag = true; 
+                }   
+            }         
+                default -> {
                 //System.out.println("Unhandled Key Pressed: " + code);
             }
         }
@@ -198,6 +204,7 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = false;
             case LEFT, A -> leftPressed = false;
             case RIGHT, D -> rightPressed = false;
+            case ESCAPE -> escPressedFlag = false;
             default -> {
                 //System.out.println("Unhandled Key Released: " + code);
             }
@@ -622,13 +629,13 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
     
-    public void setHeroDirection(Directions direction) {
-        if (direction.equals(Directions.WEST)) {
-            hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4));
-        } else if (direction.equals(Directions.EAST)) {
-            hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
-        }   
-    }
+    // public void setHeroDirection(Directions direction) {
+    //     if (direction.equals(Directions.WEST)) {
+    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4));
+    //     } else if (direction.equals(Directions.EAST)) {
+    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
+    //     }   
+    // }
     
     public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
         Monster monster = null;
