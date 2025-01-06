@@ -50,9 +50,8 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
-    private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
+    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
 	  private static final int TARGET_FPS = 120;
 	  private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
@@ -263,7 +262,7 @@ public class PlayModeController extends Application {
                 view.changeHeroSprite(getHeroImage());
                 
                 //monster spawn logic
-                if (now - lastMonsterSpawnTime >= MONSTER_UPDATE_INTERVAL) {
+                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
                     Tile initialMonsterTile = getRandomEmptyTile();
                     
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
@@ -572,34 +571,7 @@ public class PlayModeController extends Application {
         int yIndexNew = monster.getY();
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
-    
-    public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
-        Monster monster = null;
-        switch (type) {
-            case MonsterType.FIGHTER -> {
-                monster = new FighterMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.ARCHER -> {
-                monster = new ArcherMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.WIZARD -> {
-                monster = new WizardMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-        }
-        monsters.add(monster);
-        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
-        return monster;
-    }
-    
-    public boolean isNearHero(Tile otherTile, int n) {
-        int otherTileX = playModeGrid.findXofTile(otherTile);
-        int otherTileY = playModeGrid.findYofTile(otherTile);
-        double euclideanDistance = 
-        Math.sqrt((hero.getPosX() - otherTileX) * (hero.getPosX() - otherTileX) + 
-        (hero.getPosY() - otherTileY) * (hero.getPosY() - otherTileY));
-        
-        return (euclideanDistance <= n);
-    }
+
     
     public Tile getRandomEmptyTile() {
         return playModeGrid.getRandomEmptyTile();
