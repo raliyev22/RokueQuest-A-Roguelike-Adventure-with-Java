@@ -51,6 +51,7 @@ public class PlayModeController extends Application {
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
     private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
+    private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
 
 	private static final int TARGET_FPS = 120;
@@ -125,6 +126,7 @@ public class PlayModeController extends Application {
         if(view!=null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            view.pauseButton.setOnAction(e -> togglePause());
         }
     }
     
@@ -137,19 +139,20 @@ public class PlayModeController extends Application {
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
         }
+        view.pauseButton.setOnAction(e -> togglePause());
         
         Scene scene = view.getScene();
         initialize(scene);
-        view.pauseButton.setOnAction(e -> togglePause());
+        
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
-
+        
         startGameLoop();
     }
-
+    
     private void initializeSoundEffects() {
         soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
         soundPlayer.setVolume("step", -10);
@@ -216,9 +219,7 @@ public class PlayModeController extends Application {
         if (isRunning) return;
         isRunning = true;
         gameLoop = new AnimationTimer() {
-            private long lastMonsterSpawnTime = 0;
             private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
-            private long lastRuneTeleportation = 0;
             private static final long RUNE_TELEPORT_INTERVAL = 5_000_000_000L;
 
             private int counter = -1;

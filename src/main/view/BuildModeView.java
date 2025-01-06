@@ -1,6 +1,7 @@
 package main.view;
 import main.Main;
 import main.model.HallType;
+import main.model.Images;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,18 +22,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
-
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import main.utils.Grid;
+import main.utils.SoundEffects;
 import main.utils.Tile;
 import oldFiles.PlayTest;
 import test.TiledHall;
 
 import java.util.Random;
+
 import main.controller.PlayModeController;
 
 public class BuildModeView extends Application {
@@ -61,6 +65,8 @@ public class BuildModeView extends Application {
 
     private List<TiledHall> halls;
 
+    SoundEffects soundPlayer = SoundEffects.getInstance();
+
     public void start(Stage primaryStage) {
 
         // Create a pane
@@ -74,6 +80,11 @@ public class BuildModeView extends Application {
                 pane.getChildren().add(tideRectangle);
             }
         }
+
+        // Adding Sound Effects
+        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
+        soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
 
         // Create 4 TiledHall instances with specific sizes
         TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
@@ -139,7 +150,7 @@ public class BuildModeView extends Application {
             "-fx-background-color: rgb(78, 90, 107); " + // Change background on hover
             "-fx-text-fill: white; " +
             "-fx-font-size: 18px; " +
-            "-fx-padding: 10px 20px; " +
+            "-fx-padding: 10px 27px; " +
             "-fx-background-radius: 10; " +
             "-fx-border-color: #FFFFFF; " +
             "-fx-border-width: 1px; " +
@@ -154,7 +165,7 @@ public class BuildModeView extends Application {
             "-fx-background-color: #303843; " + // Revert to original color
             "-fx-text-fill: white; " +
             "-fx-font-size: 18px; " +
-            "-fx-padding: 10px 20px; " +
+            "-fx-padding: 10px 27px; " +
             "-fx-background-radius: 10; " +
             "-fx-border-color: #FFFFFF; " +
             "-fx-border-width: 1px; " +
@@ -170,10 +181,24 @@ public class BuildModeView extends Application {
         double toolboxWidth = 150; // Toolbox width
         double toolboxHeight = 720; // Toolbox height
 
+
+        HBox buttonContainer = new HBox(10);
+		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+        buttonContainer.setLayoutX(toolboxX+18);
+        buttonContainer.setLayoutY(toolboxHeight-30);
+
+
         //Exit button to exit the play mode
-        Rectangle exitButton = new Rectangle(toolboxX + (toolboxWidth / 2) - 16, toolboxY+675, 32, 32);
-        exitButton.setFill(new ImagePattern(Exit_Button));
-        pane.getChildren().add(exitButton);
+        Button exitButton = new Button();
+		exitButton.setStyle("-fx-background-color: transparent;"); 
+
+		ImageView exitButtonView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
+		exitButtonView.setFitWidth(35);
+		exitButtonView.setFitHeight(35);
+
+		exitButton.setGraphic(exitButtonView);
+		exitButton.setPrefWidth(35);
+		exitButton.setPrefHeight(35);      
 
         exitButton.setOnMouseEntered(event -> {
             exitButton.setCursor(Cursor.HAND);
@@ -184,24 +209,40 @@ public class BuildModeView extends Application {
         });
 
         exitButton.setOnMouseClicked(event -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
+
             Main mainPage = new Main();
             javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
         
             // Set up the main stage in the center of the screen
-            primaryStage.setX((screenBounds1.getWidth() - 600) / 2); // Replace 600 with the width of the mainPage scene
-            primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
+            primaryStage.setX((screenBounds1.getWidth() - 600) / 2);
+            primaryStage.setY((screenBounds1.getHeight() - 400) / 2);
         
             mainPage.start(primaryStage);
         });
+
+        Button playButton = new Button();
+		playButton.setStyle("-fx-background-color: transparent;"); 
+
+		ImageView playButtonView = new javafx.scene.image.ImageView(Images.IMAGE_PLAYBUTTON_x4);
+		playButtonView.setFitWidth(35);
+		playButtonView.setFitHeight(35);
+
+		playButton.setGraphic(playButtonView);
+		playButton.setPrefWidth(35);
+		playButton.setPrefHeight(35);      
+
+        playButton.setOnMouseEntered(event -> {
+            playButton.setCursor(Cursor.HAND);
+        });
         
+        playButton.setOnMouseExited(event -> {
+            playButton.setCursor(Cursor.DEFAULT);
+        });
 
-        // Center the button horizontally under the toolbox
-        button.setLayoutX(toolboxX + (toolboxWidth / 2) - 50); // 50 is half the button's width (assuming 100px button width)
-        button.setLayoutY(toolboxY + toolboxHeight + 10); // Slightly below the bottom of the toolbox
+        playButton.setOnMouseClicked(event -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
 
-        pane.getChildren().add(button);
-
-        button.setOnAction(event -> {
             List<Tile> earthHall = tileMap.get(hall1);
             List<Tile> airHall = tileMap.get(hall2);
             List<Tile> waterHall = tileMap.get(hall3);
@@ -247,10 +288,10 @@ public class BuildModeView extends Application {
                 // return;
             }
         
-            alert.setContentText(message.toString());
-        
-            // Custom styling for the dialog
-            // Custom styling for the dialog
+        alert.setContentText(message.toString());
+
+        // Custom styling for the dialog
+        // Custom styling for the dialog
         DialogPane dialogPane = alert.getDialogPane();
         dialogPane.setStyle(
             "-fx-background-color: #352645; " + // Match BuildModeView purple
@@ -279,23 +320,22 @@ public class BuildModeView extends Application {
             "-fx-padding: 5px 10px; " +
             "-fx-background-radius: 5px;"
         );
-
-        
             alert.showAndWait();
         });
-        
 
-        //Hide the rune in one of the objects for each hall
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.S) {
-                for (TiledHall hall : halls) {
-                    runeLocationList.add(getRuneLocatiom(hall));
-                }
-            } else if (event.getCode() == KeyCode.R) {
-                useRevealEnchantment(runeLocationList.get(0), hall1);
+    buttonContainer.getChildren().addAll(exitButton, playButton);
+    pane.getChildren().add(buttonContainer);
+
+    //Hide the rune in one of the objects for each hall
+    scene.setOnKeyPressed(event -> {
+        if (event.getCode() == KeyCode.S) {
+            for (TiledHall hall : halls) {
+                runeLocationList.add(getRuneLocatiom(hall));
             }
-        });
-
+        } else if (event.getCode() == KeyCode.R) {
+            useRevealEnchantment(runeLocationList.get(0), hall1);
+        }
+    });
     }
 
     private void setHallPosition(TiledHall hall, int x, int y) {
@@ -405,6 +445,8 @@ public class BuildModeView extends Application {
                             hall.getChildren().add(clone);
     
                             snappedToTile = true;
+
+                            soundPlayer.playSoundEffectInThread("putting");
                             
                             break;
                         }

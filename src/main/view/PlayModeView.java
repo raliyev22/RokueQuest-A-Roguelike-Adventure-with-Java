@@ -2,6 +2,7 @@ package main.view;
 
 import java.util.List;
 import javafx.application.Platform;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -92,19 +93,35 @@ public class PlayModeView {
 		buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
-		Button closeButton = new Button();
-		closeButton.setStyle("-fx-background-color: transparent;");
+		Button exitButton = new Button();
+		exitButton.setStyle("-fx-background-color: transparent;");
+
+		exitButton.setOnMouseEntered(event -> {
+            exitButton.setCursor(Cursor.HAND);
+        });
+        
+        exitButton.setOnMouseExited(event -> {
+            exitButton.setCursor(Cursor.DEFAULT);
+        });
 
 		ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
 		exitImageView.setFitWidth(40);
 		exitImageView.setFitHeight(40);
 
-		closeButton.setGraphic(exitImageView);
-		closeButton.setPrefWidth(40);
-		closeButton.setPrefHeight(40);
+		exitButton.setGraphic(exitImageView);
+		exitButton.setPrefWidth(40);
+		exitButton.setPrefHeight(40);
 
 		pauseButton = new Button();
 		pauseButton.setStyle("-fx-background-color: transparent;"); 
+
+		pauseButton.setOnMouseEntered(event -> {
+            pauseButton.setCursor(Cursor.HAND);
+        });
+        
+        pauseButton.setOnMouseExited(event -> {
+            pauseButton.setCursor(Cursor.DEFAULT);
+        });
 
 		ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
 		pauseImageView.setFitWidth(40);
@@ -114,7 +131,7 @@ public class PlayModeView {
 		pauseButton.setPrefWidth(40);
 		pauseButton.setPrefHeight(40);
 
-		buttonContainer.getChildren().addAll(closeButton, pauseButton);
+		buttonContainer.getChildren().addAll(exitButton, pauseButton);
         
 	    HBox timeLabelContainer = new HBox(); // Container for timeLabel
     	timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
@@ -175,6 +192,15 @@ public class PlayModeView {
 
 		Button saveButton = new Button();
 		saveButton.setStyle("-fx-background-color: transparent;");
+
+		saveButton.setOnMouseEntered(event -> {
+            saveButton.setCursor(Cursor.HAND);
+        });
+        
+        saveButton.setOnMouseExited(event -> {
+            saveButton.setCursor(Cursor.DEFAULT);
+        });
+
 		saveButton.setGraphic(saveImageView);
 		saveButton.setPrefWidth(40);
 		saveButton.setPrefHeight(40);

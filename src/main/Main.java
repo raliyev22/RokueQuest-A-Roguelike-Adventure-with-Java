@@ -22,13 +22,16 @@ import main.view.HelpView;
 public class Main extends Application {
     SoundEffects soundPlayer = SoundEffects.getInstance();
 
-
     @Override
     public void start(Stage primaryStage) {
         // Main layout
         VBox mainMenu = new VBox(20);
         mainMenu.setAlignment(Pos.CENTER);
         mainMenu.setPadding(new javafx.geometry.Insets(30));
+
+        // Adding Sound Effects
+        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
+        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
 
         // Title with animations
         Text title = new Text("Rokue-Like Adventure");
@@ -42,9 +45,20 @@ public class Main extends Application {
         Button exitButton = createStyledButton("Exit");
 
         // Button Actions
-        startButton.setOnAction(e -> startNewGame(primaryStage));
-        helpButton.setOnAction(e -> showHelp(primaryStage));
-        exitButton.setOnAction(e -> showExitConfirmation(primaryStage));
+        startButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            startNewGame(primaryStage);
+        });        
+
+        helpButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showHelp(primaryStage);
+        });
+        
+        exitButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showExitConfirmation(primaryStage);
+        });
 
         // Add elements to VBox
         mainMenu.getChildren().addAll(title, startButton, helpButton, exitButton);
