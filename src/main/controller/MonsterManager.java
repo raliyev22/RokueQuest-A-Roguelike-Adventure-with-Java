@@ -82,8 +82,10 @@ public class MonsterManager {
                 moveMonster(i);
             }
             if (now - monster.lastMovedTime >= MONSTER_MOVE_INTERVAL) {
+                if(monster.lastMovedTime != 0){
+                    moveMonster(i);
+                }
                 monster.lastMovedTime = now;
-                moveMonster(i);
             }
         }
     }
