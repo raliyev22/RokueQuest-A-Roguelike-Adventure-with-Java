@@ -90,7 +90,7 @@ public class Main extends Application {
         primaryStage.setResizable(false);
 
         soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
-        soundPlayer.setVolume("background", -30);   
+        soundPlayer.setVolume("background", -20);   
         soundPlayer.loopSoundEffect("background");
 
         primaryStage.show();

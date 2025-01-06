@@ -135,7 +135,10 @@ public class PlayModeController extends Application {
         if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.pauseButton.setOnAction(e -> togglePause());
+            view.pauseButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+            });                
             monsterManager.setPlayModeView(view);
         }
     }
@@ -148,8 +151,10 @@ public class PlayModeController extends Application {
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.pauseButton.setOnAction(e -> togglePause());
-            monsterManager.setPlayModeView(view);
+            view.pauseButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+            });                  monsterManager.setPlayModeView(view);
         }
 
         Scene scene = view.getScene();

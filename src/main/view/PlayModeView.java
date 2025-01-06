@@ -32,6 +32,7 @@ import main.controller.PlayModeController;
 import main.model.Images;
 import main.model.Monster;
 import main.utils.Grid;
+import main.utils.SoundEffects;
 import main.utils.Tile;
 
 public class PlayModeView {
@@ -41,7 +42,7 @@ public class PlayModeView {
 	protected Grid grid;
 	protected Rectangle heroView;
 	protected double time;
-  protected List<Rectangle> monsterViews;
+  	protected List<Rectangle> monsterViews;
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
@@ -49,6 +50,9 @@ public class PlayModeView {
 	public Button pauseButton;
 	public Button resumeButton;
 	private HBox buttonContainer;
+	SoundEffects soundPlayer = SoundEffects.getInstance();
+	private PlayModeController playModeController;
+
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -58,6 +62,7 @@ public class PlayModeView {
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
+		this.playModeController = new PlayModeController();
 		initialize();
 	}
 
@@ -75,6 +80,8 @@ public class PlayModeView {
 		}
 
         monsterViews = new ArrayList<>();
+
+        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
 		
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
@@ -101,6 +108,10 @@ public class PlayModeView {
 
 		Button exitButton = new Button();
 		exitButton.setStyle("-fx-background-color: transparent;");
+
+		exitButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });      
 
 		exitButton.setOnMouseEntered(event -> {
             exitButton.setCursor(Cursor.HAND);
@@ -197,6 +208,11 @@ public class PlayModeView {
 		Button saveButton = new Button();
 		saveButton.setStyle("-fx-background-color: transparent;");
 
+		saveButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
+			saveGame();
+        });
+
 		saveButton.setOnMouseEntered(event -> {
             saveButton.setCursor(Cursor.HAND);
         });
@@ -208,7 +224,6 @@ public class PlayModeView {
 		saveButton.setGraphic(saveImageView);
 		saveButton.setPrefWidth(40);
 		saveButton.setPrefHeight(40);
-		saveButton.setOnAction(e -> saveGame());
 		//Added to first index of button container
 		buttonContainer.getChildren().add(1, saveButton);
 		//Changing pause button's image to play button image
