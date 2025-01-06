@@ -40,7 +40,7 @@ public class PlayModeView {
 	protected int tileSize = 64;
 	protected Grid grid;
 	protected Rectangle heroView;
-	protected int time;
+	protected double time;
   protected List<Rectangle> monsterViews;
 	protected Label timeLabel;
 	private HBox heartsContainer;
@@ -52,7 +52,7 @@ public class PlayModeView {
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
-	public PlayModeView(Grid grid, int time, Stage primaryStage) {
+	public PlayModeView(Grid grid, double time, Stage primaryStage) {
 		this.grid = grid;
 		this.time = time;
 		this.pane = new Pane();
@@ -61,7 +61,7 @@ public class PlayModeView {
 		initialize();
 	}
 
-	public void refresh(Grid newGrid, int time) {
+	public void refresh(Grid newGrid, double time) {
 		this.grid = newGrid;
 		this.time = time;
 		pane.getChildren().clear();
@@ -356,6 +356,10 @@ public class PlayModeView {
 	public void addToPane(Rectangle monsterView){
 		pane.getChildren().add(monsterView);
 	}
+
+	public void removeFromPane(Rectangle monsterView){
+		pane.getChildren().remove(monsterView);
+	}
 	
 	public Pane getPane() {
 		return pane;
@@ -365,9 +369,9 @@ public class PlayModeView {
 		return scene;
 	}
 
-	public int updateTime(int time){
+	public double updateTime(double time){
 		this.time = time;
-		timeLabel.setText("Time: " + time);
+		timeLabel.setText("Time: " + (int)time);
 		return time;
 	}
 

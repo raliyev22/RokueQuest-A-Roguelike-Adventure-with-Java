@@ -13,107 +13,107 @@ import main.model.Directions;
 
 // This class creates tile-maps. Maybe it will have utility functions too
 public class Grid {
-	protected final int rowLength; // How many tiles are there within a single row
-	protected final int columnLength; // How many tiles are there within a single column
-	protected final int tileWidth;
-	protected final int tileHeight;
-	// We will create the tile map starting from top left
-	public int topLeftXCoordinate;
-	public int topLeftYCoordinate;
-	protected List<Tile> tileMap;
-	
-	public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
-	int topLeftXCoordinate, int topLeftYCoordinate) {
-		super();
-		if ((rowLength <= 0) || (columnLength <= 0) || (tileWidth <= 0) || (tileHeight <= 0))
-			System.err.println("Non-positive number while creating tile map.");
-		
-		this.rowLength = rowLength;
-		this.columnLength = columnLength;
-		this.tileWidth = tileWidth;
-		this.tileHeight = tileHeight;
-		this.topLeftXCoordinate = topLeftXCoordinate;
-		this.topLeftYCoordinate = topLeftYCoordinate;
-		this.tileMap = createTileMap(rowLength, columnLength, 
-		tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
-	}
-	
-	// Creating a tile map using other variables
-	private List<Tile> createTileMap(int rowLength, int columnLength, 
-	int tileWidth, int tileHeight, int topLeftXCoordinate, int topLeftYCoordinate) {
-		
-		int capacity = rowLength * columnLength;
-		ArrayList<Tile> tileM = new ArrayList<>(capacity);
-		
-		int leftSide = topLeftXCoordinate;
-		int topSide = topLeftYCoordinate; 
-		int rightSide = leftSide + tileWidth;
-		int bottomSide = topLeftYCoordinate + tileHeight;
-		
-		for (int index = 0; index < capacity; index++) {
-			Tile currentTile = new Tile(leftSide, rightSide, topSide, bottomSide);
-			tileM.add(index, currentTile);
-			// System.out.println(String.format("%d: %s\n", index, currentTile));
-			
-			// Find the next positions of every side
-			// If we are at the end of the row, go up 1 and start from left
-			if ((index + 1) % rowLength == 0) {
-				leftSide = topLeftXCoordinate;
-				topSide = topSide + tileHeight;
-			}
-			// Otherwise just go 1 tile to the right
-			else {
-				leftSide = leftSide + tileWidth;
-			}
-			rightSide = leftSide + tileWidth;
-			bottomSide = topSide + tileHeight;
-		}
-		
-		return tileM;
-	}
-
-	public void copyTileMap(Grid otherGrid) {
-		if (otherGrid == null) {
-			return ;
-		}
-		if (this.rowLength != otherGrid.rowLength) {
-			return ;
-		}
-		if (this.columnLength != otherGrid.columnLength) {
-			return ;
-		}
-
-		for (int i = 0; i < this.tileMap.size(); i++) {
-			char otherChar = otherGrid.tileMap.get(i).tileType;
-			if (otherChar == '!') {
-				otherChar = 'E';
-			}
-			this.tileMap.get(i).changeTileType(otherChar);
-		}
-	}
-	
-	public void setTopLeftXCordinate(int topLeftXCoordinate){
-		this.topLeftXCoordinate = topLeftXCoordinate;
-	}
-
-	public void setTopLeftYCordinate(int topLeftYCoordinate){
-		this.topLeftYCoordinate = topLeftYCoordinate;
-	}
-
-	// For a grid like below, tileIndex(1, 2) returns 7:
-	// 00 01 02
-	// 03 04 05
-	// 06 07 08
-	// 09 10 11
-	public int tileIndex(int x, int y) {
-		return y * this.rowLength + x; // Uses 0 indexing
-	}
-
-	public boolean indexInRange(int index) {
+    protected final int rowLength; // How many tiles are there within a single row
+    protected final int columnLength; // How many tiles are there within a single column
+    protected final int tileWidth;
+    protected final int tileHeight;
+    // We will create the tile map starting from top left
+    public int topLeftXCoordinate;
+    public int topLeftYCoordinate;
+    protected List<Tile> tileMap;
+    
+    public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
+    int topLeftXCoordinate, int topLeftYCoordinate) {
+        super();
+        if ((rowLength <= 0) || (columnLength <= 0) || (tileWidth <= 0) || (tileHeight <= 0))
+        System.err.println("Non-positive number while creating tile map.");
+        
+        this.rowLength = rowLength;
+        this.columnLength = columnLength;
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+        this.topLeftXCoordinate = topLeftXCoordinate;
+        this.topLeftYCoordinate = topLeftYCoordinate;
+        this.tileMap = createTileMap(rowLength, columnLength, 
+        tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
+    }
+    
+    // Creating a tile map using other variables
+    private List<Tile> createTileMap(int rowLength, int columnLength, 
+    int tileWidth, int tileHeight, int topLeftXCoordinate, int topLeftYCoordinate) {
+        
+        int capacity = rowLength * columnLength;
+        ArrayList<Tile> tileM = new ArrayList<>(capacity);
+        
+        int leftSide = topLeftXCoordinate;
+        int topSide = topLeftYCoordinate; 
+        int rightSide = leftSide + tileWidth;
+        int bottomSide = topLeftYCoordinate + tileHeight;
+        
+        for (int index = 0; index < capacity; index++) {
+            Tile currentTile = new Tile(leftSide, rightSide, topSide, bottomSide);
+            tileM.add(index, currentTile);
+            // System.out.println(String.format("%d: %s\n", index, currentTile));
+            
+            // Find the next positions of every side
+            // If we are at the end of the row, go up 1 and start from left
+            if ((index + 1) % rowLength == 0) {
+                leftSide = topLeftXCoordinate;
+                topSide = topSide + tileHeight;
+            }
+            // Otherwise just go 1 tile to the right
+            else {
+                leftSide = leftSide + tileWidth;
+            }
+            rightSide = leftSide + tileWidth;
+            bottomSide = topSide + tileHeight;
+        }
+        
+        return tileM;
+    }
+    
+    public void copyTileMap(Grid otherGrid) {
+        if (otherGrid == null) {
+            return ;
+        }
+        if (this.rowLength != otherGrid.rowLength) {
+            return ;
+        }
+        if (this.columnLength != otherGrid.columnLength) {
+            return ;
+        }
+        
+        for (int i = 0; i < this.tileMap.size(); i++) {
+            char otherChar = otherGrid.tileMap.get(i).tileType;
+            if (otherChar == '!') {
+                otherChar = 'E';
+            }
+            this.tileMap.get(i).changeTileType(otherChar);
+        }
+    }
+    
+    public void setTopLeftXCordinate(int topLeftXCoordinate){
+        this.topLeftXCoordinate = topLeftXCoordinate;
+    }
+    
+    public void setTopLeftYCordinate(int topLeftYCoordinate){
+        this.topLeftYCoordinate = topLeftYCoordinate;
+    }
+    
+    // For a grid like below, tileIndex(1, 2) returns 7:
+    // 00 01 02
+    // 03 04 05
+    // 06 07 08
+    // 09 10 11
+    public int tileIndex(int x, int y) {
+        return y * this.rowLength + x; // Uses 0 indexing
+    }
+    
+    public boolean indexInRange(int index) {
         return ((index >= 0) && (index < this.rowLength * this.columnLength));
-	}
-
-	public boolean indexInRange(int x, int y) {
+    }
+    
+    public boolean indexInRange(int x, int y) {
         return ((x >= 0) && (x < this.rowLength) && (y >= 0) && (y < this.columnLength));
 	}
 	
@@ -541,6 +541,22 @@ public class Grid {
         }
         
         return hallObjectTiles;
+    }
+
+    public Tile findTileUsingDirection(Tile tile, Directions dir) {
+        if (null != dir) switch (dir) {
+            case NORTH:
+                return findNorthTile(tile);
+            case EAST:
+                return findEastTile(tile);
+            case SOUTH:
+                return findSouthTile(tile);
+            case WEST:
+                return findWestTile(tile);
+            default:
+                return null;
+        }
+        return null;
     }
 
     public int getTileHeight() {

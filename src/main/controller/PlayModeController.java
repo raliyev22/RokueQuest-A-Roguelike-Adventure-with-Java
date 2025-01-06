@@ -3,6 +3,7 @@ package main.controller;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.sound.sampled.AudioSystem;
@@ -36,6 +37,7 @@ public class PlayModeController extends Application {
     public Grid playModeGrid;
     protected Hero hero;
     protected MonsterManager monsterManager;
+    protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
     
     private int runeXCoordinate;
@@ -44,12 +46,16 @@ public class PlayModeController extends Application {
     private double mouseX;
     private double mouseY;
     
-    public int time;
+    public static double time;
+    public static double totalTime;
     
-    protected int hallTimeMultiplier = 500;
+    protected int hallTimeMultiplier = 5;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
+    private long lastMonsterUpdateTime = 0;
+    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
+
     private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
@@ -104,6 +110,7 @@ public class PlayModeController extends Application {
                 return;
             }
         }
+        this.totalTime = time;
         
         //playModeGrid.copyTileMap(earthHall);
         // Find the first random tile that the hero will spawn on
@@ -254,9 +261,10 @@ public class PlayModeController extends Application {
                     time--;
                     lastUpdateTime = now;
                 }
-                
-                moveHero();
-                
+
+                if(!hero.getIsTeleported()){
+                    moveHero();
+                }                
                 view.changeHeroSprite(getHeroImage());
                 
                 //monster spawn logic
@@ -271,7 +279,22 @@ public class PlayModeController extends Application {
                     lastMonsterSpawnTime = now; 
                 }
                 
-                monsterManager.moveAllMonsters(now);
+                // monsterManager.moveAllMonsters(now);
+
+                if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
+
+                    monsterIterator = monsters.iterator();
+
+                    while (monsterIterator.hasNext()) {
+                        Monster monster = monsterIterator.next();
+
+                        if (monster instanceof WizardMonster wizardMonster) {
+                            wizardMonster.act(PlayModeController.this); // Execute wizard behavior
+                        } else {
+                            moveCharacter(monster); // Default monster movement
+                        }
+                        
+                    }
                 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -546,6 +569,20 @@ public class PlayModeController extends Application {
     
     public int getTopLeftYCoordinate() {
         return this.topLeftYCoordinate;
+    }
+
+    public Hero getHero(){
+        return this.hero;
+    }
+    public PlayModeView getView(){
+        return this.view;
+    }
+
+    public void removeMonster(Monster monster) {
+        //monsters.remove(monster);
+        monsterIterator.remove();
+        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), 'E');
+        view.removeFromPane(monster.getMonsterView());
     }
 }
 
