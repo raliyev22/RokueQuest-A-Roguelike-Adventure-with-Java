@@ -143,6 +143,52 @@ public class PlayModeView {
 
 		initializePauseOverlay();
 	}
+
+    private void initializePauseOverlay() {
+
+        // Create a "Paused" text
+        Label pauseText = new Label("Game Paused");
+        pauseText.setFont(Font.font(36));
+        pauseText.setTextFill(Color.WHITE);
+
+        VBox overlayContent = new VBox(20, pauseText);
+        overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+		overlayContent.setTranslateY(400);
+		overlayContent.setTranslateX(300);
+
+        // Add elements to a stack pane
+        pauseOverlay = new StackPane(overlayContent);
+        pauseOverlay.setVisible(false);
+        pane.getChildren().add(pauseOverlay);
+    }
+
+	public void showPauseGame() {
+        pauseOverlay.setVisible(true);
+		// Setup for save button
+		ImageView saveImageView = new ImageView(Images.IMAGE_SAVEBUTTON_x4);
+		saveImageView.setFitHeight(40);
+		saveImageView.setFitWidth(40);
+
+		Button saveButton = new Button();
+		saveButton.setStyle("-fx-background-color: transparent;");
+		saveButton.setGraphic(saveImageView);
+		saveButton.setPrefWidth(40);
+		saveButton.setPrefHeight(40);
+		saveButton.setOnAction(e -> saveGame());
+		//Added to first index of button container
+		buttonContainer.getChildren().add(1, saveButton);
+		//Changing pause button's image to play button image
+		ImageView resumeImageView = new ImageView(Images.IMAGE_PLAYBUTTON_x4);
+		resumeImageView.setFitHeight(40);
+		resumeImageView.setFitWidth(40);
+
+		pauseButton.setGraphic(resumeImageView);
+		pauseButton.setPrefWidth(40);
+		pauseButton.setPrefHeight(40);
+    }
+
+		initializePauseOverlay();
+	}
 	
 	
 	private void showWalls(Grid grid) {
