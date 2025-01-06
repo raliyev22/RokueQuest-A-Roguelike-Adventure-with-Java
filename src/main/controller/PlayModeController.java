@@ -368,6 +368,7 @@ public class PlayModeController extends Application {
         System.out.println("Game loop stopped.");
     }
 
+
     private void togglePause() {
         if (isRunning){
             stopGameLoop();
