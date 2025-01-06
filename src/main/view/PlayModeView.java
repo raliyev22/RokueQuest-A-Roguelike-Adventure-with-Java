@@ -3,6 +3,7 @@ package main.view;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Platform;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -98,19 +99,35 @@ public class PlayModeView {
 		buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
-		Button closeButton = new Button();
-		closeButton.setStyle("-fx-background-color: transparent;");
+		Button exitButton = new Button();
+		exitButton.setStyle("-fx-background-color: transparent;");
+
+		exitButton.setOnMouseEntered(event -> {
+            exitButton.setCursor(Cursor.HAND);
+        });
+        
+        exitButton.setOnMouseExited(event -> {
+            exitButton.setCursor(Cursor.DEFAULT);
+        });
 
 		ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
 		exitImageView.setFitWidth(40);
 		exitImageView.setFitHeight(40);
 
-		closeButton.setGraphic(exitImageView);
-		closeButton.setPrefWidth(40);
-		closeButton.setPrefHeight(40);
+		exitButton.setGraphic(exitImageView);
+		exitButton.setPrefWidth(40);
+		exitButton.setPrefHeight(40);
 
 		pauseButton = new Button();
 		pauseButton.setStyle("-fx-background-color: transparent;"); 
+
+		pauseButton.setOnMouseEntered(event -> {
+            pauseButton.setCursor(Cursor.HAND);
+        });
+        
+        pauseButton.setOnMouseExited(event -> {
+            pauseButton.setCursor(Cursor.DEFAULT);
+        });
 
 		ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
 		pauseImageView.setFitWidth(40);
@@ -120,36 +137,34 @@ public class PlayModeView {
 		pauseButton.setPrefWidth(40);
 		pauseButton.setPrefHeight(40);
 
-		buttonContainer.getChildren().addAll(closeButton, pauseButton);
+		buttonContainer.getChildren().addAll(exitButton, pauseButton);
          
-        HBox timeLabelContainer = new HBox(); // Container for timeLabel
-        timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
-        timeLabel = new Label("Time: " + time);
-        timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
-        timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
-        
-        
-        heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
-        heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
-        heartsContainer.setTranslateY(80);
-        Rectangle heart1,heart2,heart3,heart4;
-        heart1 = new Rectangle(32,32);
-        heart2 = new Rectangle(32,32);
-        heart3 = new Rectangle(32,32);
-        heart4 = new Rectangle(32,32);
-        heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-        heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-        heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-        heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-        heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
-        
-        Rectangle inventory = new Rectangle(200,400);
-        inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
-        inventory.setTranslateY(100);
-        
-        
-        uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
-        pane.getChildren().add(uiContainer);
+    HBox timeLabelContainer = new HBox(); // Container for timeLabel
+    timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
+    timeLabel = new Label("Time: " + time);
+    timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
+    timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
+
+    heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
+    heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
+    heartsContainer.setTranslateY(80);
+    Rectangle heart1,heart2,heart3,heart4;
+    heart1 = new Rectangle(32,32);
+    heart2 = new Rectangle(32,32);
+    heart3 = new Rectangle(32,32);
+    heart4 = new Rectangle(32,32);
+    heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+    heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+    heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+    heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+    heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
+
+    Rectangle inventory = new Rectangle(200,400);
+    inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
+    inventory.setTranslateY(100);
+
+    uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
+    pane.getChildren().add(uiContainer);
 
 		initializePauseOverlay();
 	}
@@ -163,8 +178,8 @@ public class PlayModeView {
 
         VBox overlayContent = new VBox(20, pauseText);
         overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
-		overlayContent.setTranslateY(400);
-		overlayContent.setTranslateX(300);
+	  	  overlayContent.setTranslateY(400);
+	    	overlayContent.setTranslateX(300);
 
         // Add elements to a stack pane
         pauseOverlay = new StackPane(overlayContent);
@@ -181,6 +196,15 @@ public class PlayModeView {
 
 		Button saveButton = new Button();
 		saveButton.setStyle("-fx-background-color: transparent;");
+
+		saveButton.setOnMouseEntered(event -> {
+            saveButton.setCursor(Cursor.HAND);
+        });
+        
+        saveButton.setOnMouseExited(event -> {
+            saveButton.setCursor(Cursor.DEFAULT);
+        });
+
 		saveButton.setGraphic(saveImageView);
 		saveButton.setPrefWidth(40);
 		saveButton.setPrefHeight(40);

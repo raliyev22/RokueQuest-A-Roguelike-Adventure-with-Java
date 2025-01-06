@@ -50,13 +50,14 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
+    private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
-    
-    private static final int TARGET_FPS = 120;
-    private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
-    private long lastFrameTime = 0;
-    
+    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
+
+	  private static final int TARGET_FPS = 120;
+	  private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
+  	private long lastFrameTime = 0;
+
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
     
@@ -127,9 +128,9 @@ public class PlayModeController extends Application {
         if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            view.pauseButton.setOnAction(e -> togglePause());
             monsterManager.setPlayModeView(view);
         }
-        
     }
     
     public void start(Stage primaryStage) {
@@ -140,12 +141,13 @@ public class PlayModeController extends Application {
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            view.pauseButton.setOnAction(e -> togglePause());
             monsterManager.setPlayModeView(view);
         }
-        
+
         Scene scene = view.getScene();
         initialize(scene);
-        view.pauseButton.setOnAction(e -> togglePause());
+        
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
@@ -220,6 +222,7 @@ public class PlayModeController extends Application {
     public void startGameLoop() {
         if (isRunning) return;
         isRunning = true;
+
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
