@@ -35,7 +35,7 @@ public class PlayModeController extends Application {
     
     public Grid playModeGrid;
     protected Hero hero;
-    protected ArrayList<Monster> monsters;
+    protected MonsterManager monsterManager;
     protected HallType hallType;
     
     private int runeXCoordinate;
@@ -50,23 +50,23 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
-    private long lastMonsterUpdateTime = 0; // Tracks the last monster update time
-    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
-
-	private static final int TARGET_FPS = 120;
-	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
-	private long lastFrameTime = 0;
+    private long lastMonsterSpawnTime = 0;
+    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+    
+    private static final int TARGET_FPS = 120;
+    private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
+    private long lastFrameTime = 0;
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
     
     private Random random = new Random();
-
+    
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
-    private boolean escPressedFlag = false; 
 
+    private boolean escPressedFlag = false; 
 
     // public PlayModeController() {
     //     initializePlayMode();
@@ -100,6 +100,7 @@ public class PlayModeController extends Application {
             case FIRE -> { // Add game over screen here
                 stopGameLoop();
                 view.showGameOverPopup(true);
+                return;
             }
         }
         
@@ -114,18 +115,21 @@ public class PlayModeController extends Application {
         hero.targetX = heroTile.getLeftSide();
         hero.targetY = heroTile.getTopSide();
         
-        //Create empty monster array
-        monsters = new ArrayList<>();
+        // Create monster manager
         
         // Find the random object that the rune will spawn in
         Tile runeTile = getRandomHallObjectTile();
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
-
-        if(view!=null){ // Else we have already come from another grid, which means we only need to refresh the view
+        
+        monsterManager = new MonsterManager(playModeGrid);
+        
+        if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            monsterManager.setPlayModeView(view);
         }
+        
     }
     
     public void start(Stage primaryStage) {
@@ -136,6 +140,7 @@ public class PlayModeController extends Application {
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            monsterManager.setPlayModeView(view);
         }
         
         Scene scene = view.getScene();
@@ -146,10 +151,10 @@ public class PlayModeController extends Application {
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
-
+        
         startGameLoop();
     }
-
+    
     private void initializeSoundEffects() {
         soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
         soundPlayer.setVolume("step", -10);
@@ -216,156 +221,92 @@ public class PlayModeController extends Application {
         if (isRunning) return;
         isRunning = true;
         gameLoop = new AnimationTimer() {
-            private long lastMonsterSpawnTime = 0;
-            private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
-            private long lastRuneTeleportation = 0;
-            private static final long RUNE_TELEPORT_INTERVAL = 5_000_000_000L;
-
-            private int counter = -1;
-            
-            
-            
             @Override
             public void handle(long now) {
-				if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
-					return;
-				}
-				lastFrameTime = now;
+                if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
+                    return;
+                }
+                lastFrameTime = now;
 
-                    if (time < 0) {
-                        view.showGameOverPopup(false);
-                        playSoundEffectInThread("gameLoser");
-                        stopGameLoop();
-                        return;
-                    }
+                if (lastUpdateTime == 0) {
+                    lastUpdateTime = now;
+                } 
+                if (lastMonsterSpawnTime == 0) {
+                    lastMonsterSpawnTime = now;
+                }
+                
+                if (time < 0) {
+                    view.showGameOverPopup(false);
+                    playSoundEffectInThread("gameLoser");
+                    stopGameLoop();
+                    return;
+                }
+                
+                if (hero.getLiveCount() <= 0) {
+                    view.showGameOverPopup(false);
+                    playSoundEffectInThread("gameLoser");
+                    stopGameLoop();
+                    return;
+                }
+                
+                if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
+                    view.updateTime(time); // Update the view
+                    time--;
+                    lastUpdateTime = now;
+                }
+                
+                moveHero();
+                
+                view.changeHeroSprite(getHeroImage());
+                
+                //monster spawn logic
+                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
+                    Tile initialMonsterTile = getRandomEmptyTile();
                     
-                    if (hero.getLiveCount() == 0) {
-                        view.showGameOverPopup(false);
-                        playSoundEffectInThread("gameLoser");
-                        stopGameLoop();
-                        return;
-                    }
+                    int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
+                    int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
                     
-                    if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
-                        view.updateTime(time); // Update the view
-                        time--;
-                        lastUpdateTime = now;
-                        counter++;
-                    }
-
-                    moveHero();
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate);     
                     
-                    view.changeHeroSprite(getHeroImage());
-                    
-                    //monster spawn logic
-                    if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL && counter >= 8) {
+                    lastMonsterSpawnTime = now; 
+                }
+                
+                monsterManager.moveAllMonsters(now);
+                
+                if (mouseClicked) {
+                    if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
+                        Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
                         
-                        int randomInt = random.nextInt(3);
-                        
-                        Monster monster = null;
-                        Tile initialMonsterTile = getRandomEmptyTile();
-                        
-                        int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
-                        int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
-                        Tile monsterTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
-                        
-                        Rectangle monsterView = new Rectangle(64,64);
-                        
-                        switch (randomInt) {
-                            case 0:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                            monster.setMonsterView(monsterView);
-                            break;
-                            case 1:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
-                            monster.setMonsterView(monsterView);
-                            break;
-                            case 2:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
-                            monster.setMonsterView(monsterView);
-                            monster.setLastRuneTeleportation(now);
-                            break;
-                            default:
-                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                            monster.setMonsterView(monsterView);
-                        }
-                        
-                        
-                        view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());
-                        view.addToPane(monsterView);
-                        
-                        view.showGrid(playModeGrid);
-                        
-                        lastMonsterSpawnTime = now; 
-                    }
-                    
-                    if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
-                        for(Monster monster : monsters){
-                            switch(monster.getType()){
-                                case MonsterType.FIGHTER:
-                                moveCharacter(monster);
-                                break;
-                                case MonsterType.ARCHER:
-                                moveCharacter(monster);
-                                break;
-                                case MonsterType.WIZARD:
-                                if (now >= monster.getLastRuneTeleportation() && now - monster.getLastRuneTeleportation() >= RUNE_TELEPORT_INTERVAL) {
-                                    teleportRune();
-                                    playSoundEffectInThread("wizard");
-                                    monster.setLastRuneTeleportation(now);
-                                }                                
-                                break;
-                            }
-                        }
-                        lastMonsterUpdateTime = now;
-                    }
-                    
-                    // if (now - lastRuneTeleportation >= RUNE_TELEPORT_INTERVAL) {
-                    //     for (int i = 0; i < wizardCount; i++) {
-                    //         teleportRune();
-                    //         playSoundEffectInThread("wizard");        
-                    //     }
-                    //     lastRuneTeleportation = now;
-                    // }
-                    
-                    //monster movement
-                    
-                    if (mouseClicked) {
-                        if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
-                            Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
+                        if (checkRune(clickedTile)) {
+                            stopGameLoop();
+                            hero.isMoving = false;
+                            lastMonsterSpawnTime = 0;
+                            lastUpdateTime = 0;
                             
-                            if (checkRune(clickedTile)) {
-                                stopGameLoop();
-                                hero.isMoving = false;
-                                counter=-1;
-                                if(hallType == HallType.FIRE){
-                                    playSoundEffectInThread("gameWinner");
-                                }
-                                else{
-                                    playSoundEffectInThread("door");
-                                    try {
-                                        Thread.sleep(1500);
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                initializePlayMode();
-                                startGameLoop();
+                            if(hallType == HallType.FIRE){
+                                playSoundEffectInThread("gameWinner");
                             }
+                            else{
+                                playSoundEffectInThread("door");
+                                try {
+                                    Thread.sleep(1500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            initializePlayMode();
+                            startGameLoop();
                         }
-                        
-                        mouseClicked = false;
                     }
+                    
+                    mouseClicked = false;
+                }
                 
             }
         };
         gameLoop.start();
     }
-
+    
     private void stopGameLoop() {
         if (!isRunning) return;
         isRunning = false;
@@ -374,7 +315,6 @@ public class PlayModeController extends Application {
         }
         System.out.println("Game loop stopped.");
     }
-
 
     private void togglePause() {
         if (isRunning){
@@ -392,11 +332,12 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }
+
     public void moveHero() {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         int heroViewLeftSide = heroTile.getLeftSide();
         int heroViewTopSide = heroTile.getTopSide();
-
+        
         if(!hero.isMoving){
             hero.currentX = heroViewLeftSide;
             hero.currentY = heroViewTopSide;
@@ -412,7 +353,7 @@ public class PlayModeController extends Application {
                 hero.targetY = hero.currentY - tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.NORTH;
-
+                
                 playSoundEffectInThread("step");        
             } else if (downPressed && isWalkableTile(playModeGrid.findSouthTile(heroTile))) {
                 heroTile.changeTileType('?');
@@ -423,7 +364,7 @@ public class PlayModeController extends Application {
                 hero.targetY = hero.currentY + tileHeight;
                 hero.isMoving = true;
                 hero.movingDirection = Directions.SOUTH;
-
+                
                 playSoundEffectInThread("step");        
             } else if (leftPressed && isWalkableTile(playModeGrid.findWestTile(heroTile))) {
                 heroTile.changeTileType('?');
@@ -431,11 +372,11 @@ public class PlayModeController extends Application {
                 if (westTile != null) {
                     westTile.changeTileType('?');
                 }
-                hero.targetX = hero.currentX - tileHeight;
+                hero.targetX = hero.currentX - tileWidth;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
-
+                
                 playSoundEffectInThread("step");        
             } else if (rightPressed && isWalkableTile(playModeGrid.findEastTile(heroTile))) {
                 heroTile.changeTileType('?');
@@ -443,15 +384,15 @@ public class PlayModeController extends Application {
                 if (eastTile != null) {
                     eastTile.changeTileType('?');
                 }
-                hero.targetX = hero.currentX + tileHeight;
+                hero.targetX = hero.currentX + tileWidth;
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
                 hero.movingDirection = Directions.EAST;
-
+                
                 playSoundEffectInThread("step");        
             }
         }
-
+        
         if (hero.currentX < hero.targetX) {
             hero.currentX = Math.min(hero.currentX + hero.speed, hero.targetX);
             view.updateHeroPosition(hero.currentX, hero.currentY);
@@ -471,13 +412,13 @@ public class PlayModeController extends Application {
         if (hero.currentX == hero.targetX && hero.currentY == hero.targetY) {
             hero.isMoving = false;
             if (hero.movingDirection != null) {
-                moveHeroDirection(hero.movingDirection);
+                moveHeroOnGrid(hero.movingDirection);
                 hero.movingDirection = null;
             }
         }
     }
-
-    public void moveHeroDirection(Directions dir) {
+    
+    public void moveHeroOnGrid(Directions dir) {
         int xIndexOld = hero.getPosX();
         int yIndexOld = hero.getPosY();
         playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
@@ -565,7 +506,7 @@ public class PlayModeController extends Application {
             }
         }
     }
-
+    
     public void playSoundEffectInThread(String label) {
         new Thread(() -> {
             soundPlayer.playSoundEffect(label);
@@ -637,77 +578,27 @@ public class PlayModeController extends Application {
     //     }   
     // }
     
-    public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
-        Monster monster = null;
-        switch (type) {
-            case MonsterType.FIGHTER -> {
-                monster = new FighterMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.ARCHER -> {
-                monster = new ArcherMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-            case MonsterType.WIZARD -> {
-                monster = new WizardMonster(xCoordinate,yCoordinate,monsterTile);
-            }
-        }
-        monsters.add(monster);
-        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
-        return monster;
-    }
-    
-    public boolean isNearHero(Tile otherTile, int n) {
-        int otherTileX = playModeGrid.findXofTile(otherTile);
-        int otherTileY = playModeGrid.findYofTile(otherTile);
-        double euclideanDistance = 
-        Math.sqrt((hero.getPosX() - otherTileX) * (hero.getPosX() - otherTileX) + 
-        (hero.getPosY() - otherTileY) * (hero.getPosY() - otherTileY));
-        
-        return (euclideanDistance <= n);
-    }
+    // All of the things below (rightfully) refer to Grid class.
+    // You may replace all of these in the code, I didn't bother.
     
     public Tile getRandomEmptyTile() {
-        SecureRandom rng = new SecureRandom();
-        ArrayList<Tile> emptyTiles = getEmptyTiles();
-        
-        int luckyTileInd = rng.nextInt(emptyTiles.size());
-        
-        return emptyTiles.get(luckyTileInd);
+        return playModeGrid.getRandomEmptyTile();
     }
     
     public ArrayList<Tile> getEmptyTiles() {
-        ArrayList<Tile> emptyTiles = new ArrayList<>();
-        
-        for (Tile tile: playModeGrid.getTileMap()) {
-            if (isEmptyTileType(tile.getTileType())){
-                emptyTiles.add(tile);
-            }
-        }
-        
-        return emptyTiles;
+        return playModeGrid.getEmptyTiles();
     }
     
     public static boolean isHallObjectTile(Tile tile) {
-        return isHallObjectTileType(tile.getTileType());
+        return Grid.isHallObjectTile(tile);
     }
     
     public static boolean isHallObjectTileType(char c) {
-        if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
-        || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
-            return true;
-        }
-        return false;
+        return Grid.isHallObjectTileType(c);
     }
     
     public ArrayList<Tile> getHallObjectTiles() {
-        ArrayList<Tile> hallObjectTiles = new ArrayList<>();
-        
-        for (Tile tile: playModeGrid.getTileMap()) {
-            if (isHallObjectTile(tile)){
-                hallObjectTiles.add(tile);
-            }
-        }
-        
-        return hallObjectTiles;
+        return playModeGrid.getHallObjectTiles();
     }
     
     public Tile getRandomHallObjectTile() {
@@ -720,25 +611,18 @@ public class PlayModeController extends Application {
     }
     
     public static boolean isEmptyTileType(char c) {
-        if (c == 'E' || c == 'e') {
-            return true;
-        }
-        return false;
+        Grid.isEmptyTileType(c);
     }
     
     public boolean isWalkableTile(Tile tile){
-        if(tile == null){
-            return false;
-        }
-        return isWalkableTileType(tile.getTileType());
+        return Grid.isWalkableTile(tile);
     }
     
     public static boolean isWalkableTileType(char c) {
-        if (c == 'E' || c == 'e') {
-            return true;
-        }
-        return false;
+        return Grid.isWalkableTileType(c);
     }
+    
+    //
     
     public Grid getPlayModeGrid() {
         return this.playModeGrid;
