@@ -263,7 +263,7 @@ public class PlayModeController extends Application {
                 view.changeHeroSprite(getHeroImage());
                 
                 //monster spawn logic
-                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
+                if (now - lastMonsterSpawnTime >= MONSTER_UPDATE_INTERVAL) {
                     Tile initialMonsterTile = getRandomEmptyTile();
                     
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
@@ -573,16 +573,33 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
     
-    // public void setHeroDirection(Directions direction) {
-    //     if (direction.equals(Directions.WEST)) {
-    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERLEFT_x4));
-    //     } else if (direction.equals(Directions.EAST)) {
-    //         hero.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
-    //     }   
-    // }
+    public Monster createMonster(int xCoordinate, int yCoordinate, MonsterType type,Tile monsterTile) {
+        Monster monster = null;
+        switch (type) {
+            case MonsterType.FIGHTER -> {
+                monster = new FighterMonster(xCoordinate,yCoordinate,monsterTile);
+            }
+            case MonsterType.ARCHER -> {
+                monster = new ArcherMonster(xCoordinate,yCoordinate,monsterTile);
+            }
+            case MonsterType.WIZARD -> {
+                monster = new WizardMonster(xCoordinate,yCoordinate,monsterTile);
+            }
+        }
+        monsters.add(monster);
+        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
+        return monster;
+    }
     
-    // All of the things below (rightfully) refer to Grid class.
-    // You may replace all of these in the code, I didn't bother.
+    public boolean isNearHero(Tile otherTile, int n) {
+        int otherTileX = playModeGrid.findXofTile(otherTile);
+        int otherTileY = playModeGrid.findYofTile(otherTile);
+        double euclideanDistance = 
+        Math.sqrt((hero.getPosX() - otherTileX) * (hero.getPosX() - otherTileX) + 
+        (hero.getPosY() - otherTileY) * (hero.getPosY() - otherTileY));
+        
+        return (euclideanDistance <= n);
+    }
     
     public Tile getRandomEmptyTile() {
         return playModeGrid.getRandomEmptyTile();
