@@ -79,8 +79,9 @@ public class Main extends Application {
         root.getChildren().add(mainMenu);
 
         // Create Scene
-        Scene scene = new Scene(root, 600, 400);
+        Scene scene1 = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
+        primaryStage.setScene(scene);sadasd
         primaryStage.setTitle("Rokue-Like Adventure");
         javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
         
