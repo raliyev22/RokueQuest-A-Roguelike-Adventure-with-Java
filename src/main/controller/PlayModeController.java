@@ -270,32 +270,35 @@ public class PlayModeController extends Application {
                         
                         Rectangle monsterView = new Rectangle(64,64);
                         
-                        // switch (randomInt) {
-                        //     case 0:
-                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                        //     monster.setMonsterView(monsterView);
-                        //     break;
-                        //     case 1:
-                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
-                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
-                        //     monster.setMonsterView(monsterView);
-                        //     break;
-                        //     case 2:
-                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
-                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
-                        //     monster.setMonsterView(monsterView);
-                        //     monster.setLastRuneTeleportation(now);
-                        //     break;
-                        //     default:
-                        //     monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
-                        //     monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
-                        //     monster.setMonsterView(monsterView);
-                        // }
-                        monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
-                        monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
-                        monster.setMonsterView(monsterView);
-                        monster.setLastRuneTeleportation(now);
+                        switch (randomInt) {
+                            case 0:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                            monster.setMonsterView(monsterView);
+                            break;
+                            case 1:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.ARCHER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_ARCHER_x4));
+                            monster.setMonsterView(monsterView);
+                            break;
+                            case 2:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+                            monster.setMonsterView(monsterView);
+                            monster.setLastRuneTeleportation(now);
+                            break;
+                            default:
+                            monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.FIGHTER,monsterTile);
+                            monsterView.setFill(new ImagePattern(Images.IMAGE_FIGHTER_x4));
+                            monster.setMonsterView(monsterView);
+                        }
+
+
+
+                        // monster = createMonster(randomXCoordinate, randomYCoordinate, MonsterType.WIZARD,monsterTile);
+                        // monsterView.setFill(new ImagePattern(Images.IMAGE_WIZARD_x4));
+                        // monster.setMonsterView(monsterView);
+                        // monster.setLastRuneTeleportation(now);
                         
                         
                         view.updateMonsterPosition(monsterView,monsterTile.getLeftSide(), monsterTile.getTopSide());

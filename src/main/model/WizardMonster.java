@@ -21,14 +21,13 @@ public class WizardMonster extends Monster {
         double timePercentage = (double) PlayModeController.time / PlayModeController.totalTime;
         WizardBehavior newBehavior;
 
-        // if (timePercentage < 0.3) {
-        //     newBehavior = new DesperateWizardBehavior();
-        // } else if (timePercentage > 0.7) {
-        //     newBehavior = new ChallengingWizardBehavior();
-        // } else {
-        //     newBehavior = new IndecisiveWizardBehavior();
-        // }
-        newBehavior = new DesperateWizardBehavior();
+        if (timePercentage < 0.3) {
+            newBehavior = new DesperateWizardBehavior();
+        } else if (timePercentage > 0.7) {
+            newBehavior = new ChallengingWizardBehavior();
+        } else {
+            newBehavior = new IndecisiveWizardBehavior();
+        }
 
         if (behavior == null || !newBehavior.getClass().equals(behavior.getClass())) {
             behavior = newBehavior;
