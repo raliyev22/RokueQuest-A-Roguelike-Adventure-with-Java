@@ -139,7 +139,7 @@ public class PlayModeController extends Application {
         
         Scene scene = view.getScene();
         initialize(scene);
-        view.pauseButton.setOnAction(e -> togglePause());
+        
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
@@ -185,7 +185,6 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = true;
             case LEFT, A -> leftPressed = true;
             case RIGHT, D -> rightPressed = true;
-            case ESCAPE -> togglePause();
             default -> {
                 //System.out.println("Unhandled Key Pressed: " + code);
             }
