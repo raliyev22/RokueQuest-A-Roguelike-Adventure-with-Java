@@ -40,10 +40,6 @@ public class PlayModeView {
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
-	private StackPane pauseOverlay;
-	public Button pauseButton;
-	public Button resumeButton;
-	private HBox buttonContainer;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -89,7 +85,7 @@ public class PlayModeView {
         uiContainer.setPrefWidth(200);
         uiContainer.setPrefHeight(736);
 
-		buttonContainer = new HBox(10);
+		HBox buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
 		Button closeButton = new Button();
@@ -191,22 +187,7 @@ public class PlayModeView {
 		pauseButton.setPrefHeight(40);
     }
 
-	public void hidePauseGame() {
-        pauseOverlay.setVisible(false);
-		//Removing save button from button container
-		buttonContainer.getChildren().remove(1);
-		//Changing pause button's image to pause button image
-		ImageView pauseImageView = new ImageView(Images.IMAGE_PAUSEBUTTON_x4);
-		pauseImageView.setFitWidth(40);
-		pauseImageView.setFitHeight(40);
-		
-		pauseButton.setGraphic(pauseImageView);
-		pauseButton.setPrefWidth(40);
-		pauseButton.setPrefHeight(40);
-    }
-
-	public void saveGame() {
-		System.out.println("Game Saved!");
+		initializePauseOverlay();
 	}
 	
 	
