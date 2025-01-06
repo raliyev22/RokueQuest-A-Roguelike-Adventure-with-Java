@@ -72,6 +72,8 @@ public class PlayModeView {
 		if (scene == null) {
 			scene = new Scene(pane);
 		}
+
+        monsterViews = new ArrayList<>();
 		
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
@@ -119,34 +121,7 @@ public class PlayModeView {
 		pauseButton.setPrefHeight(40);
 
 		buttonContainer.getChildren().addAll(closeButton, pauseButton);
-        
-        HBox buttonContainer = new HBox(10);
-        buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
-        
-        Button closeButton = new Button();
-        closeButton.setStyle("-fx-background-color: transparent;");
-        
-        ImageView exitImageView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
-        exitImageView.setFitWidth(40);
-        exitImageView.setFitHeight(40);
-        
-        closeButton.setGraphic(exitImageView);
-        closeButton.setPrefWidth(40);
-        closeButton.setPrefHeight(40);
-        
-        Button pauseButton = new Button();
-        pauseButton.setStyle("-fx-background-color: transparent;"); 
-        
-        ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
-        pauseImageView.setFitWidth(40);
-        pauseImageView.setFitHeight(40);
-        
-        pauseButton.setGraphic(pauseImageView);
-        pauseButton.setPrefWidth(40);
-        pauseButton.setPrefHeight(40);
-        
-        buttonContainer.getChildren().addAll(closeButton, pauseButton);
-        
+         
         HBox timeLabelContainer = new HBox(); // Container for timeLabel
         timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
         timeLabel = new Label("Time: " + time);
@@ -340,6 +315,13 @@ public class PlayModeView {
 		heroView.setX(x);
 		heroView.setY(y);
 	}
+
+    public void updateMonsterPosition(int monsterID, double x, double y) {
+        Rectangle monsterView = monsterViews.get(monsterID);
+        
+        monsterView.setX(x);
+        monsterView.setY(y);
+    }
 
 	public void updateMonsterPosition(Rectangle monsterView,double x, double y) {
 		monsterView.setX(x);
