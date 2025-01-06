@@ -49,7 +49,7 @@ public class PlayModeController extends Application {
     public static double time;
     public static double totalTime;
     
-    protected int hallTimeMultiplier = 5;
+    protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     
@@ -279,23 +279,8 @@ public class PlayModeController extends Application {
                     lastMonsterSpawnTime = now; 
                 }
                 
-                // monsterManager.moveAllMonsters(now);
+                monsterManager.moveAndActAllMonsters(now, PlayModeController.this);
 
-                if (now - lastMonsterUpdateTime >= MONSTER_UPDATE_INTERVAL) {
-
-                    monsterIterator = monsters.iterator();
-
-                    while (monsterIterator.hasNext()) {
-                        Monster monster = monsterIterator.next();
-
-                        if (monster instanceof WizardMonster wizardMonster) {
-                            wizardMonster.act(PlayModeController.this); // Execute wizard behavior
-                        } else {
-                            moveCharacter(monster); // Default monster movement
-                        }
-                        
-                    }
-                
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
                         Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
@@ -469,19 +454,19 @@ public class PlayModeController extends Application {
     //     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     // }
     
-    // private void  teleportRune() {
-    //     SecureRandom rng = new SecureRandom();
-    //     ArrayList<Tile> hallObjects = getHallObjectTiles();
+    public void  teleportRune() {
+        SecureRandom rng = new SecureRandom();
+        ArrayList<Tile> hallObjects = getHallObjectTiles();
         
-    //     int luckyHallObjectIndex = rng.nextInt(hallObjects.size());
-    //     Tile luckyHallObjectTile = hallObjects.get(luckyHallObjectIndex);
+        int luckyHallObjectIndex = rng.nextInt(hallObjects.size());
+        Tile luckyHallObjectTile = hallObjects.get(luckyHallObjectIndex);
         
-    //     int newRuneX = playModeGrid.findXofTile(luckyHallObjectTile);
-    //     int newRuneY = playModeGrid.findYofTile(luckyHallObjectTile);
+        int newRuneX = playModeGrid.findXofTile(luckyHallObjectTile);
+        int newRuneY = playModeGrid.findYofTile(luckyHallObjectTile);
         
-    //     runeXCoordinate = newRuneX;
-    //     runeYCoordinate = newRuneY;
-    // }
+        runeXCoordinate = newRuneX;
+        runeYCoordinate = newRuneY;
+    }
     
     // private void attackHeroIfInRange(Monster monster) {
     //     double distance = calculateDistance(hero.getPosX(), hero.getPosY(), monster.getX(), monster.getY());

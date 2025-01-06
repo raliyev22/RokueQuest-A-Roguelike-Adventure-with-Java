@@ -10,9 +10,9 @@ public class ChallengingWizardBehavior implements WizardBehavior {
     public void execute(WizardMonster wizard, PlayModeController controller) {
         long now = System.nanoTime();
         if (now - lastRuneTeleportationTime >= RUNE_TELEPORT_INTERVAL) {
-            System.out.println("Wizard is challenging! Teleporting the rune.");
+            // System.out.println("Wizard is challenging! Teleporting the rune.");
             controller.teleportRune();
-            controller.playSoundEffectInThread("wizard");
+            // controller.playSoundEffectInThread("wizard");
             lastRuneTeleportationTime = now;
         }
     }

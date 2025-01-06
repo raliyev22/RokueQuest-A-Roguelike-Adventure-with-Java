@@ -33,6 +33,7 @@ public class MonsterManager {
         
         MonsterType type = MonsterType.WIZARD;
         
+        luckyType = 0;
         if (luckyType == 0) {
             type = MonsterType.WIZARD;
         } else if (luckyType == 1) {
@@ -75,9 +76,15 @@ public class MonsterManager {
         return monster;
     }
     
-    public void moveAllMonsters(long now) {
+    public void moveAndActAllMonsters(long now, PlayModeController controller) {
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
+
+            if (monster instanceof WizardMonster wizardMonster) {
+                wizardMonster.act(controller); // Execute wizard behavior
+                return ;
+            }
+
             if (monster.isMoving) {
                 moveMonster(i);
             }

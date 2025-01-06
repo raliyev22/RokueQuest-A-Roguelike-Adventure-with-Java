@@ -1,8 +1,6 @@
 package main.model;
-import java.util.Iterator;
 
 import main.controller.PlayModeController;
-import main.utils.Tile;
 
 public class WizardMonster extends Monster {
 
