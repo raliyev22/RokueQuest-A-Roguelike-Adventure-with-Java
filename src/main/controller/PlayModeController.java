@@ -59,7 +59,6 @@ public class PlayModeController extends Application {
     
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
-    public boolean isPaused = false;
     
     private Random random = new Random();
 
@@ -140,7 +139,7 @@ public class PlayModeController extends Application {
         
         Scene scene = view.getScene();
         initialize(scene);
-        
+        view.pauseButton.setOnAction(e -> togglePause());
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
@@ -186,6 +185,7 @@ public class PlayModeController extends Application {
             case DOWN, S -> downPressed = true;
             case LEFT, A -> leftPressed = true;
             case RIGHT, D -> rightPressed = true;
+            case ESCAPE -> togglePause();
             default -> {
                 //System.out.println("Unhandled Key Pressed: " + code);
             }
@@ -217,7 +217,7 @@ public class PlayModeController extends Application {
             private int counter = -1;
             
             
-
+            
             @Override
             public void handle(long now) {
 				if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
@@ -368,6 +368,7 @@ public class PlayModeController extends Application {
         System.out.println("Game loop stopped.");
     }
 
+
     private void togglePause() {
         if (isRunning){
             stopGameLoop();
@@ -384,7 +385,6 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }
-
     public void moveHero() {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         int heroViewLeftSide = heroTile.getLeftSide();

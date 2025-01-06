@@ -34,7 +34,7 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDPNG = new Image("/rokue-like_assets/rokue33.png");
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
-	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680(1).png");
+	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
 	
 	
 	
