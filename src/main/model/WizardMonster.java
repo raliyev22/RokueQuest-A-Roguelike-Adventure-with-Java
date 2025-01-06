@@ -8,10 +8,9 @@ public class WizardMonster extends Monster {
 
     private WizardBehavior behavior;
 
-    public WizardMonster(int x, int y,Tile monsterTile){
-        this.x = x;
-        this.y = y;
-        this.tile = monsterTile;
+    public WizardMonster(int x, int y){
+        this.posX = x;
+        this.posY = y;
         this.type = MonsterType.WIZARD;
         updateBehavior();
     }

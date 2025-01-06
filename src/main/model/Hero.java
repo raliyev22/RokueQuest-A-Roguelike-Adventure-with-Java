@@ -2,7 +2,7 @@ package main.model;
 
 public class Hero {
 	public final int maxLives = 4;
-    public int speed = 4;
+    public final int speed = 4;
 
 	private int posX, posY;
     private int remainingLives;

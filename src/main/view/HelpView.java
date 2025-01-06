@@ -17,14 +17,19 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.Main;
+import main.utils.SoundEffects;
 
 public class HelpView extends Application {
-
     private Stage primaryStage;
+    SoundEffects soundPlayer = SoundEffects.getInstance();
 
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
+
+        // Adding Sound Effects
+        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+
         showMainHelpMenu();
     }
 
@@ -160,7 +165,9 @@ public class HelpView extends Application {
             "-fx-border-width: 1px; " +
             "-fx-border-radius: 10;"
         ));
-        button.setOnAction(e -> action.run());
+        button.setOnAction(e -> {            
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            action.run();});
         return button;
     }
 

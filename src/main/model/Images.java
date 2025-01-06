@@ -20,6 +20,8 @@ public class Images extends Application {
 	public static final Image IMAGE_EXITBUTTON_x4 = new Image("/rokue-like_assets/ExitButton_x4_64_64.png");
 	public static final Image IMAGE_PAUSEBUTTON_x2 = new Image("/rokue-like_assets/PauseButton_x2_32_32.png");
 	public static final Image IMAGE_PAUSEBUTTON_x4 = new Image("/rokue-like_assets/PauseButton_x4_64_64.png");
+	public static final Image IMAGE_SAVEBUTTON_x2 = new Image("/rokue-like_assets/SaveButton_x2_32_32.png");
+	public static final Image IMAGE_SAVEBUTTON_x4 = new Image("/rokue-like_assets/SaveButton_x4_64_64.png");
 	public static final Image IMAGE_PLAYBUTTON_x2 = new Image("/rokue-like_assets/PlayButton_x2_32_32.png");
 	public static final Image IMAGE_PLAYBUTTON_x4 = new Image("/rokue-like_assets/PlayButton_x4_64_64.png");
 	
@@ -32,7 +34,7 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDPNG = new Image("/rokue-like_assets/rokue33.png");
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
-	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680(1).png");
+	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
 	
 	
 	

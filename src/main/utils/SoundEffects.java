@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SoundEffects {
-    private static SoundEffects instance = null;
+    private static SoundEffects instance;
     private Map<String, Clip> soundEffects = new HashMap<>();
 
     private SoundEffects() {}
@@ -66,4 +66,10 @@ public class SoundEffects {
             System.err.println("Belirtilen etiketle ses efekti bulunamadı: " + label);
         }
     }
+
+    public void playSoundEffectInThread(String label) {
+        new Thread(() -> {
+            playSoundEffect(label);
+        }).start();
+    }   
 }
