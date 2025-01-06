@@ -17,12 +17,10 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import main.Main;
 import main.controller.PlayModeController;
@@ -103,7 +101,7 @@ public class PlayModeView {
 		closeButton.setPrefWidth(40);
 		closeButton.setPrefHeight(40);
 
-		pauseButton = new Button();
+		Button pauseButton = new Button();
 		pauseButton.setStyle("-fx-background-color: transparent;"); 
 
 		ImageView pauseImageView = new javafx.scene.image.ImageView(Images.IMAGE_PAUSEBUTTON_x4);
@@ -144,27 +142,25 @@ public class PlayModeView {
         
         uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
         pane.getChildren().add(uiContainer);
-
-		initializePauseOverlay();
 	}
 
-    private void initializePauseOverlay() {
+  private void initializePauseOverlay() {
 
-        // Create a "Paused" text
-        Label pauseText = new Label("Game Paused");
-        pauseText.setFont(Font.font(36));
-        pauseText.setTextFill(Color.WHITE);
+      // Create a "Paused" text
+      Label pauseText = new Label("Game Paused");
+      pauseText.setFont(Font.font(36));
+      pauseText.setTextFill(Color.WHITE);
 
-        VBox overlayContent = new VBox(20, pauseText);
-        overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
-		overlayContent.setTranslateY(400);
-		overlayContent.setTranslateX(300);
+      VBox overlayContent = new VBox(20, pauseText);
+      overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+  overlayContent.setTranslateY(400);
+  overlayContent.setTranslateX(300);
 
-        // Add elements to a stack pane
-        pauseOverlay = new StackPane(overlayContent);
-        pauseOverlay.setVisible(false);
-        pane.getChildren().add(pauseOverlay);
-    }
+      // Add elements to a stack pane
+      pauseOverlay = new StackPane(overlayContent);
+      pauseOverlay.setVisible(false);
+      pane.getChildren().add(pauseOverlay);
+  }
 
 	public void showPauseGame() {
         pauseOverlay.setVisible(true);
@@ -208,7 +204,6 @@ public class PlayModeView {
 	public void saveGame() {
 		System.out.println("Game Saved!");
 	}
-	
 	
 	private void showWalls(Grid grid) {
 		int wallX = grid.topLeftXCoordinate - 20;
@@ -309,7 +304,6 @@ public class PlayModeView {
 			heartsContainer.getChildren().add(heart);
 		}
 	}
-
 
 	public void showGameOverPopup(boolean isWin) {
 		Platform.runLater(() -> {
