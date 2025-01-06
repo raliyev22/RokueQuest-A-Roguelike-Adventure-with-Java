@@ -368,18 +368,6 @@ public class PlayModeController extends Application {
         System.out.println("Game loop stopped.");
     }
 
-
-    private void togglePause() {
-        if (isRunning){
-            stopGameLoop();
-            view.showPauseGame();
-        }
-        else {
-            startGameLoop();
-            view.hidePauseGame();
-        }
-    }
-
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
         Hero hero = new Hero(xCoordinate, yCoordinate);
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
