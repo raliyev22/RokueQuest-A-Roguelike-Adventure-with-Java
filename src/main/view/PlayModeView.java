@@ -47,9 +47,14 @@ public class PlayModeView {
 	private HBox heartsContainer;
 	private Stage primaryStage;
 	private StackPane pauseOverlay;
+	private StackPane exitOverlay;
 	public Button pauseButton;
 	public Button resumeButton;
 	private HBox buttonContainer;
+	public Button sureExitButton;
+	public Button exitButton;
+	public Button cancelExitButton;
+	public Button saveButton;
 	SoundEffects soundPlayer = SoundEffects.getInstance();
 	private PlayModeController playModeController;
 
@@ -106,12 +111,8 @@ public class PlayModeView {
 		buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
-		Button exitButton = new Button();
-		exitButton.setStyle("-fx-background-color: transparent;");
-
-		exitButton.setOnAction(e -> {
-            soundPlayer.playSoundEffectInThread("blueButtons");
-        });      
+		exitButton = new Button();
+		exitButton.setStyle("-fx-background-color: transparent;");     
 
 		exitButton.setOnMouseEntered(event -> {
             exitButton.setCursor(Cursor.HAND);
@@ -150,34 +151,35 @@ public class PlayModeView {
 
 		buttonContainer.getChildren().addAll(exitButton, pauseButton);
          
-    HBox timeLabelContainer = new HBox(); // Container for timeLabel
-    timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
-    timeLabel = new Label("Time: " + time);
-    timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
-    timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
+		HBox timeLabelContainer = new HBox(); // Container for timeLabel
+		timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
+		timeLabel = new Label("Time: " + time);
+		timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
+		timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
 
-    heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
-    heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
-    heartsContainer.setTranslateY(80);
-    Rectangle heart1,heart2,heart3,heart4;
-    heart1 = new Rectangle(32,32);
-    heart2 = new Rectangle(32,32);
-    heart3 = new Rectangle(32,32);
-    heart4 = new Rectangle(32,32);
-    heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-    heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-    heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-    heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-    heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
+		heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
+		heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
+		heartsContainer.setTranslateY(80);
+		Rectangle heart1,heart2,heart3,heart4;
+		heart1 = new Rectangle(32,32);
+		heart2 = new Rectangle(32,32);
+		heart3 = new Rectangle(32,32);
+		heart4 = new Rectangle(32,32);
+		heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+		heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+		heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+		heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
+		heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
 
-    Rectangle inventory = new Rectangle(200,400);
-    inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
-    inventory.setTranslateY(100);
+		Rectangle inventory = new Rectangle(200,400);
+		inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
+		inventory.setTranslateY(100);
 
-    uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
-    pane.getChildren().add(uiContainer);
+		uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
+		pane.getChildren().add(uiContainer);
 
 		initializePauseOverlay();
+		initializeExitOverlay();
 	}
 
     private void initializePauseOverlay() {
@@ -188,14 +190,73 @@ public class PlayModeView {
         pauseText.setTextFill(Color.WHITE);
 
         VBox overlayContent = new VBox(20, pauseText);
-        overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
-	  	  overlayContent.setTranslateY(400);
-	    	overlayContent.setTranslateX(300);
+		overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+		overlayContent.setTranslateY(400);
+		overlayContent.setTranslateX(300);
 
         // Add elements to a stack pane
         pauseOverlay = new StackPane(overlayContent);
         pauseOverlay.setVisible(false);
         pane.getChildren().add(pauseOverlay);
+    }
+
+	public void initializeExitOverlay() {
+		Rectangle background = new Rectangle();
+        background.setFill(Color.rgb(0, 0, 0, 0.5));
+        background.widthProperty().bind(pane.widthProperty());
+        background.heightProperty().bind(pane.heightProperty());
+
+        // Create a "Exit Game" text
+        Label exitText = new Label("Exit Game?");
+        exitText.setFont(Font.font(36));
+        exitText.setTextFill(Color.WHITE);
+        
+		
+		sureExitButton = new Button("Exit Game");
+
+		sureExitButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+		
+        sureExitButton.setOnMouseEntered(event -> {
+			sureExitButton.setCursor(Cursor.HAND);
+        });
+		
+        sureExitButton.setOnMouseExited(event -> {
+			sureExitButton.setCursor(Cursor.DEFAULT);
+        });
+		
+		
+        cancelExitButton = new Button("Cancel");
+		cancelExitButton.setStyle("-fx-font-size: 16px; -fx-padding: 10px;");
+		
+        cancelExitButton.setOnMouseEntered(event -> {
+			cancelExitButton.setCursor(Cursor.HAND);
+        });
+		
+        cancelExitButton.setOnMouseExited(event -> {
+			cancelExitButton.setCursor(Cursor.DEFAULT);
+        });
+		
+		VBox buttonContainer = new VBox(10, sureExitButton, cancelExitButton);
+        buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+
+
+		VBox overlayContent = new VBox(20, exitText, buttonContainer);
+		overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+
+
+        // Add elements to a stack pane
+        exitOverlay = new StackPane(background, overlayContent);
+        exitOverlay.setVisible(false);
+        pane.getChildren().add(exitOverlay);
+    
+	}
+	
+	public void showExitGame(){
+		exitOverlay.setVisible(true);
+	}
+
+	public void hideExitGame(){
+        exitOverlay.setVisible(false);
     }
 
 	public void showPauseGame() {
@@ -205,13 +266,8 @@ public class PlayModeView {
 		saveImageView.setFitHeight(40);
 		saveImageView.setFitWidth(40);
 
-		Button saveButton = new Button();
+		saveButton = new Button();
 		saveButton.setStyle("-fx-background-color: transparent;");
-
-		saveButton.setOnAction(e -> {
-            soundPlayer.playSoundEffectInThread("blueButtons");
-			saveGame();
-        });
 
 		saveButton.setOnMouseEntered(event -> {
             saveButton.setCursor(Cursor.HAND);
@@ -249,10 +305,6 @@ public class PlayModeView {
 		pauseButton.setPrefWidth(40);
 		pauseButton.setPrefHeight(40);
     }
-
-	public void saveGame() {
-		System.out.println("Game Saved!");
-	}
 	
 	
 	private void showWalls(Grid grid) {

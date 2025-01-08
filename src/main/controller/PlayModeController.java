@@ -138,7 +138,20 @@ public class PlayModeController extends Application {
             view.pauseButton.setOnAction(e -> {
                 togglePause();
                 soundPlayer.playSoundEffectInThread("blueButtons");
-            });                
+            });
+            view.exitButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+                view.showExitGame();
+            });
+            view.cancelExitButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+                view.hideExitGame();
+            });
+            view.sureExitButton.setOnAction(e -> {
+                System.exit(0);
+            });
             monsterManager.setPlayModeView(view);
         }
     }
@@ -154,7 +167,21 @@ public class PlayModeController extends Application {
             view.pauseButton.setOnAction(e -> {
                 togglePause();
                 soundPlayer.playSoundEffectInThread("blueButtons");
-            });                  monsterManager.setPlayModeView(view);
+            });
+            view.exitButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+                view.showExitGame();
+            });
+            view.cancelExitButton.setOnAction(e -> {
+                togglePause();
+                soundPlayer.playSoundEffectInThread("blueButtons");
+                view.hideExitGame();
+            });
+            view.sureExitButton.setOnAction(e -> {
+                System.exit(0);
+            });
+            monsterManager.setPlayModeView(view);
         }
 
         Scene scene = view.getScene();
@@ -338,6 +365,7 @@ public class PlayModeController extends Application {
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
+            view.saveButton.setOnAction(e -> saveGame());
             pauseStartTime = System.nanoTime();
         }
         else {
@@ -346,6 +374,10 @@ public class PlayModeController extends Application {
             startGameLoop();
             view.hidePauseGame();
         }
+    }
+
+    private void saveGame() {
+        System.out.println("Game saved.");
     }
 
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
