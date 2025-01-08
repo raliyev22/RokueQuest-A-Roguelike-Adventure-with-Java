@@ -1,6 +1,8 @@
 package main.controller;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
@@ -580,6 +582,65 @@ public class PlayModeController extends Application {
         // monsterIterator.remove();
         playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E');
         view.removeFromPane(monster.monsterView);
+    }
+    public void save(){
+        System.out.println("Game Saved!");
+		String filePath = "example.txt";
+        String earthallString = earthHall.toString();
+		String airhallString = airHall.toString();
+		String waterhalString = waterHall.toString();
+		String firehallString = fireHall.toString();
+		String currentHall = "";
+		if (null == hallType) {
+            currentHall = "Earth";
+        } else switch (hallType) {
+            case EARTH -> {
+                currentHall = "Air";
+            }
+            case AIR -> {
+                currentHall = "Water";
+            }
+            case WATER -> {
+                currentHall = "Fire";
+            }
+            
+        }
+
+
+        try (FileWriter writer = new FileWriter(filePath)) {
+			writer.write("EartHall:");
+            writer.write(earthallString);
+			writer.write("\n");
+			writer.write("AirHall:");
+            writer.write(airhallString);
+			writer.write("\n");
+			writer.write("WaterHall:");
+            writer.write(waterhalString);
+			writer.write("\n");
+			writer.write("FireHall:");
+            writer.write(firehallString);
+			writer.write("\n");
+			writer.write("CurrentHall:\n");
+			writer.write(currentHall);
+			writer.write("\n");
+			writer.write("TimeLeft:\n");
+			writer.write(Double.toString(time));
+			writer.write("\nHeroPosx:\n");
+			writer.write(Integer.toString(hero.getPosX()));
+			writer.write("\nHeroPosy:\n");
+			writer.write(Integer.toString(hero.getPosY()));
+			writer.write("\nHeroRemainingLives:\n");
+			writer.write(Integer.toString(hero.getLiveCount()));
+			writer.write("\nRuneXCoordinate:\n");
+			writer.write(Integer.toString(runeXCoordinate));
+			writer.write("\nRuneYCoordinate:\n");
+			writer.write(Integer.toString(runeYCoordinate));
+
+
+            System.out.println("File written successfully!");
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
     }
 }
 
