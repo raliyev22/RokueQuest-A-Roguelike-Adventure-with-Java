@@ -1,6 +1,8 @@
 package main.controller;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
@@ -201,6 +203,7 @@ public class PlayModeController extends Application {
             togglePause();
             soundPlayer.playSoundEffectInThread("blueButtons");
         });
+        
         view.exitButton.setOnAction(e -> {
             stopGameLoop();
             Main mainPage = new Main();
@@ -213,11 +216,13 @@ public class PlayModeController extends Application {
             mainPage.start(primaryStage);
             soundPlayer.playSoundEffectInThread("blueButtons");
         });
+
         view.cancelExitButton.setOnAction(e -> {
             togglePause();
             soundPlayer.playSoundEffectInThread("blueButtons");
             view.hideExitGame();
         });
+
         view.sureExitButton.setOnAction(e -> {
             System.exit(0);
         });
@@ -364,7 +369,7 @@ public class PlayModeController extends Application {
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
-            view.saveButton.setOnAction(e -> saveGame());
+            view.saveButton.setOnAction(e -> save());
             pauseStartTime = System.nanoTime();
             soundPlayer.pauseSoundEffect("background");
         }
@@ -375,10 +380,6 @@ public class PlayModeController extends Application {
             view.hidePauseGame();
             soundPlayer.resumeSoundEffect("background");
         }
-    }
-
-    private void saveGame() {
-        System.out.println("Game saved.");
     }
 
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
@@ -613,6 +614,50 @@ public class PlayModeController extends Application {
         // monsterIterator.remove();
         playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E');
         view.removeFromPane(monster.monsterView);
+    }
+
+    public void save(){
+        System.out.println("Game Saved!");
+		String filePath = "example.txt";
+        String earthallString = earthHall.toString();
+		String airhallString = airHall.toString();
+		String waterhalString = waterHall.toString();
+		String firehallString = fireHall.toString();
+		String currentHall = hallType.toString();
+
+        try (FileWriter writer = new FileWriter(filePath)) {
+			writer.write("EartHall:");
+            writer.write(earthallString);
+			writer.write("\n");
+			writer.write("AirHall:");
+            writer.write(airhallString);
+			writer.write("\n");
+			writer.write("WaterHall:");
+            writer.write(waterhalString);
+			writer.write("\n");
+			writer.write("FireHall:");
+            writer.write(firehallString);
+			writer.write("\n");
+			writer.write("CurrentHall:\n");
+			writer.write(currentHall);
+			writer.write("\n");
+			writer.write("TimeLeft:\n");
+			writer.write(Double.toString(time));
+			writer.write("\nHeroPosx:\n");
+			writer.write(Integer.toString(hero.getPosX()));
+			writer.write("\nHeroPosy:\n");
+			writer.write(Integer.toString(hero.getPosY()));
+			writer.write("\nHeroRemainingLives:\n");
+			writer.write(Integer.toString(hero.getLiveCount()));
+			writer.write("\nRuneXCoordinate:\n");
+			writer.write(Integer.toString(runeXCoordinate));
+			writer.write("\nRuneYCoordinate:\n");
+			writer.write(Integer.toString(runeYCoordinate));
+
+            System.out.println("File written successfully!");
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
     }
 }
 
