@@ -1,20 +1,20 @@
 package main.model;
 
 import main.controller.PlayModeController;
+import main.utils.SoundEffects;
 
 public class ChallengingWizardBehavior implements WizardBehavior {
-    private long lastRuneTeleportationTime = 0;
-    private static final long RUNE_TELEPORT_INTERVAL = 3_000_000_000L; // 3 seconds in nanoseconds
+    private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
+
+    public ChallengingWizardBehavior() {
+        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
+        soundPlayer.setVolume("wizard", -10);
+    }
 
     @Override
     public void execute(WizardMonster wizard, PlayModeController controller) {
-        long now = System.nanoTime();
-        if (now - lastRuneTeleportationTime >= RUNE_TELEPORT_INTERVAL) {
-            // System.out.println("Wizard is challenging! Teleporting the rune.");
-            controller.teleportRune();
-            // controller.playSoundEffectInThread("wizard");
-            lastRuneTeleportationTime = now;
-        }
+        controller.teleportRune();
+        soundPlayer.playSoundEffect("wizard");
     }
 
 }

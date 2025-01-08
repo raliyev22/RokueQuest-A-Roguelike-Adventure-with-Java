@@ -29,7 +29,7 @@ public class SoundEffects {
                 soundEffects.put(label, clip);
             }
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Ses efektini yüklerken hata oluştu: " + e.getMessage());
+            System.err.println("Error loading sound effect: " + e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class SoundEffects {
             clip.setFramePosition(0); 
             clip.start();
         } else {
-            System.err.println("Belirtilen etiketle ses efekti bulunamadı: " + label);
+            System.err.println("No sound effects found with the specified tag: " + label);
         }
     }
 
@@ -52,7 +52,7 @@ public class SoundEffects {
             clip.setFramePosition(0);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         } else if (clip == null) {
-            System.err.println("Belirtilen etiketle ses efekti bulunamadı: " + label);
+            System.err.println("No sound effects found with the specified tag: " + label);
         }
     }
 
@@ -63,7 +63,7 @@ public class SoundEffects {
             volume = Math.max(gainControl.getMinimum(), Math.min(gainControl.getMaximum(), volume));
             gainControl.setValue(volume);
         } else {
-            System.err.println("Belirtilen etiketle ses efekti bulunamadı: " + label);
+            System.err.println("No sound effects found with the specified tag: " + label);
         }
     }
 

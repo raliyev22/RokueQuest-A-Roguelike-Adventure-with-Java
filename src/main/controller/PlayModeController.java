@@ -55,7 +55,7 @@ public class PlayModeController extends Application {
     private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
 
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 3_000_000_000L; // 8 seconds in nanoseconds
+    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
 	  private static final int TARGET_FPS = 120;
 	  private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;

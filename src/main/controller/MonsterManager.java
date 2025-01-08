@@ -17,6 +17,7 @@ public class MonsterManager {
     protected final double MONSTER_STAY_RATE = 0.8;
     protected final double MONSTER_MOVE_INTERVAL = 1_000_000_000L;
     protected final double MONSTER_WAIT_PERIOD = 1_000_000_000L;
+    private static final long RUNE_TELEPORT_INTERVAL = 3_000_000_000L; // 3 seconds in nanoseconds
     
     protected Grid playModeGrid;
     protected List<Monster> monsterList;
@@ -84,14 +85,18 @@ public class MonsterManager {
             Monster monster = monsterList.get(i);
 
             if (now - monster.spawnTime >= MONSTER_WAIT_PERIOD) {
-                if (monster instanceof WizardMonster wizardmonster) {
-                    wizardmonster.act(controller);
+                if (monster instanceof WizardMonster wizardMonster) {
+                    long timeSinceLastAct = now - wizardMonster.getLastActTime();
+                    if (timeSinceLastAct >= RUNE_TELEPORT_INTERVAL) {
+                        wizardMonster.act(controller);
+                        wizardMonster.setLastActTime(now);
+                    }
                 }
             }
         }
     }
     
-    public void moveAllMonsters(long now) {
+    public void moveAllMonsters(long now) { 
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
 

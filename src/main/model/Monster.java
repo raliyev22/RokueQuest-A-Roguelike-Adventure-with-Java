@@ -1,6 +1,7 @@
 package main.model;
 
 import javafx.scene.shape.Rectangle;
+import main.controller.PlayModeController;
 
 public abstract class Monster {
     public final int speed = 5;
@@ -14,9 +15,9 @@ public abstract class Monster {
     public Directions movingDirection = null;
     public Boolean isMoving = false;
 
-    private long lastRuneTeleportation = 0; // For wizard monster
     public long lastMovedTime = 0;
     public long spawnTime = 0;
+    public long lastActTime = 0;
 
     public Rectangle monsterView;
     
@@ -57,12 +58,14 @@ public abstract class Monster {
 		}
 	}
 
-    public long getLastRuneTeleportation() {
-        return lastRuneTeleportation;
+    public long getLastActTime() {
+        return lastActTime;
     }
 
-    public void setLastRuneTeleportation(long time) {
-        this.lastRuneTeleportation = time;
+    public void setLastActTime(long lastActTime) {
+        this.lastActTime = lastActTime;
     }
+
+    public abstract void act(PlayModeController controller);
 }
 
