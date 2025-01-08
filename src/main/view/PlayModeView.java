@@ -323,6 +323,8 @@ public class PlayModeView {
         
         monsterViews.add(monsterView);
         updateMonsterPosition(monsterView, monster.currentX, monster.currentY);
+
+		monster.monsterView = monsterView;
         
         return monsterView;
     }
@@ -374,6 +376,7 @@ public class PlayModeView {
 
 	public void removeFromPane(Rectangle monsterView){
 		pane.getChildren().remove(monsterView);
+		monsterViews.remove(monsterView);
 	}
 	
 	public Pane getPane() {

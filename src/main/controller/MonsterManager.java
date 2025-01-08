@@ -33,7 +33,7 @@ public class MonsterManager {
         
         MonsterType type = MonsterType.WIZARD;
         
-        luckyType = 0;
+        // luckyType = 0;
         if (luckyType == 0) {
             type = MonsterType.WIZARD;
         } else if (luckyType == 1) {
@@ -80,9 +80,11 @@ public class MonsterManager {
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
 
-            if (monster instanceof WizardMonster wizardMonster) {
-                wizardMonster.act(controller); // Execute wizard behavior
-                return ;
+            if (now - monster.lastMovedTime >= MONSTER_MOVE_INTERVAL) {
+                if (monster instanceof WizardMonster wizardMonster) {
+                    wizardMonster.act(controller); // Execute wizard behavior
+                    continue;
+                }
             }
 
             if (monster.isMoving) {

@@ -1,5 +1,7 @@
 package main.model;
 
+import javafx.scene.shape.Rectangle;
+
 public abstract class Monster {
     public final int speed = 5;
     public MonsterType type;
@@ -14,6 +16,8 @@ public abstract class Monster {
 
     private long lastRuneTeleportation = 0; // For wizard monster
     public long lastMovedTime = 0;
+
+    public Rectangle monsterView;
     
     public MonsterType getType(){
         return type;

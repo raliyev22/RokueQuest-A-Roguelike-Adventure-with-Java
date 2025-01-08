@@ -18,7 +18,7 @@ public class WizardMonster extends Monster {
         double timePercentage = (double) PlayModeController.time / PlayModeController.totalTime;
         WizardBehavior newBehavior;
 
-        if (timePercentage < 0.3) {
+        if (timePercentage > 0.8) {
             newBehavior = new DesperateWizardBehavior();
         } else if (timePercentage > 0.7) {
             newBehavior = new ChallengingWizardBehavior();
