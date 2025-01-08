@@ -71,6 +71,8 @@ public class PlayModeController extends Application {
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
 
     private boolean escPressedFlag = false; 
+    private long pauseStartTime = 0;
+    private long totalPausedTime = 0;
 
     // public PlayModeController() {
     //     initializePlayMode();
@@ -236,13 +238,15 @@ public class PlayModeController extends Application {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
+                long adjustedNow = now - totalPausedTime;
+
+                if (lastFrameTime > 0 && adjustedNow - lastFrameTime < FRAME_DURATION_NANOS) {
                     return;
                 }
-                lastFrameTime = now;
+                lastFrameTime = adjustedNow;
 
                 if (lastMonsterSpawnTime == 0) {
-                    lastMonsterSpawnTime = now-1;
+                    lastMonsterSpawnTime = adjustedNow-1;
                 }
                 
                 if (time < 0) {
@@ -259,10 +263,10 @@ public class PlayModeController extends Application {
                     return;
                 }
                 
-                if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
+                if (adjustedNow - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
                     view.updateTime(time); // Update the view
                     time--;
-                    lastUpdateTime = now;
+                    lastUpdateTime = adjustedNow;
                 }
 
                 if(!hero.getIsTeleported()){
@@ -271,20 +275,20 @@ public class PlayModeController extends Application {
                 view.changeHeroSprite(getHeroImage());
                 
                 //monster spawn logic
-                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
+                if (adjustedNow - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
                     Tile initialMonsterTile = getRandomEmptyTile();
                     
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
                     int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
                     
-                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, now);     
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, adjustedNow);     
                     
-                    lastMonsterSpawnTime = now; 
+                    lastMonsterSpawnTime = adjustedNow; 
                 }
 
-                monsterManager.actAllMonsters(now, PlayModeController.this);
+                monsterManager.actAllMonsters(adjustedNow, PlayModeController.this);
                 
-                monsterManager.moveAllMonsters(now);
+                monsterManager.moveAllMonsters(adjustedNow);
 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -334,8 +338,11 @@ public class PlayModeController extends Application {
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
+            pauseStartTime = System.nanoTime();
         }
         else {
+            long now = System.nanoTime();
+            totalPausedTime += now - pauseStartTime;
             startGameLoop();
             view.hidePauseGame();
         }
