@@ -3,7 +3,6 @@ package main.controller;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 import javax.sound.sampled.AudioSystem;
@@ -37,7 +36,6 @@ public class PlayModeController extends Application {
     public Grid playModeGrid;
     protected Hero hero;
     protected MonsterManager monsterManager;
-    protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
     
     private int runeXCoordinate;
@@ -279,12 +277,14 @@ public class PlayModeController extends Application {
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
                     int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
                     
-                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate);     
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, now);     
                     
                     lastMonsterSpawnTime = now; 
                 }
+
+                monsterManager.actAllMonsters(now, PlayModeController.this);
                 
-                monsterManager.moveAndActAllMonsters(now, PlayModeController.this);
+                monsterManager.moveAllMonsters(now);
 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {

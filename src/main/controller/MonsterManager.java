@@ -16,6 +16,7 @@ public class MonsterManager {
     // cannot shoot while moving, so we want for them to stay still for some time.
     protected final double MONSTER_STAY_RATE = 0.8;
     protected final double MONSTER_MOVE_INTERVAL = 1_000_000_000L;
+    protected final double MONSTER_WAIT_PERIOD = 1_000_000_000L;
     
     protected Grid playModeGrid;
     protected List<Monster> monsterList;
@@ -26,7 +27,7 @@ public class MonsterManager {
         this.monsterList = new ArrayList<>();
     }
     
-    public Monster createMonster(int xPosition, int yPosition) {
+    public Monster createMonster(int xPosition, int yPosition, long now) {
         SecureRandom rng = new SecureRandom();
         
         int luckyType = rng.nextInt(3);
@@ -42,10 +43,10 @@ public class MonsterManager {
             type = MonsterType.FIGHTER;
         }
         
-        return createMonster(xPosition, yPosition, type);
+        return createMonster(xPosition, yPosition, type, now);
     }
     
-    protected Monster createMonster(int xPosition, int yPosition, MonsterType type) {
+    protected Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
         Monster monster = null;
         
         switch (type) {
@@ -60,6 +61,8 @@ public class MonsterManager {
             }
             default -> throw new IllegalArgumentException("Invalid monster type");
         }
+
+        monster.spawnTime = now;
         
         Tile monsterTile = playModeGrid.findTileWithIndex(xPosition, yPosition);
         monster.currentX = monsterTile.getLeftSide();
@@ -75,16 +78,25 @@ public class MonsterManager {
 
         return monster;
     }
-    
-    public void moveAndActAllMonsters(long now, PlayModeController controller) {
+
+    public void actAllMonsters(long now, PlayModeController controller) {
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
 
-            if (now - monster.lastMovedTime >= MONSTER_MOVE_INTERVAL) {
-                if (monster instanceof WizardMonster wizardMonster) {
-                    wizardMonster.act(controller); // Execute wizard behavior
-                    continue;
+            if (now - monster.spawnTime >= MONSTER_WAIT_PERIOD) {
+                if (monster instanceof WizardMonster wizardmonster) {
+                    wizardmonster.act(controller);
                 }
+            }
+        }
+    }
+    
+    public void moveAllMonsters(long now) {
+        for (int i = 0; i < monsterList.size(); i++) {
+            Monster monster = monsterList.get(i);
+
+            if (monster.type == MonsterType.WIZARD) {
+                continue;
             }
 
             if (monster.isMoving) {

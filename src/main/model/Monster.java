@@ -16,6 +16,7 @@ public abstract class Monster {
 
     private long lastRuneTeleportation = 0; // For wizard monster
     public long lastMovedTime = 0;
+    public long spawnTime = 0;
 
     public Rectangle monsterView;
     
