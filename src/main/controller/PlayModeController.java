@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import main.Main;
 import main.model.*;
 import main.utils.*;
 import main.view.PlayModeView;
@@ -57,8 +58,8 @@ public class PlayModeController extends Application {
     private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
-	  private static final int TARGET_FPS = 120;
-	  private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
+	private static final int TARGET_FPS = 120;
+	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
   	private long lastFrameTime = 0;
 
     private PlayModeView view;
@@ -73,6 +74,8 @@ public class PlayModeController extends Application {
     private boolean escPressedFlag = false; 
     private long pauseStartTime = 0;
     private long totalPausedTime = 0;
+
+    private Stage primaryStage;
 
     // public PlayModeController() {
     //     initializePlayMode();
@@ -135,23 +138,7 @@ public class PlayModeController extends Application {
         if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.pauseButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-            });
-            view.exitButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-                view.showExitGame();
-            });
-            view.cancelExitButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-                view.hideExitGame();
-            });
-            view.sureExitButton.setOnAction(e -> {
-                System.exit(0);
-            });
+            initializeSetOnActions();
             monsterManager.setPlayModeView(view);
         }
     }
@@ -164,23 +151,7 @@ public class PlayModeController extends Application {
         if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.pauseButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-            });
-            view.exitButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-                view.showExitGame();
-            });
-            view.cancelExitButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-                view.hideExitGame();
-            });
-            view.sureExitButton.setOnAction(e -> {
-                System.exit(0);
-            });
+            initializeSetOnActions();
             monsterManager.setPlayModeView(view);
         }
 
@@ -192,6 +163,7 @@ public class PlayModeController extends Application {
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
+        this.primaryStage = primaryStage;
         
         startGameLoop();
     }
@@ -222,6 +194,33 @@ public class PlayModeController extends Application {
             mouseY = event.getY();
         });
         scene.getRoot().requestFocus();
+    }
+
+    public void initializeSetOnActions(){
+        view.pauseButton.setOnAction(e -> {
+            togglePause();
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });
+        view.exitButton.setOnAction(e -> {
+            stopGameLoop();
+            Main mainPage = new Main();
+            javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
+            
+            // Set up the main stage in the center of the screen
+            primaryStage.setX((screenBounds1.getWidth() - 600) / 2);
+            primaryStage.setY((screenBounds1.getHeight() - 400) / 2);
+            
+            mainPage.start(primaryStage);
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });
+        view.cancelExitButton.setOnAction(e -> {
+            togglePause();
+            soundPlayer.playSoundEffectInThread("blueButtons");
+            view.hideExitGame();
+        });
+        view.sureExitButton.setOnAction(e -> {
+            System.exit(0);
+        });
     }
     
     
@@ -367,12 +366,14 @@ public class PlayModeController extends Application {
             view.showPauseGame();
             view.saveButton.setOnAction(e -> saveGame());
             pauseStartTime = System.nanoTime();
+            soundPlayer.pauseSoundEffect("background");
         }
         else {
             long now = System.nanoTime();
             totalPausedTime += now - pauseStartTime;
             startGameLoop();
             view.hidePauseGame();
+            soundPlayer.resumeSoundEffect("background");
         }
     }
 

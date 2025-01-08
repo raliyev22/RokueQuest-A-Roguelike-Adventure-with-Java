@@ -9,6 +9,7 @@ import java.util.Map;
 public class SoundEffects {
     private static SoundEffects instance;
     private Map<String, Clip> soundEffects = new HashMap<>();
+    private Map<String, Integer> pausedPositions = new HashMap<>();
 
     private SoundEffects() {}
 
@@ -72,4 +73,26 @@ public class SoundEffects {
             playSoundEffect(label);
         }).start();
     }   
+
+    public void pauseSoundEffect(String label) {
+        Clip clip = soundEffects.get(label);
+        if (clip != null && clip.isRunning()) {
+            pausedPositions.put(label, clip.getFramePosition());
+            clip.stop();
+        } else {
+            System.err.println("No sound effects playing with the specified tag: " + label);
+        }
+    }
+
+    public void resumeSoundEffect(String label) {
+        Clip clip = soundEffects.get(label);
+        Integer pausedPosition = pausedPositions.get(label);
+        if (clip != null && pausedPosition != null) {
+            clip.setFramePosition(pausedPosition);
+            clip.start();
+            pausedPositions.remove(label);  // Clear the paused position after resuming
+        } else {
+            System.err.println("No paused sound effects found with the specified tag: " + label);
+        }
+    }
 }
