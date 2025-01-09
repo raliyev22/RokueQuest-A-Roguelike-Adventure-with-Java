@@ -4,9 +4,7 @@ import javafx.animation.*;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -16,17 +14,21 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import main.view.BuildModeView;
-import main.view.CustomAlertView;
-import main.view.HelpView;
+import main.utils.SoundEffects;
+
 
 public class MainMenuView extends Application {
+    SoundEffects soundPlayer = SoundEffects.getInstance();
+
     @Override
     public void start(Stage primaryStage) {
         // Main layout
         VBox mainMenu = new VBox(20);
         mainMenu.setAlignment(Pos.CENTER);
         mainMenu.setPadding(new javafx.geometry.Insets(30));
+
+        // Adding Sound Effects
+        initializeSoundEffects();
 
         // Title with animations
         Text title = new Text("Rokue-Like Adventure");
@@ -36,16 +38,33 @@ public class MainMenuView extends Application {
 
         // Buttons
         Button startButton = createStyledButton("Start a New Game");
+        Button loadGameButton = createStyledButton("Load Game");
         Button helpButton = createStyledButton("Help");
         Button exitButton = createStyledButton("Exit");
 
         // Button Actions
-        startButton.setOnAction(e -> startNewGame(primaryStage));
-        helpButton.setOnAction(e -> showHelp(primaryStage));
-        exitButton.setOnAction(e -> showExitConfirmation(primaryStage));
+        startButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            startNewGame(primaryStage);
+        });   
+
+        loadGameButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showLoadMenu(primaryStage);
+        });
+
+        helpButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showHelp(primaryStage);
+        });
+        
+        exitButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showExitConfirmation(primaryStage);
+        });
 
         // Add elements to VBox
-        mainMenu.getChildren().addAll(title, startButton, helpButton, exitButton);
+        mainMenu.getChildren().addAll(title, startButton,loadGameButton, helpButton, exitButton);
 
         // Background styling
         StackPane root = new StackPane();
@@ -66,6 +85,15 @@ public class MainMenuView extends Application {
         Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Rokue-Like Adventure");
+        javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
+        
+        // Set up the main stage in the center of the screen
+        primaryStage.setX((screenBounds1.getWidth() - 600) / 2); // Replace 600 with the width of the mainPage scene
+        primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
+        primaryStage.setResizable(false);
+
+        soundPlayer.loopSoundEffect("background");
+
         primaryStage.show();
     }
 
@@ -163,20 +191,42 @@ public class MainMenuView extends Application {
         helpMenuView.start(primaryStage);
     }
 
-
-
-    public static void main(String[] args) {
-        launch(args);
+    private void showLoadMenu(Stage primaryStage) {
+        // Show Load Menu Window
+        LoadMenuView loadMenuView = new LoadMenuView();
+        loadMenuView.start(primaryStage);
     }
+
+    private void initializeSoundEffects() {
+        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
+        soundPlayer.setVolume("background", -20);   
+        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
+        soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
+        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
+        soundPlayer.setVolume("step", -10);
+        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
+        soundPlayer.setVolume("door", -10);
+        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
+        soundPlayer.setVolume("gameWinner", -15);
+        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
+        soundPlayer.setVolume("gameLoser", -15);
+        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
+        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
+        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
+        soundPlayer.setVolume("wizard", -10);
+    }
+    
     private void showExitConfirmation(Stage primaryStage) {
-        CustomAlertView.showAlert(
-            primaryStage,
-            "Exit Confirmation",
-            "Are you sure you want to exit the game?"
-        );
-        // Add logic for handling OK button action inside `CustomAlertView` if needed
-        CustomAlertView.showAlert(primaryStage, "Exit Confirmation", "Are you sure you want to exit?");
-        // Handle the OK button click inside CustomAlertView to close the application.
+        System.exit(0);
+        // CustomAlertView.showAlert(
+        //     primaryStage,
+        //     "Exit Confirmation",
+        //     "Are you sure you want to exit the game?"
+        // );
+        // // Add logic for handling OK button action inside `CustomAlertView` if needed
+        // CustomAlertView.showAlert(primaryStage, "Exit Confirmation", "Are you sure you want to exit?");
+        // // Handle the OK button click inside CustomAlertView to close the application.
     }
 
 }
