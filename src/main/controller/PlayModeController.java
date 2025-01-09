@@ -20,6 +20,7 @@ import javafx.scene.media.AudioClip;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javax.sound.sampled.LineListener;
 import main.Main;
 import main.model.*;
 import main.utils.*;
@@ -611,7 +612,35 @@ public class PlayModeController extends Application {
 
     public void save(){
         System.out.println("Game Saved!");
-		String filePath = "example.txt";
+		String filePath = "src/saveFiles/allSaveFiles.txt";
+        File file = new File(filePath);
+        ArrayList<String> saves = new ArrayList<String>();
+        try (Scanner scanner = new Scanner(file)){
+            while (scanner.hasNextLine()){
+                String line = scanner.nextLine();
+                if(!line.isEmpty()){
+                    saves.add(line);
+                }
+            }
+        }catch (IOException e){
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+        StringBuilder str = new StringBuilder(saves.get(saves.size()-1));
+        str.delete(0,4);
+        str.delete(str.length()-4,str.length());
+        int num = Integer.valueOf(str.toString()) + 1;
+        try (FileWriter writer = new FileWriter(file, true)){
+            writer.write("\nsave" + String.valueOf(num) + ".txt");
+        }catch(IOException e){
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+        createSaveFile("save" + String.valueOf(num));
+    }
+
+
+    public void createSaveFile(String name){
+        String filePath = "src/saveFiles/" + name + ".txt";
+        File file = new File(filePath);
         String earthallString = earthHall.toString();
 		String airhallString = airHall.toString();
 		String waterhalString = waterHall.toString();
@@ -619,8 +648,8 @@ public class PlayModeController extends Application {
 		String playModeGridString = playModeGrid.toString();
 		String currentHall = hallType.toString();
 
-        try (FileWriter writer = new FileWriter(filePath)) {
-			writer.write("EartHall:");
+        try (FileWriter writer = new FileWriter(file)) {
+			writer.write("EarthHall:");
             writer.write(earthallString);
 			writer.write("\n");
 			writer.write("AirHall:");
