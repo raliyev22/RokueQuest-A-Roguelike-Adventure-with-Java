@@ -679,6 +679,8 @@ public class PlayModeController extends Application {
 			writer.write(Integer.toString(runeXCoordinate));
 			writer.write("\nRuneYCoordinate:\n");
 			writer.write(Integer.toString(runeYCoordinate));
+            writer.write("\nLastMonsterSpawnTime:\n");
+            writer.write(Long.toString(System.currentTimeMillis()*1000000-lastMonsterSpawnTime));
 
             System.out.println("File written successfully!");
         } catch (IOException e) {
@@ -801,6 +803,13 @@ public class PlayModeController extends Application {
                 }
             } else {
                 throw new RuntimeException("Rune data missing or corrupted.");
+            }
+            if (index < lines.size() && lines.get(index).startsWith("LastMonsterSpawnTime:")) {
+                index++;
+                this.lastMonsterSpawnTime = System.currentTimeMillis() * ( 1000000) - Long.parseLong(lines.get(index++));
+                System.err.println(lastMonsterSpawnTime);
+            } else {
+                throw new RuntimeException("LastMonsterSpawnTime data missing or corrupted.");
             }
             
             view = new PlayModeView(playModeGrid, time, primaryStage);
