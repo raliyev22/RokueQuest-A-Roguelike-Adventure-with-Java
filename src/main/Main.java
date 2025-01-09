@@ -19,6 +19,7 @@ import main.utils.SoundEffects;
 import main.view.BuildModeView;
 //import main.view.CustomAlertView;
 import main.view.HelpView;
+import main.view.LoadMenuView;
 
 public class Main extends Application {
     SoundEffects soundPlayer = SoundEffects.getInstance();
@@ -53,8 +54,7 @@ public class Main extends Application {
 
         loadGameButton.setOnAction(e -> {
             soundPlayer.playSoundEffectInThread("menuButtons");
-            PlayModeController playModeController = new PlayModeController();
-            playModeController.load(primaryStage);
+            showLoadMenu(primaryStage);
         });
 
         helpButton.setOnAction(e -> {
@@ -193,6 +193,12 @@ public class Main extends Application {
         // Show Help Window
         HelpView helpMenuView = new HelpView();
         helpMenuView.start(primaryStage);
+    }
+
+    private void showLoadMenu(Stage primaryStage) {
+        // Show Load Menu Window
+        LoadMenuView loadMenuView = new LoadMenuView();
+        loadMenuView.start(primaryStage);
     }
 
     private void initializeSoundEffects() {

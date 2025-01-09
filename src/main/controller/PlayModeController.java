@@ -686,9 +686,9 @@ public class PlayModeController extends Application {
         }
     }
 
-    public void load(Stage primaryStage) {
+    public void load(Stage primaryStage, String fileName) {
+        String filePath = "src/saveFiles/" + fileName;
         System.out.println("Loading game...");
-        String filePath = "example.txt";
         try {
             File file = new File(filePath);
             if (!file.exists()) {
@@ -709,7 +709,7 @@ public class PlayModeController extends Application {
             int index = 0;
     
             // Load Earth Hall grid
-            if (index < lines.size() && lines.get(index).startsWith("EartHall:TileMap:")) {
+            if (index < lines.size() && lines.get(index).startsWith("EarthHall:TileMap:")) {
                 index++;
                 earthHall = new Grid(10, 9, 64, 64, 100, 150);
                 index = parseTileMap(earthHall, lines, index);

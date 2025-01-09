@@ -163,6 +163,8 @@ public class MainMenuView extends Application {
         helpMenuView.start(primaryStage);
     }
 
+
+
     public static void main(String[] args) {
         launch(args);
     }
