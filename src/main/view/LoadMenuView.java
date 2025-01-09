@@ -14,6 +14,7 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -55,17 +56,39 @@ public class LoadMenuView extends Application{
         title.setFill(Color.GOLD);
         addTitleAnimation(title);
 
+        // Initialize the buttons for save files
         initializeLoadButtons();
 
-        VBox contentBox = new VBox(20,title,buttonBox);
-        contentBox.setAlignment(Pos.CENTER);
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(buttonBox);
+        scrollPane.setFitToWidth(true); 
+        scrollPane.setPrefViewportHeight(200);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
 
-        root.getChildren().add(contentBox);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
-        Scene scene = new Scene(root, 600, 400);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Load Menu");
-        primaryStage.show();
+        Button backButton = new Button("Back");
+        backButton.setStyle("-fx-font-size: 16px; -fx-background-color: gold;");
+        backButton.setOnAction(e -> {
+            soundPlayer.playSoundEffect("menuButtons");
+            // Logic to go back to the previous menu
+            System.out.println("Back button clicked!");
+            // Example: return to the main menu
+            MainMenuView main = new MainMenuView();
+            main.start(primaryStage);
+    });
+
+    // Main layout container
+    VBox contentBox = new VBox(20, title, scrollPane,backButton);
+    contentBox.setAlignment(Pos.CENTER);
+
+    root.getChildren().add(contentBox);
+
+    Scene scene = new Scene(root, 600, 400);
+    primaryStage.setScene(scene);
+    primaryStage.setTitle("Load Menu");
+    primaryStage.show();
     }
 
     private void initializeLoadButtons(){
@@ -73,20 +96,22 @@ public class LoadMenuView extends Application{
         buttonBox.setAlignment(Pos.CENTER);
         String filePath = "src/saveFiles/allSaveFiles.txt";
         File file = new File(filePath);
-        ArrayList<String> saves = new ArrayList<String>();
-        try (Scanner scanner = new Scanner(file)){
-            while (scanner.hasNextLine()){
+        ArrayList<String> saves = new ArrayList<>();
+
+        // Load save files into the list    
+        try (Scanner scanner = new Scanner(file)) {
+            while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if(!line.isEmpty()){
+                if (!line.isEmpty()) {
                     saves.add(line);
                 }
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());
         }
 
-        for(int i=0;i<saves.size();i++){
-            String save = saves.get(i);
+        // Create buttons for each save file
+        for (String save : saves) {
             Button theButton = new Button(save);
             theButton.setOnAction(e -> {
                 soundPlayer.playSoundEffect("menuButtons");
@@ -127,4 +152,6 @@ public class LoadMenuView extends Application{
         ParallelTransition animation = new ParallelTransition(gradientAnimation, glowAnimation);
         animation.play();
     }
+    
 }
+
