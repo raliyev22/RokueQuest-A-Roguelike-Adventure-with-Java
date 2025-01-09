@@ -23,6 +23,7 @@ public class MonsterManager {
     protected Hero hero;
     protected List<Monster> monsterList;
     protected PlayModeView playModeView;
+    private SoundEffects soundPlayer = SoundEffects.getInstance();
     
     public MonsterManager(Grid grid, Hero hero) {
         this.playModeGrid = grid;
@@ -109,6 +110,7 @@ public class MonsterManager {
                 hero.decreaseLives();
                 hero.lastDamagedFrame = now;
                 playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("archer");
             }
         }
     }
@@ -128,6 +130,7 @@ public class MonsterManager {
                 hero.decreaseLives();
                 hero.lastDamagedFrame = now;
                 playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("fighter");
             }
         }
     }

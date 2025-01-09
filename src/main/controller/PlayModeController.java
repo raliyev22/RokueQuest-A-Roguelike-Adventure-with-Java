@@ -295,7 +295,7 @@ public class PlayModeController extends Application {
                     moveHero();
                 }
 
-                
+                // If hero is taking damage, change blip animations
                 if (hero.isTakingDamage) {
                     hero.increaseTakingDamageAnimationCounter();
 
