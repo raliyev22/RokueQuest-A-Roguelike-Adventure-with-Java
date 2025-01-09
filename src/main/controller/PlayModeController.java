@@ -362,7 +362,7 @@ public class PlayModeController extends Application {
             return;
         }
         lastToggleTime = now;
-    
+        soundPlayer.playSoundEffectInThread("escButton");
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
@@ -496,7 +496,7 @@ public class PlayModeController extends Application {
     //     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     // }
     
-    public void  teleportRune() {
+    public void teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();
         

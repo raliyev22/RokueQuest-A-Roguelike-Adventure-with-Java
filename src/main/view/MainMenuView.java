@@ -215,6 +215,7 @@ public class MainMenuView extends Application {
         soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
         soundPlayer.setVolume("wizard", -10);
+        soundPlayer.addSoundEffect("escButton","src/main/sounds/escButton.wav");
     }
     
     private void showExitConfirmation(Stage primaryStage) {

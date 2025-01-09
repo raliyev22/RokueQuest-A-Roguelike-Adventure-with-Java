@@ -258,6 +258,8 @@ public class PlayModeView {
 
 	public void showPauseGame() {
         pauseOverlay.setVisible(true);
+		pauseOverlay.toFront();
+		
 		// Setup for save button
 		ImageView saveImageView = new ImageView(Images.IMAGE_SAVEBUTTON_x4);
 		saveImageView.setFitHeight(40);
