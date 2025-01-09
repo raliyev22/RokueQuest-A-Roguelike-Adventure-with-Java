@@ -80,18 +80,18 @@ public class LoadMenuView extends Application{
             // Example: return to the main menu
             MainMenuView main = new MainMenuView();
             main.start(primaryStage);
-    });
+        });
 
-    // Main layout container
-    VBox contentBox = new VBox(20, title, scrollPane,backButton);
-    contentBox.setAlignment(Pos.CENTER);
+        // Main layout container
+        VBox contentBox = new VBox(20, title, scrollPane,backButton);
+        contentBox.setAlignment(Pos.CENTER);
 
-    root.getChildren().add(contentBox);
+        root.getChildren().add(contentBox);
 
-    Scene scene = new Scene(root, 600, 400);
-    primaryStage.setScene(scene);
-    primaryStage.setTitle("Load Menu");
-    primaryStage.show();
+        Scene scene = new Scene(root, 600, 400);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Load Menu");
+        primaryStage.show();
     }
 
     private void initializeLoadButtons(){
