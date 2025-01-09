@@ -20,11 +20,13 @@ public class MonsterManager {
     private static final long RUNE_TELEPORT_INTERVAL = 3_000_000_000L; // 3 seconds in nanoseconds
     
     protected Grid playModeGrid;
+    protected Hero hero;
     protected List<Monster> monsterList;
     protected PlayModeView playModeView;
     
-    public MonsterManager(Grid grid) {
+    public MonsterManager(Grid grid, Hero hero) {
         this.playModeGrid = grid;
+        this.hero = hero;
         this.monsterList = new ArrayList<>();
     }
     
@@ -91,9 +93,30 @@ public class MonsterManager {
                         wizardMonster.act(controller);
                         wizardMonster.setLastActTime(now);
                     }
+                } else if (monster instanceof ArcherMonster archerMonster) {
+                    archerAttack(now, archerMonster);
                 }
             }
         }
+    }
+
+    public void archerAttack(long now, ArcherMonster archerMonster) {
+        if (!archerMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
+            if (isArcherInRange(archerMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+            }
+        }
+    }
+
+    public boolean isArcherInRange(ArcherMonster archerMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
+        if (manhattanDistance < ArcherMonster.ARCHER_RANGE) {
+            return true;
+        }
+        return false;
     }
     
     public void moveAllMonsters(long now) { 

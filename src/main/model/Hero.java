@@ -1,6 +1,9 @@
 package main.model;
 
+import javafx.scene.image.Image;
+
 public class Hero {
+    public static final long INVINCIBILITY_FRAMES = 1_000_000_000L;
 	public final int maxLives = 4;
     public final int speed = 4;
 
@@ -14,9 +17,10 @@ public class Hero {
 	public boolean isTakingDamage;
     public Directions movingDirection;
 	public Directions facingDirection;
-
+    
+    public long lastDamagedFrame = 0;
 	private boolean isTeleported=false;
-	
+	private Image sprite;
 	
 	public Hero(int posX, int posY) {
 		this.posX = posX;
@@ -25,6 +29,8 @@ public class Hero {
 		this.isMoving = false;
 		this.isTakingDamage = false;
 		this.facingDirection = Directions.EAST;
+
+        sprite = Images.IMAGE_PLAYERRIGHT_x4;
 	}
 
 	public void move(Directions direction) {
@@ -92,6 +98,14 @@ public class Hero {
 			return 'R';
 		}
 	}
+
+    public Image getSprite() {
+        return this.sprite;
+    }
+
+    public void setSprite(Image newSprite) {
+        this.sprite = newSprite;
+    }
 
 	public Boolean getIsTeleported(){
 		return this.isTeleported;

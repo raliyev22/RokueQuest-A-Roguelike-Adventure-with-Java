@@ -62,7 +62,7 @@ public class PlayModeController extends Application {
 
     private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+    private static final long MONSTER_SPAWN_INTERVAL = 3_000_000_000L; // 8 seconds in nanoseconds
 
 	private static final int TARGET_FPS = 120;
 	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
@@ -142,7 +142,7 @@ public class PlayModeController extends Application {
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
         
-        monsterManager = new MonsterManager(playModeGrid);
+        monsterManager = new MonsterManager(playModeGrid, hero);
         
         if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
@@ -291,10 +291,21 @@ public class PlayModeController extends Application {
                     lastUpdateTime = adjustedNow;
                 }
 
-                if(!hero.getIsTeleported()){
+                if (!hero.getIsTeleported()){
                     moveHero();
-                }                
-                view.changeHeroSprite(getHeroImage());
+                }
+
+                view.changeHeroSprite(hero.getSprite());
+
+                if (hero.isTakingDamage) {
+                    blinkHeroSprite();
+
+                    if (adjustedNow - hero.lastDamagedFrame >= Hero.INVINCIBILITY_FRAMES) {
+                        hero.isTakingDamage = false;
+                        changeHeroSpriteToNormal();
+                    }
+                    view.changeHeroSprite(hero.getSprite());
+                }
                 
                 //monster spawn logic
                 if (adjustedNow - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
@@ -427,6 +438,7 @@ public class PlayModeController extends Application {
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
+                hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
                 
                 soundPlayer.playSoundEffectInThread("step");        
             } else if (rightPressed && isWalkableTile(playModeGrid.findEastTile(heroTile))) {
@@ -439,6 +451,7 @@ public class PlayModeController extends Application {
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
                 hero.movingDirection = Directions.EAST;
+                hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
                 
                 soundPlayer.playSoundEffectInThread("step");        
             }
@@ -481,14 +494,25 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, hero.getCharType());
         //System.out.println(playModeGrid);
     }
-    
-    public Image getHeroImage() {
-        if (hero.getCharType() == 'R') {
-            return Images.IMAGE_PLAYERRIGHT_x4;
-        } else if (hero.getCharType() == 'L') {
-            return Images.IMAGE_PLAYERLEFT_x4;
-        }else {
-            return null;
+
+    public void blinkHeroSprite() {
+        // Change hero sprite to red if normal, normal if red.
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
+        }
+    }
+
+    public void changeHeroSpriteToNormal() {
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
         }
     }
     
@@ -819,7 +843,7 @@ public class PlayModeController extends Application {
             
             view = new PlayModeView(playModeGrid, time, primaryStage);
             
-            monsterManager = new MonsterManager(playModeGrid);
+            monsterManager = new MonsterManager(playModeGrid, hero);
             
             // Refresh the view
             Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());

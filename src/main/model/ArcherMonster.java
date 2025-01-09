@@ -1,6 +1,8 @@
 package main.model;
 
 public class ArcherMonster extends Monster {
+    public static int ARCHER_RANGE = 3;
+
     public ArcherMonster(int x, int y) {
         this.posX = x;
         this.posY = y;
