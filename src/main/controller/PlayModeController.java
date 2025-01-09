@@ -640,6 +640,31 @@ public class PlayModeController extends Application {
         view.removeFromPane(monster.monsterView);
     }
 
+    public Grid resolveAllMovingCharacters() {
+        Grid resolvedGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
+        resolvedGrid.copyTileMap(playModeGrid);
+
+        if (hero.isMoving) {
+            Tile heroTile = resolvedGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+            Tile destinationTile = resolvedGrid.findTileUsingDirection(heroTile, hero.movingDirection);
+
+            heroTile.changeTileType(hero.getCharType());
+            destinationTile.changeTileType('E');
+        }
+
+        for (Monster monster: monsterManager.monsterList) {
+            if (monster.isMoving) {
+                Tile monsterTile = resolvedGrid.findTileWithIndex(monster.posX, monster.posY);
+                Tile destinationTile = resolvedGrid.findTileUsingDirection(monsterTile, monster.movingDirection);
+    
+                monsterTile.changeTileType('E');
+                destinationTile.changeTileType(monster.getCharType());
+            }
+        }
+
+        return resolvedGrid;
+    }
+
     public void save(){
         soundPlayer.playSoundEffectInThread("blueButtons");
         System.out.println("Game Saved!");
@@ -676,7 +701,7 @@ public class PlayModeController extends Application {
 		String airhallString = airHall.toString();
 		String waterhalString = waterHall.toString();
 		String firehallString = fireHall.toString();
-		String playModeGridString = playModeGrid.toString();
+		String playModeGridString = resolveAllMovingCharacters().toString(); // Change '?' before saving
 		String currentHall = hallType.toString();
 
         try (FileWriter writer = new FileWriter(file)) {
