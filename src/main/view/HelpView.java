@@ -59,7 +59,11 @@ public class HelpView extends Application {
         Button controlsButton = createStyledButton("Controls", this::showControlsSection);
 
         // Back button
-        Button backButton = createStyledButton("Back to Main Menu", this::backToMainMenu);
+        Button backButton = new Button("Back to Main Menu");
+        backButton.setStyle("-fx-font-size: 16px; -fx-background-color: gold;");
+        backButton.setOnAction(e -> {            
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            backToMainMenu();});
 
         // VBox for buttons
         VBox buttonBox = new VBox(10, gameplayButton, objectivesButton, monstersButton, enchantmentsButton, controlsButton, backButton);

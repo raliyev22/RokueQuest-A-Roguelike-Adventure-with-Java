@@ -613,6 +613,7 @@ public class PlayModeController extends Application {
     }
 
     public void save(){
+        soundPlayer.playSoundEffectInThread("blueButtons");
         System.out.println("Game Saved!");
 		String filePath = "src/saveFiles/allSaveFiles.txt";
         File file = new File(filePath);
