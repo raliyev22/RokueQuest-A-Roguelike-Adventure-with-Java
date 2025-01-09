@@ -1,7 +1,9 @@
 package main.view;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -18,6 +20,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -92,13 +95,14 @@ public class LoadMenuView extends Application{
     }
 
     private void initializeLoadButtons(){
+
         buttonBox = new VBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         String filePath = "src/saveFiles/allSaveFiles.txt";
         File file = new File(filePath);
         ArrayList<String> saves = new ArrayList<>();
 
-        // Load save files into the list    
+        // Load save files into the list
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -112,15 +116,38 @@ public class LoadMenuView extends Application{
 
         // Create buttons for each save file
         for (String save : saves) {
-            Button theButton = new Button(save);
-            theButton.setOnAction(e -> {
+            HBox saveRow = new HBox(10);
+            saveRow.setAlignment(Pos.CENTER);
+
+            // Load Button
+            Button loadButton = new Button(save);
+            loadButton.setOnAction(e -> {
                 soundPlayer.playSoundEffect("menuButtons");
-                // TODO: Load the game from the selected save file
+                // Load the game from the selected save file
                 PlayModeController controller = new PlayModeController();
                 controller.load(primaryStage, save);
                 System.out.println("Loading save file: " + save);
             });
-            buttonBox.getChildren().add(theButton);
+
+            // Delete Button
+            Button deleteButton = new Button("Delete");
+            deleteButton.setStyle("-fx-background-color: red; -fx-text-fill: white;");
+            deleteButton.setOnAction(e -> {
+                soundPlayer.playSoundEffect("menuButtons");
+                // Delete the save file
+                File saveFile = new File("src/saveFiles/" + save);
+                if (saveFile.exists() && saveFile.delete()) {
+                    System.out.println("Deleted save file: " + save);
+                    buttonBox.getChildren().remove(saveRow); // Remove the row from the UI
+                    // Optionally, update `allSaveFiles.txt` to remove the entry
+                    updateSaveFileList(saves, save, filePath);
+                } else {
+                    System.out.println("Failed to delete save file: " + save);
+                }
+            });
+
+            saveRow.getChildren().addAll(loadButton, deleteButton);
+            buttonBox.getChildren().add(saveRow);
         }
 
     }
@@ -152,6 +179,15 @@ public class LoadMenuView extends Application{
         ParallelTransition animation = new ParallelTransition(gradientAnimation, glowAnimation);
         animation.play();
     }
-    
+    private void updateSaveFileList(ArrayList<String> saves, String saveToDelete, String filePath) {
+        saves.remove(saveToDelete); // Remove from the list
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, false))) {
+            for (String save : saves) {
+                writer.println(save);
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while updating the save file list: " + e.getMessage());
+        }
+    }
 }
 
