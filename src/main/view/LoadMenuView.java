@@ -64,10 +64,10 @@ public class LoadMenuView extends Application{
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(buttonBox);
-        scrollPane.setFitToWidth(true); 
+        scrollPane.setFitToWidth(true);
         scrollPane.setPrefViewportHeight(200);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         scrollPane.setStyle("-fx-background: transparent;-fx-background-color: transparent; -fx-border-color: transparent;");
 
