@@ -807,7 +807,6 @@ public class PlayModeController extends Application {
             if (index < lines.size() && lines.get(index).startsWith("LastMonsterSpawnTime:")) {
                 index++;
                 this.lastMonsterSpawnTime = System.currentTimeMillis() * ( 1000000) - Long.parseLong(lines.get(index++));
-                System.err.println(lastMonsterSpawnTime);
             } else {
                 throw new RuntimeException("LastMonsterSpawnTime data missing or corrupted.");
             }
