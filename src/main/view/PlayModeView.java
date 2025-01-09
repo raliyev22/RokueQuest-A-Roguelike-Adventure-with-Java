@@ -56,8 +56,6 @@ public class PlayModeView {
 	public Button cancelExitButton;
 	public Button saveButton;
 	SoundEffects soundPlayer = SoundEffects.getInstance();
-	private PlayModeController playModeController;
-
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -67,7 +65,6 @@ public class PlayModeView {
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
-		this.playModeController = new PlayModeController();
 		initialize();
 	}
 

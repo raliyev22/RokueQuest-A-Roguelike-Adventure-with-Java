@@ -1,6 +1,9 @@
 package main.utils;
 
 import javax.sound.sampled.*;
+
+import javafx.scene.media.AudioClip;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -75,14 +78,26 @@ public class SoundEffects {
     }   
 
     public void pauseSoundEffect(String label) {
-        Clip clip = soundEffects.get(label);
-        if (clip != null && clip.isRunning()) {
-            pausedPositions.put(label, clip.getFramePosition());
-            clip.stop();
-        } else {
-            System.err.println("No sound effects playing with the specified tag: " + label);
-        }
+        new Thread(() -> {
+            try {
+                // 1500 ms bekle
+                Thread.sleep(300);
+    
+                // Ses efektini durdur
+                Clip clip = soundEffects.get(label);
+                if (clip != null && clip.isRunning()) {
+                    pausedPositions.put(label, clip.getFramePosition());
+                    clip.stop();
+                    System.out.println("Sound effect paused after 1500 ms.");
+                } else {
+                    System.err.println("No sound effects playing with the specified tag: " + label);
+                }
+            } catch (InterruptedException e) {
+                System.err.println("Thread interrupted: " + e.getMessage());
+            }
+        }).start();
     }
+    
 
     public void resumeSoundEffect(String label) {
         Clip clip = soundEffects.get(label);
@@ -94,5 +109,24 @@ public class SoundEffects {
         } else {
             System.err.println("No paused sound effects found with the specified tag: " + label);
         }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+            // JavaFX başlatılması gerekiyor
+            new javafx.embed.swing.JFXPanel(); // JavaFX runtime'ı başlatır
+            
+            // Buton sesini yükle
+            String buttonSoundPath = new File("src/main/sounds/blueButtons.wav").toURI().toString();
+            AudioClip buttonSound = new AudioClip(buttonSoundPath);
+            
+            // Buton sesini çal
+            buttonSound.play();
+            System.out.println("Button sound started.");
+
+            // Sesin tamamen çalmasını bekle
+            Thread.sleep(2000); // 2 saniye bekle (buton sesinin süresine göre ayarlayın)
+
+            System.out.println("Button sound finished.");
     }
 }

@@ -14,6 +14,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import main.controller.PlayModeController;
 import main.utils.SoundEffects;
 import main.view.BuildModeView;
 //import main.view.CustomAlertView;
@@ -30,8 +31,7 @@ public class Main extends Application {
         mainMenu.setPadding(new javafx.geometry.Insets(30));
 
         // Adding Sound Effects
-        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
-        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+        initializeSoundEffects();
 
         // Title with animations
         Text title = new Text("Rokue-Like Adventure");
@@ -41,6 +41,7 @@ public class Main extends Application {
 
         // Buttons
         Button startButton = createStyledButton("Start a New Game");
+        Button loadGameButton = createStyledButton("Load Game");
         Button helpButton = createStyledButton("Help");
         Button exitButton = createStyledButton("Exit");
 
@@ -48,7 +49,13 @@ public class Main extends Application {
         startButton.setOnAction(e -> {
             soundPlayer.playSoundEffectInThread("menuButtons");
             startNewGame(primaryStage);
-        });        
+        });   
+
+        loadGameButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            PlayModeController playModeController = new PlayModeController();
+            playModeController.load(primaryStage);
+        });
 
         helpButton.setOnAction(e -> {
             soundPlayer.playSoundEffectInThread("menuButtons");
@@ -61,7 +68,7 @@ public class Main extends Application {
         });
 
         // Add elements to VBox
-        mainMenu.getChildren().addAll(title, startButton, helpButton, exitButton);
+        mainMenu.getChildren().addAll(title, startButton,loadGameButton, helpButton, exitButton);
 
         // Background styling
         StackPane root = new StackPane();
@@ -89,8 +96,6 @@ public class Main extends Application {
         primaryStage.setY((screenBounds1.getHeight() - 400) / 2); // Replace 400 with the height of the mainPage scene
         primaryStage.setResizable(false);
 
-        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
-        soundPlayer.setVolume("background", -20);   
         soundPlayer.loopSoundEffect("background");
 
         primaryStage.show();
@@ -189,6 +194,27 @@ public class Main extends Application {
         HelpView helpMenuView = new HelpView();
         helpMenuView.start(primaryStage);
     }
+
+    private void initializeSoundEffects() {
+        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
+        soundPlayer.setVolume("background", -20);   
+        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
+        soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
+        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
+        soundPlayer.setVolume("step", -10);
+        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
+        soundPlayer.setVolume("door", -10);
+        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
+        soundPlayer.setVolume("gameWinner", -15);
+        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
+        soundPlayer.setVolume("gameLoser", -15);
+        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
+        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
+        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
+        soundPlayer.setVolume("wizard", -10);
+    }
+    
 
     public static void main(String[] args) {
         launch(args);     

@@ -70,11 +70,18 @@ public class Hero {
 	public int getPosY() {
 		return posY;
 	}
+
+	public int getRemainingLives(){
+		return remainingLives;
+	}
 	public void setPosY(int pos){
 		this.posY= pos;
 	}
 	public void setPosX(int pos){
 		this.posX = pos;
+	}
+	public void setRemaningLives(int lives){
+		this.remainingLives = lives;
 	}
 	
 	public char getCharType() {

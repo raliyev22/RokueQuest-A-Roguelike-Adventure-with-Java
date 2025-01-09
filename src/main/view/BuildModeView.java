@@ -64,6 +64,7 @@ public class BuildModeView extends Application {
     public static HashMap<TiledHall, HallType> hallTypeMap = new HashMap<>(); // Yeni ekleme
 
     private List<TiledHall> halls;
+    private Stage primaryStage;
 
     SoundEffects soundPlayer = SoundEffects.getInstance();
 
@@ -80,11 +81,6 @@ public class BuildModeView extends Application {
                 pane.getChildren().add(tideRectangle);
             }
         }
-
-        // Adding Sound Effects
-        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
-        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
-        soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
 
         // Create 4 TiledHall instances with specific sizes
         TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
@@ -130,6 +126,8 @@ public class BuildModeView extends Application {
         primaryStage.setX((screenBounds.getWidth() - 1200) / 2); // Width of the scene
         primaryStage.setY((screenBounds.getHeight() - 800) / 2); // Height of the scene
         primaryStage.show();
+
+        // this.primaryStage = primaryStage;
 
         //Create a button to click when the build mode is finished
         Button button = new Button("Finish");
@@ -279,9 +277,7 @@ public class BuildModeView extends Application {
 				PlayModeController.fireHall = hall4.getGrid();
 
                 PlayModeController playModeController = new PlayModeController();
-				Stage newStage = new Stage();
-                playModeController.start(newStage);
-                primaryStage.close();
+                playModeController.start(primaryStage);
                 return;
                 // PlayModeView2 view = new PlayModeView2(halls);
                 // view.start(primaryStage);

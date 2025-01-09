@@ -566,6 +566,14 @@ public class Grid {
     public int getTileWidth() {
         return tileWidth;
     }
+
+	public int getRowLength() {
+        return rowLength;
+    }
+
+    public int getColumnLength() {
+        return columnLength;
+    }
 	
 	@Override
 	public String toString() {
@@ -587,4 +595,5 @@ public class Grid {
 		}
 		return str;
 	}
+
 }

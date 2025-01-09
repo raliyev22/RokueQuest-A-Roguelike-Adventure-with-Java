@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -15,6 +16,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -76,6 +78,8 @@ public class PlayModeController extends Application {
     private boolean escPressedFlag = false; 
     private long pauseStartTime = 0;
     private long totalPausedTime = 0;
+    private long lastToggleTime = 0;
+    private static final long TOGGLE_DEBOUNCE_DELAY = 300_000_000L;
 
     private Stage primaryStage;
 
@@ -147,7 +151,6 @@ public class PlayModeController extends Application {
     
     public void start(Stage primaryStage) {
         initializePlayMode();
-        initializeSoundEffects();
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         // If view is null (which means we are in the first hall), create a new one
         if (view == null){
@@ -170,21 +173,6 @@ public class PlayModeController extends Application {
         startGameLoop();
     }
     
-    private void initializeSoundEffects() {
-        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
-        soundPlayer.setVolume("step", -10);
-        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
-        soundPlayer.setVolume("door", -10);
-        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
-        soundPlayer.setVolume("gameWinner", -15);
-        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
-        soundPlayer.setVolume("gameLoser", -15);
-        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
-        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
-        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
-        soundPlayer.setVolume("wizard", -10);
-    }
-    
     public void initialize(Scene scene) {
         scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
         scene.getRoot().requestFocus();
@@ -200,8 +188,8 @@ public class PlayModeController extends Application {
 
     public void initializeSetOnActions(){
         view.pauseButton.setOnAction(e -> {
+            soundPlayer.playSoundEffect("blueButtons");
             togglePause();
-            soundPlayer.playSoundEffectInThread("blueButtons");
         });
         
         view.exitButton.setOnAction(e -> {
@@ -366,15 +354,20 @@ public class PlayModeController extends Application {
     }
 
     private void togglePause() {
+        long now = System.nanoTime();
+        if (now - lastToggleTime < TOGGLE_DEBOUNCE_DELAY) {
+            return;
+        }
+        lastToggleTime = now;
+    
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
+            soundPlayer.pauseSoundEffect("background");
             view.saveButton.setOnAction(e -> save());
             pauseStartTime = System.nanoTime();
-            soundPlayer.pauseSoundEffect("background");
         }
         else {
-            long now = System.nanoTime();
             totalPausedTime += now - pauseStartTime;
             startGameLoop();
             view.hidePauseGame();
@@ -623,6 +616,7 @@ public class PlayModeController extends Application {
 		String airhallString = airHall.toString();
 		String waterhalString = waterHall.toString();
 		String firehallString = fireHall.toString();
+		String playModeGridString = playModeGrid.toString();
 		String currentHall = hallType.toString();
 
         try (FileWriter writer = new FileWriter(filePath)) {
@@ -637,6 +631,9 @@ public class PlayModeController extends Application {
 			writer.write("\n");
 			writer.write("FireHall:");
             writer.write(firehallString);
+			writer.write("\n");			
+            writer.write("PlayModeGrid:");
+            writer.write(playModeGridString);
 			writer.write("\n");
 			writer.write("CurrentHall:\n");
 			writer.write(currentHall);
@@ -659,6 +656,202 @@ public class PlayModeController extends Application {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
+
+    public void load(Stage primaryStage) {
+        System.out.println("Loading game...");
+        String filePath = "example.txt";
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                System.out.println("No saved game file found.");
+                return;
+            }
+    
+            ArrayList<String> lines = new ArrayList<>();
+            try (Scanner scanner = new Scanner(file)) {
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine().trim();
+                    if (!line.isEmpty()) { // Skip empty lines
+                        lines.add(line);
+                    }
+                }
+            }
+    
+            int index = 0;
+    
+            // Load Earth Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("EartHall:TileMap:")) {
+                index++;
+                earthHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(earthHall, lines, index);
+            } else {
+                throw new RuntimeException("Earth Hall data missing or corrupted.");
+            }
+    
+            // Load Air Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("AirHall:TileMap:")) {
+                index++;
+                airHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(airHall, lines, index);
+            } else {
+                throw new RuntimeException("Air Hall data missing or corrupted.");
+            }
+    
+            // Load Water Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("WaterHall:TileMap:")) {
+                index++;
+                waterHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(waterHall, lines, index);
+            } else {
+                throw new RuntimeException("Water Hall data missing or corrupted.");
+            }
+    
+            // Load Fire Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("FireHall:TileMap:")) {
+                index++;
+                fireHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(fireHall, lines, index);
+            } else {
+                throw new RuntimeException("Fire Hall data missing or corrupted.");
+            }
+
+            // Load Current Play Mode grid
+            if (index < lines.size() && lines.get(index).startsWith("PlayModeGrid:TileMap:")) {
+                index++;
+                playModeGrid = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(playModeGrid, lines, index);
+            } else {
+                throw new RuntimeException("Play Mode Grid data missing or corrupted.");
+            }
+    
+            // Load current hall type
+            if (index < lines.size() && lines.get(index).equals("CurrentHall:")) {
+                index++;
+                hallType = HallType.valueOf(lines.get(index++));
+            } else {
+                throw new RuntimeException("Current Hall data missing or corrupted.");
+            }
+
+            // Load remaining time
+            if (index < lines.size() && lines.get(index).equals("TimeLeft:")) {
+                index++;
+                time = Double.parseDouble(lines.get(index++));
+            } else {
+                throw new RuntimeException("TimeLeft data missing or corrupted.");
+            }
+    
+            // Load hero's position and lives
+            if (index < lines.size() && lines.get(index).equals("HeroPosx:")) {
+                index++;
+                int heroPosX = Integer.parseInt(lines.get(index++));
+                
+                if (index < lines.size() && lines.get(index).equals("HeroPosy:")) {
+                    index++;
+                    int heroPosY = Integer.parseInt(lines.get(index++));
+                    
+                    if (index < lines.size() && lines.get(index).equals("HeroRemainingLives:")) {
+                        index++;
+                        int heroLives = Integer.parseInt(lines.get(index++));
+                        
+                        hero = initializeHero(heroPosX, heroPosY);
+                        hero.setRemaningLives(heroLives);
+                    }
+                }
+            } else {
+                throw new RuntimeException("Hero data missing or corrupted.");
+            }
+            
+            // Load rune's position
+            if (index < lines.size() && lines.get(index).equals("RuneXCoordinate:")) {
+                index++;
+                runeXCoordinate = Integer.parseInt(lines.get(index++));
+                
+                if (index < lines.size() && lines.get(index).equals("RuneYCoordinate:")) {
+                    index++;
+                    runeYCoordinate = Integer.parseInt(lines.get(index++));
+                }
+            } else {
+                throw new RuntimeException("Rune data missing or corrupted.");
+            }
+            
+            view = new PlayModeView(playModeGrid, time, primaryStage);
+            
+            monsterManager = new MonsterManager(playModeGrid);
+            
+            // Refresh the view
+            Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+            hero.targetX = heroTile.getLeftSide();
+            hero.targetY = heroTile.getTopSide();
+            hero.isMoving = false;
+            view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            view.updateHeroLife(hero.getRemainingLives());
+            initializeSetOnActions();
+            monsterManager.setPlayModeView(view);
+
+            for (int y = 0; y < playModeGrid.getColumnLength(); y++) {
+                for (int x = 0; x < playModeGrid.getRowLength(); x++) {
+                    Tile tile = playModeGrid.findTileWithIndex(x, y);
+                    char tileType = tile.getTileType();
+                    
+                    MonsterType monsterType = null;
+                    
+                    switch (tileType) {
+                        case 'F' -> monsterType = MonsterType.FIGHTER;
+                        case 'A' -> monsterType = MonsterType.ARCHER;
+                        case 'W' -> monsterType = MonsterType.WIZARD;
+                    }
+                    
+                    if (monsterType != null) {
+                        // Canavarı oluştur ve ekrana çiz
+                        monsterManager.createMonster(x, y, monsterType, System.nanoTime());
+                    }
+                }
+            }
+            
+            Scene scene = view.getScene();
+            initialize(scene);
+            
+            primaryStage.setTitle("Play Mode");
+            primaryStage.setScene(scene);
+            primaryStage.setY(0);
+            // primaryStage.setFullScreen(true);
+            // primaryStage.setFullScreenExitHint("");
+            primaryStage.show();
+            this.primaryStage = primaryStage;
+            
+            startGameLoop();
+    
+            System.out.println("Game loaded successfully!");
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading the game: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    
+    private int parseTileMap(Grid grid, ArrayList<String> lines, int index) {
+        int tileCount = 0; // Keep track of processed tiles
+        int totalTiles = grid.getRowLength()* grid.getColumnLength(); // Total tiles expected in the grid
+    
+        for (int i = 0; i < grid.getColumnLength(); i++) {
+            String[] tiles = lines.get(index++).split(", ");
+            for (int j = 0; j < tiles.length; j++) {
+                String[] tileData = tiles[j].split(" ");
+                char tileType = tileData[1].charAt(0); // Extract tile type
+                grid.changeTileWithIndex(j, i, tileType);
+                tileCount++;
+            }
+        }
+    
+        if (tileCount != totalTiles) {
+            System.err.println("Warning: Parsed tile count does not match expected grid size.");
+        }
+        
+        return index;
+    }
+
 }
 
 
