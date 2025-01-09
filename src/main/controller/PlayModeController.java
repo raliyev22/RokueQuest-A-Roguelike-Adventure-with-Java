@@ -60,6 +60,7 @@ public class PlayModeController extends Application {
     private long lastMonsterUpdateTime = 0;
     private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
 
+    private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
@@ -72,6 +73,7 @@ public class PlayModeController extends Application {
     
     private Random random = new Random();
     
+    private long adjustedNow;
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
@@ -258,15 +260,15 @@ public class PlayModeController extends Application {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                long adjustedNow = now - totalPausedTime;
+                adjustedNow = now - totalPausedTime;
 
                 if (lastFrameTime > 0 && adjustedNow - lastFrameTime < FRAME_DURATION_NANOS) {
                     return;
                 }
-                lastFrameTime = adjustedNow;
+                lastFrameTime = adjustedNow;               
 
                 if (lastMonsterSpawnTime == 0) {
-                    lastMonsterSpawnTime = adjustedNow-1;
+                    lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
                 }
                 
                 if (time < 0) {
@@ -679,6 +681,9 @@ public class PlayModeController extends Application {
 			writer.write(Integer.toString(runeXCoordinate));
 			writer.write("\nRuneYCoordinate:\n");
 			writer.write(Integer.toString(runeYCoordinate));
+			writer.write("\nRemainingMonsterSpawnTime:\n");
+            remainingMonsterSpawnTime = adjustedNow - lastMonsterSpawnTime;
+            writer.write(Long.toString(remainingMonsterSpawnTime));
 
             System.out.println("File written successfully!");
         } catch (IOException e) {
@@ -802,6 +807,14 @@ public class PlayModeController extends Application {
             } else {
                 throw new RuntimeException("Rune data missing or corrupted.");
             }
+
+            // Load last monster spawn time
+            if (index < lines.size() && lines.get(index).equals("RemainingMonsterSpawnTime:")) {
+                index++;
+                remainingMonsterSpawnTime = Long.parseLong(lines.get(index++));
+            } else {
+                throw new RuntimeException("RemainingMonsterSpawnTime data missing or corrupted.");
+}
             
             view = new PlayModeView(playModeGrid, time, primaryStage);
             
