@@ -295,17 +295,21 @@ public class PlayModeController extends Application {
                     moveHero();
                 }
 
-                view.changeHeroSprite(hero.getSprite());
-
+                
                 if (hero.isTakingDamage) {
-                    blinkHeroSprite();
+                    hero.increaseTakingDamageAnimationCounter();
 
+                    if (hero.getTakingDamageAnimationCounter() == 0) {
+                        blinkHeroSprite();
+                    }
+                    
                     if (adjustedNow - hero.lastDamagedFrame >= Hero.INVINCIBILITY_FRAMES) {
                         hero.isTakingDamage = false;
                         changeHeroSpriteToNormal();
                     }
-                    view.changeHeroSprite(hero.getSprite());
                 }
+
+                view.changeHeroSprite(hero.getSprite());
                 
                 //monster spawn logic
                 if (adjustedNow - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {

@@ -113,7 +113,7 @@ public class MonsterManager {
 
     public boolean isArcherInRange(ArcherMonster archerMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
-        if (manhattanDistance < ArcherMonster.ARCHER_RANGE) {
+        if (manhattanDistance <= ArcherMonster.ARCHER_RANGE) {
             return true;
         }
         return false;

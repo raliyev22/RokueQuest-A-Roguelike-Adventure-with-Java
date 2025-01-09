@@ -21,6 +21,8 @@ public class Hero {
     public long lastDamagedFrame = 0;
 	private boolean isTeleported=false;
 	private Image sprite;
+    private int takingDamageAnimationCounter = 0;
+    private final int TAKING_DAMAGE_ANIMATION_LOOP = 3;
 	
 	public Hero(int posX, int posY) {
 		this.posX = posX;
@@ -105,6 +107,18 @@ public class Hero {
 
     public void setSprite(Image newSprite) {
         this.sprite = newSprite;
+    }
+
+    public int getTakingDamageAnimationCounter() {
+        return this.takingDamageAnimationCounter;
+    }
+
+    public void increaseTakingDamageAnimationCounter() {
+        if (this.takingDamageAnimationCounter <= this.TAKING_DAMAGE_ANIMATION_LOOP) {
+            this.takingDamageAnimationCounter += 1;
+        } else {
+            this.takingDamageAnimationCounter = 0;
+        }
     }
 
 	public Boolean getIsTeleported(){
