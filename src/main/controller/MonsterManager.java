@@ -95,6 +95,8 @@ public class MonsterManager {
                     }
                 } else if (monster instanceof ArcherMonster archerMonster) {
                     archerAttack(now, archerMonster);
+                } else if (monster instanceof FighterMonster fighterMonster) {
+                    fighterAttack(now, fighterMonster);
                 }
             }
         }
@@ -114,6 +116,25 @@ public class MonsterManager {
     public boolean isArcherInRange(ArcherMonster archerMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
         if (manhattanDistance <= ArcherMonster.ARCHER_RANGE) {
+            return true;
+        }
+        return false;
+    }
+
+    public void fighterAttack(long now, FighterMonster fighterMonster) {
+        if (!fighterMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
+            if (isFighterInRange(fighterMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+            }
+        }
+    }
+
+    public boolean isFighterInRange(FighterMonster fighterMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
+        if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
             return true;
         }
         return false;
