@@ -69,7 +69,7 @@ public class LoadMenuView extends Application{
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
 
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+        scrollPane.setStyle("-fx-background: transparent;-fx-background-color: transparent; -fx-border-color: transparent;");
 
         Button backButton = new Button("Back");
         backButton.setStyle("-fx-font-size: 16px; -fx-background-color: gold;");
