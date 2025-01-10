@@ -261,6 +261,8 @@ public class PlayModeController extends Application {
                 }
                 
                 if (hero.getLiveCount() <= 0) {
+                    changeHeroSpriteToDamaged();
+                    view.changeHeroSprite(hero.getSprite());
                     view.showGameOverPopup(false);
                     soundPlayer.playSoundEffectInThread("gameLoser");
                     stopGameLoop();
@@ -279,11 +281,11 @@ public class PlayModeController extends Application {
 
                 // If hero is taking damage, change blip animations
                 if (hero.isTakingDamage) {
-                    hero.increaseTakingDamageAnimationCounter();
-
                     if (hero.getTakingDamageAnimationCounter() == 0) {
                         blinkHeroSprite();
                     }
+
+                    hero.increaseTakingDamageAnimationCounter();
                     
                     if (adjustedNow - hero.lastDamagedFrame >= Hero.INVINCIBILITY_FRAMES) {
                         hero.isTakingDamage = false;
@@ -499,6 +501,14 @@ public class PlayModeController extends Application {
             hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
         } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4)) {
             hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
+        }
+    }
+
+    public void changeHeroSpriteToDamaged() {
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4);
         }
     }
     
