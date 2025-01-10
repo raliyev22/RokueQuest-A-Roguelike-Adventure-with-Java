@@ -2,12 +2,14 @@ package main.view;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -26,6 +28,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import main.Main;
 import main.controller.MonsterManager;
 import main.controller.PlayModeController;
@@ -56,6 +59,7 @@ public class PlayModeView {
 	public Button cancelExitButton;
 	public Button saveButton;
 	SoundEffects soundPlayer = SoundEffects.getInstance();
+	private Timeline countdown;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -150,7 +154,7 @@ public class PlayModeView {
          
 		HBox timeLabelContainer = new HBox(); // Container for timeLabel
 		timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
-		timeLabel = new Label("Time: " + time);
+		timeLabel = new Label("Time: " + (int)time);
 		timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
 		timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
 
@@ -259,7 +263,7 @@ public class PlayModeView {
 	public void showPauseGame() {
         pauseOverlay.setVisible(true);
 		pauseOverlay.toFront();
-		
+
 		// Setup for save button
 		ImageView saveImageView = new ImageView(Images.IMAGE_SAVEBUTTON_x4);
 		saveImageView.setFitHeight(40);
@@ -515,4 +519,28 @@ public class PlayModeView {
 			alert.showAndWait();
 		});
 	}
+
+	public void showCountdownAndStart(Runnable onComplete) {
+		Label countdownLabel = new Label("3");
+		countdownLabel.setStyle("-fx-font-size: 72px; -fx-text-fill: white; -fx-font-weight: bold;");
+		
+		StackPane countdownPane = new StackPane(countdownLabel);
+		countdownPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+		countdownPane.setPrefSize(primaryStage.getWidth(), primaryStage.getHeight());
+	
+		pane.getChildren().add(countdownPane);
+	
+		countdown = new Timeline(
+			new KeyFrame(Duration.seconds(0), e -> countdownLabel.setText("3")),
+			new KeyFrame(Duration.seconds(1), e -> countdownLabel.setText("2")),
+			new KeyFrame(Duration.seconds(2), e -> countdownLabel.setText("1")),
+			new KeyFrame(Duration.seconds(3), e -> {
+				pane.getChildren().remove(countdownPane);
+				onComplete.run();
+			})
+		);
+	
+		countdown.play();
+	}
+	
 }

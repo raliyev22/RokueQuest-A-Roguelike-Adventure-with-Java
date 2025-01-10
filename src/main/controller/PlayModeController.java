@@ -8,19 +8,12 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
-import javafx.scene.media.AudioClip;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javax.sound.sampled.LineListener;
+
 import main.Main;
 import main.model.*;
 import main.utils.*;
@@ -56,9 +49,6 @@ public class PlayModeController extends Application {
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
-    
-    private long lastMonsterUpdateTime = 0;
-    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
 
     private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
@@ -71,8 +61,6 @@ public class PlayModeController extends Application {
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
     
-    private Random random = new Random();
-    
     private long adjustedNow;
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
@@ -83,6 +71,7 @@ public class PlayModeController extends Application {
     private long totalPausedTime = 0;
     private long lastToggleTime = 0;
     private static final long TOGGLE_DEBOUNCE_DELAY = 300_000_000L;
+    private boolean isCountdownRunning = false;
 
     private Stage primaryStage;
 
@@ -203,24 +192,17 @@ public class PlayModeController extends Application {
             // Set up the main stage in the center of the screen
             primaryStage.setX((screenBounds1.getWidth() - 600) / 2);
             primaryStage.setY((screenBounds1.getHeight() - 400) / 2);
-            
+
             mainPage.start(primaryStage);
             soundPlayer.playSoundEffectInThread("blueButtons");
-        });
-
-        view.cancelExitButton.setOnAction(e -> {
-            togglePause();
-            soundPlayer.playSoundEffectInThread("blueButtons");
-            view.hideExitGame();
-        });
-
-        view.sureExitButton.setOnAction(e -> {
-            System.exit(0);
         });
     }
     
     
     private void handleKeyPressed(KeyCode code) {
+        if (isCountdownRunning) {
+            return;
+        }
         //System.out.println("Key Pressed: " + code); // Debugging statement
         switch (code) {
             case UP, W -> upPressed = true;
@@ -746,6 +728,7 @@ public class PlayModeController extends Application {
     }
 
     public void load(Stage primaryStage, String fileName) {
+        
         String filePath = "src/saveFiles/" + fileName;
         System.out.println("Loading game...");
         try {
@@ -754,7 +737,7 @@ public class PlayModeController extends Application {
                 System.out.println("No saved game file found.");
                 return;
             }
-    
+
             ArrayList<String> lines = new ArrayList<>();
             try (Scanner scanner = new Scanner(file)) {
                 while (scanner.hasNextLine()) {
@@ -914,8 +897,11 @@ public class PlayModeController extends Application {
             // primaryStage.setFullScreenExitHint("");
             primaryStage.show();
             this.primaryStage = primaryStage;
-            
-            startGameLoop();
+            view.showCountdownAndStart(() -> {
+                isCountdownRunning= false;
+                startGameLoop();
+            });
+            isCountdownRunning = true; 
     
             System.out.println("Game loaded successfully!");
         } catch (IOException e) {
@@ -925,7 +911,6 @@ public class PlayModeController extends Application {
             e.printStackTrace();
         }
     }
-    
     
     private int parseTileMap(Grid grid, ArrayList<String> lines, int index) {
         int tileCount = 0; // Keep track of processed tiles
