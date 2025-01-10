@@ -112,6 +112,8 @@ public class PlayModeView {
 		buttonContainer = new HBox(10);
 		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
 
+		saveButton = new Button();
+
 		exitButton = new Button();
 		exitButton.setStyle("-fx-background-color: transparent;");     
 
@@ -269,7 +271,6 @@ public class PlayModeView {
 		saveImageView.setFitHeight(40);
 		saveImageView.setFitWidth(40);
 
-		saveButton = new Button();
 		saveButton.setStyle("-fx-background-color: transparent;");
 
 		saveButton.setOnMouseEntered(event -> {
@@ -285,6 +286,10 @@ public class PlayModeView {
 		saveButton.setPrefHeight(40);
 		//Added to first index of button container
 		buttonContainer.getChildren().add(1, saveButton);
+
+		saveButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });
 		//Changing pause button's image to play button image
 		ImageView resumeImageView = new ImageView(Images.IMAGE_PLAYBUTTON_x4);
 		resumeImageView.setFitHeight(40);

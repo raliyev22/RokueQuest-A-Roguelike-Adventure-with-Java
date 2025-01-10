@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 
 import javafx.animation.AnimationTimer;
@@ -52,7 +51,7 @@ public class PlayModeController extends Application {
 
     private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 3_000_000_000L; // 8 seconds in nanoseconds
+    private static final long MONSTER_SPAWN_INTERVAL = 5_000_000_000L; // 8 seconds in nanoseconds
 
 	private static final int TARGET_FPS = 120;
 	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
@@ -196,6 +195,10 @@ public class PlayModeController extends Application {
             mainPage.start(primaryStage);
             soundPlayer.playSoundEffectInThread("blueButtons");
         });
+
+        view.saveButton.setOnAction(e -> {
+            save();
+        });    
     }
     
     
@@ -211,6 +214,7 @@ public class PlayModeController extends Application {
             case RIGHT, D -> rightPressed = true;
             case ESCAPE -> {
                 if (!escPressedFlag) {
+                    soundPlayer.playSoundEffectInThread("escButton");
                     togglePause();
                     escPressedFlag = true; 
                 }   
@@ -361,12 +365,11 @@ public class PlayModeController extends Application {
             return;
         }
         lastToggleTime = now;
-        soundPlayer.playSoundEffectInThread("escButton");
+
         if (isRunning){
             stopGameLoop();
-            view.showPauseGame();
+            view.showPauseGame();    
             soundPlayer.pauseSoundEffect("background");
-            view.saveButton.setOnAction(e -> save());
             pauseStartTime = System.nanoTime();
         }
         else {
@@ -658,7 +661,6 @@ public class PlayModeController extends Application {
     }
 
     public void save(){
-        soundPlayer.playSoundEffectInThread("blueButtons");
         System.out.println("Game Saved!");
 		String filePath = "src/saveFiles/allSaveFiles.txt";
         File file = new File(filePath);
