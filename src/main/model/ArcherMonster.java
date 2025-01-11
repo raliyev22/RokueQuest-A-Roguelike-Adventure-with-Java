@@ -1,12 +1,17 @@
 package main.model;
 
+import main.utils.Grid;
+import main.utils.Tile;
+
+import java.util.Random;
+
 public class ArcherMonster extends Monster {
     public ArcherMonster(int x, int y) {
         this.posX = x;
         this.posY = y;
         type = MonsterType.ARCHER;
     }
-    /*
+
     public void moveRandomly(Grid grid){
         Random rand = new Random();
         int randomMove = rand.nextInt(4);
@@ -107,6 +112,6 @@ public class ArcherMonster extends Monster {
 
 
     }
-        */
+
 
 }

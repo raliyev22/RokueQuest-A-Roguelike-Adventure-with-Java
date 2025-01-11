@@ -49,13 +49,13 @@ public class MonsterManager {
         Monster monster = null;
         
         switch (type) {
-            case MonsterType.FIGHTER -> {
+            case FIGHTER -> {
                 monster = new FighterMonster(xPosition, yPosition);
             }
-            case MonsterType.ARCHER -> {
+            case ARCHER -> {
                 monster = new ArcherMonster(xPosition, yPosition);
             }
-            case MonsterType.WIZARD -> {
+            case WIZARD -> {
                 monster = new WizardMonster(xPosition, yPosition);
             }
             default -> throw new IllegalArgumentException("Invalid monster type");
@@ -75,7 +75,15 @@ public class MonsterManager {
 
         return monster;
     }
-    
+    public Monster getMonsterAtPosition(int x, int y) {
+        for (Monster monster : monsterList) {
+            if (monster.posX == x && monster.posY == y) {
+                return monster;
+            }
+        }
+        return null; // No monster found at the given position
+    }
+
     public void moveAndActAllMonsters(long now, PlayModeController controller) {
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
@@ -228,7 +236,6 @@ public class MonsterManager {
             return null;
         }
     }
-    
     public void setPlayModeView(PlayModeView view) {
         this.playModeView = view;
     }

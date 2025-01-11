@@ -2,7 +2,6 @@ package main.view;
 
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -17,7 +16,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.view.BuildModeView;
-import main.view.CustomAlertView;
+//import main.view.CustomAlertView;
 import main.view.HelpView;
 
 public class MainMenuView extends Application {
@@ -25,7 +24,7 @@ public class MainMenuView extends Application {
     public void start(Stage primaryStage) {
         // Main layout
         VBox mainMenu = new VBox(20);
-        mainMenu.setAlignment(Pos.CENTER);
+        mainMenu.setStyle("-fx-alignment: center;");
         mainMenu.setPadding(new javafx.geometry.Insets(30));
 
         // Title with animations
@@ -167,14 +166,14 @@ public class MainMenuView extends Application {
         launch(args);
     }
     private void showExitConfirmation(Stage primaryStage) {
-        CustomAlertView.showAlert(
-            primaryStage,
-            "Exit Confirmation",
-            "Are you sure you want to exit the game?"
-        );
-        // Add logic for handling OK button action inside `CustomAlertView` if needed
-        CustomAlertView.showAlert(primaryStage, "Exit Confirmation", "Are you sure you want to exit?");
-        // Handle the OK button click inside CustomAlertView to close the application.
+//        CustomAlertView.showAlert(
+//            primaryStage,
+//            "Exit Confirmation",
+//            "Are you sure you want to exit the game?"
+//        );
+//        // Add logic for handling OK button action inside `CustomAlertView` if needed
+//        CustomAlertView.showAlert(primaryStage, "Exit Confirmation", "Are you sure you want to exit?");
+//        // Handle the OK button click inside CustomAlertView to close the application.
     }
 
 }

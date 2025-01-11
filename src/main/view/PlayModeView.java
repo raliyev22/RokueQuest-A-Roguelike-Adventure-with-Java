@@ -1,6 +1,7 @@
 package main.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javafx.application.Platform;
 import javafx.scene.Cursor;
@@ -29,11 +30,13 @@ import javafx.stage.Stage;
 import main.Main;
 import main.controller.MonsterManager;
 import main.controller.PlayModeController;
+import main.model.Enchantment;
 import main.model.Images;
 import main.model.Monster;
 import main.utils.Grid;
 import main.utils.SoundEffects;
 import main.utils.Tile;
+
 
 public class PlayModeView {
 	protected Pane pane;
@@ -52,6 +55,7 @@ public class PlayModeView {
 	private HBox buttonContainer;
 	SoundEffects soundPlayer = SoundEffects.getInstance();
 	private PlayModeController playModeController;
+	private HashMap<Enchantment.Type, Label> bagLabels;
 
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
@@ -63,9 +67,78 @@ public class PlayModeView {
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
 		this.playModeController = new PlayModeController();
+		bagLabels = new HashMap<>();
+		initializeBagUI();
 		initialize();
 	}
+	private void initializeBagUI() {
+		int offsetX = 20;
+		int offsetY = 20;
 
+		for (Enchantment.Type type : Enchantment.Type.values()) {
+			Label label = new Label(type.name() + ": 0");
+			label.setLayoutX(offsetX);
+			label.setLayoutY(offsetY);
+			offsetY += 30;
+
+			bagLabels.put(type, label);
+			pane.getChildren().add(label);
+		}
+	}
+
+	public void updateBagUI(HashMap<Enchantment.Type, Integer> enchantments) {
+		for (Enchantment.Type type : bagLabels.keySet()) {
+			int count = enchantments.getOrDefault(type, 0);
+			bagLabels.get(type).setText(type.name() + ": " + count);
+		}
+	}
+
+	public void displayEnchantment(Enchantment enchantment) {
+		Rectangle rect = new Rectangle(40, 40, Color.GOLD);
+		rect.setLayoutX(enchantment.getPosX() * 40);
+		rect.setLayoutY(enchantment.getPosY() * 40);
+		rect.setId("enchantment-" + enchantment.getType());
+		pane.getChildren().add(rect);
+	}
+
+	public void removeEnchantment(Enchantment enchantment) {
+		pane.getChildren().removeIf(node -> node.getId() != null &&
+				node.getId().equals("enchantment-" + enchantment.getType()));
+	}
+
+	public void highlightTile(Tile tile, boolean highlight) {
+		Rectangle rect = new Rectangle(40, 40);
+		rect.setLayoutX(tile.getLeftSide());
+		rect.setLayoutY(tile.getTopSide());
+		rect.setFill(highlight ? Color.LIGHTBLUE : Color.TRANSPARENT);
+		rect.setStroke(highlight ? Color.BLUE : null);
+		rect.setId("highlight-" + tile.hashCode());
+
+		if (highlight) {
+			pane.getChildren().add(rect);
+		} else {
+			pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals("highlight-" + tile.hashCode()));
+		}
+	}
+
+	public void updateTime(int timeRemaining) {
+		// Update a UI label showing the time remaining
+	}
+
+	public int getTimeRemaining() {
+		// Return the current time remaining
+		return 0;
+	}
+
+	public int getRuneXCoordinate() {
+		// Return the X coordinate of the rune
+		return 0;
+	}
+
+	public int getRuneYCoordinate() {
+		// Return the Y coordinate of the rune
+		return 0;
+	}
 	public void refresh(Grid newGrid, double time) {
 		this.grid = newGrid;
 		this.time = time;
@@ -104,7 +177,7 @@ public class PlayModeView {
         uiContainer.setPrefHeight(736);
 
 		buttonContainer = new HBox(10);
-		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+		buttonContainer.setStyle("-fx-alignment: center;");
 
 		Button exitButton = new Button();
 		exitButton.setStyle("-fx-background-color: transparent;");
@@ -151,13 +224,13 @@ public class PlayModeView {
 		buttonContainer.getChildren().addAll(exitButton, pauseButton);
          
     HBox timeLabelContainer = new HBox(); // Container for timeLabel
-    timeLabelContainer.setAlignment(javafx.geometry.Pos.CENTER); // Center align horizontally
+		timeLabelContainer.setStyle("-fx-alignment: center;");
     timeLabel = new Label("Time: " + time);
     timeLabel.setStyle("-fx-font-size: 32px; -fx-text-fill: white; -fx-background-color: transparent;");
     timeLabelContainer.getChildren().add(timeLabel); // Add the label to the container
 
     heartsContainer = new HBox(5); // Kalpler arasındaki boşluk 5 px
-    heartsContainer.setAlignment(javafx.geometry.Pos.CENTER); // Kalpleri ortala
+		heartsContainer.setStyle("-fx-alignment: center;");
     heartsContainer.setTranslateY(80);
     Rectangle heart1,heart2,heart3,heart4;
     heart1 = new Rectangle(32,32);
@@ -188,7 +261,7 @@ public class PlayModeView {
         pauseText.setTextFill(Color.WHITE);
 
         VBox overlayContent = new VBox(20, pauseText);
-        overlayContent.setAlignment(javafx.geometry.Pos.CENTER);
+		overlayContent.setStyle("-fx-alignment: center;");
 	  	  overlayContent.setTranslateY(400);
 	    	overlayContent.setTranslateX(300);
 
@@ -197,7 +270,10 @@ public class PlayModeView {
         pauseOverlay.setVisible(false);
         pane.getChildren().add(pauseOverlay);
     }
-
+	public void removeMonsterView(Monster monster) {
+		pane.getChildren().removeIf(node ->
+				node.getId() != null && node.getId().equals("monster-" + monster.hashCode()));
+	}
 	public void showPauseGame() {
         pauseOverlay.setVisible(true);
 		// Setup for save button
@@ -408,7 +484,7 @@ public class PlayModeView {
 	
 			Label headerLabel = new Label(isWin ? "Congratulations!" : "Try Again");
 			headerLabel.setStyle("-fx-font-size: 20px; -fx-text-fill: white; -fx-font-weight: bold;");
-			headerLabel.setAlignment(javafx.geometry.Pos.CENTER);
+			headerLabel.setStyle("-fx-alignment: center;");
 			headerLabel.setMaxWidth(Double.MAX_VALUE);
 	
 			Label contentLabel = new Label(isWin 
@@ -417,7 +493,7 @@ public class PlayModeView {
 			contentLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: white;");
 	
 			VBox contentBox = new VBox(10, headerLabel, contentLabel);
-			contentBox.setAlignment(javafx.geometry.Pos.CENTER);
+			contentBox.setStyle("-fx-alignment: center;");
 			contentBox.setStyle("-fx-background-color: transparent; -fx-padding: 10;");
 	
 			// Butonları elle oluştur ve ortala
@@ -439,10 +515,10 @@ public class PlayModeView {
 			});
 	
 			HBox buttonBox = new HBox(20, mainMenuButton, exitButton);
-			buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
+			buttonBox.setStyle("-fx-alignment: center;");
 	
 			VBox dialogContent = new VBox(20, contentBox, buttonBox);
-			dialogContent.setAlignment(javafx.geometry.Pos.CENTER);
+			dialogContent.setStyle("-fx-alignment: center;");
 			dialogContent.setStyle("-fx-background-color: #222; -fx-padding: 20;");
 	
 			DialogPane dialogPane = alert.getDialogPane();

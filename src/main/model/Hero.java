@@ -1,5 +1,7 @@
 package main.model;
 
+import java.util.HashMap;
+
 public class Hero {
 	public final int maxLives = 4;
     public final int speed = 4;
@@ -14,6 +16,10 @@ public class Hero {
 	public boolean isTakingDamage;
     public Directions movingDirection;
 	public Directions facingDirection;
+	private boolean isProtected;
+
+	private HashMap<Enchantment.Type, Integer> enchantments;
+
 
 	private boolean isTeleported=false;
 	
@@ -24,27 +30,58 @@ public class Hero {
 		this.remainingLives = 4;
 		this.isMoving = false;
 		this.isTakingDamage = false;
+		this.isProtected = false;
 		this.facingDirection = Directions.EAST;
+		this.enchantments = new HashMap<>();
 	}
 
 	public void move(Directions direction) {
 		switch (direction) {
-			case Directions.NORTH -> {
+			case NORTH -> {
 				posY--;
 			}
-			case Directions.SOUTH -> {
+			case SOUTH -> {
 				posY++;
 			}
-			case Directions.EAST -> {
+			case EAST -> {
 				posX++;
 			}
-			case Directions.WEST -> {
+			case WEST -> {
 				posX--;
 			}
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
-	
+	public boolean isProtected() {
+		return isProtected;
+	}
+
+	public void setProtected(boolean isProtected) {
+		this.isProtected = isProtected;
+	}
+
+	public void addEnchantment(Enchantment.Type type) {
+		enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
+	}
+
+	public void addToBag(Enchantment.Type type) {
+		enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
+	}
+
+	public Enchantment consumeEnchantment(Enchantment.Type type) {
+		if (enchantments.containsKey(type) && enchantments.get(type) > 0) {
+			enchantments.put(type, enchantments.get(type) - 1);
+			if (enchantments.get(type) == 0) {
+				enchantments.remove(type);
+			}
+			return new Enchantment(type, posX, posY, System.currentTimeMillis());
+		}
+		return null;
+	}
+
+	public HashMap<Enchantment.Type, Integer> getEnchantments() {
+		return enchantments;
+	}
 	public void increaseLives(int num){
 		remainingLives += num;
 		if(remainingLives > maxLives){

@@ -10,6 +10,8 @@ import java.util.Set;
 import javafx.util.Pair;
 import main.controller.PlayModeController;
 import main.model.Directions;
+import main.model.Monster;
+import main.controller.MonsterManager;
 
 // This class creates tile-maps. Maybe it will have utility functions too
 public class Grid {
@@ -21,6 +23,7 @@ public class Grid {
     public int topLeftXCoordinate;
     public int topLeftYCoordinate;
     protected List<Tile> tileMap;
+	protected MonsterManager monsterManager;
     
     public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
     int topLeftXCoordinate, int topLeftYCoordinate) {
@@ -37,6 +40,50 @@ public class Grid {
         this.tileMap = createTileMap(rowLength, columnLength, 
         tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
     }
+
+	public void lureMonsters(int heroPosX, int heroPosY, Directions dir) {
+		List<Monster> nearbyMonsters = findMonstersAdjacentToHero(heroPosX, heroPosY);
+
+		for (Monster monster : nearbyMonsters) {
+			Tile currentTile = findTileWithIndex(monster.getX(), monster.getY());
+			Tile targetTile = findTileUsingDirection(currentTile, dir);
+
+			if (targetTile != null && isWalkableTile(targetTile)) {
+				// Move monster to the new tile
+				changeTileWithIndex(monster.getX(), monster.getY(), 'E'); // Clear current tile
+				monster.move(dir);
+				changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
+			}
+		}
+	}
+
+	private List<Monster> findMonstersAdjacentToHero(int heroPosX, int heroPosY) {
+		List<Monster> adjacentMonsters = new ArrayList<>();
+		Tile heroTile = findTileWithIndex(heroPosX, heroPosY);
+
+		for (Directions dir : Directions.values()) {
+			Tile adjacentTile = findTileUsingDirection(heroTile, dir);
+			if (adjacentTile != null && isMonsterTile(adjacentTile)) {
+				Monster monster = getMonsterFromTile(adjacentTile);
+				if (monster != null) {
+					adjacentMonsters.add(monster);
+				}
+			}
+		}
+
+		return adjacentMonsters;
+	}
+
+	private boolean isMonsterTile(Tile tile) {
+		char tileType = tile.getTileType();
+		return tileType == 'A' || tileType == 'F' || tileType == 'W'; // Monster types
+	}
+
+	public Monster getMonsterFromTile(Tile tile) {
+		// Retrieve the monster instance based on tile coordinates
+		// Assuming monsters are managed elsewhere (e.g., MonsterManager)
+		return MonsterManager.getMonsterAtPosition(findXofTile(tile), findYofTile(tile));
+	}
     
     // Creating a tile map using other variables
     private List<Tile> createTileMap(int rowLength, int columnLength, 

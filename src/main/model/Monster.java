@@ -1,5 +1,7 @@
 package main.model;
 
+import javafx.scene.image.Image;
+
 public abstract class Monster {
     public final int speed = 5;
     public MonsterType type;
@@ -21,13 +23,13 @@ public abstract class Monster {
 
     public char getCharType(){
         switch (type){
-            case MonsterType.FIGHTER -> {
+            case FIGHTER -> {
                 return 'F';
             }
-            case MonsterType.ARCHER -> {
+            case ARCHER -> {
                 return 'A';
             }
-            case MonsterType.WIZARD -> {
+            case WIZARD -> {
                 return 'W';
             }
             default -> throw new IllegalArgumentException("Invalid monster type");
@@ -36,21 +38,36 @@ public abstract class Monster {
 
     public void move(Directions direction) {
 		switch (direction) {
-			case Directions.NORTH -> {
+			case NORTH -> {
 				posY--;
 			}
-			case Directions.SOUTH -> {
+			case SOUTH -> {
 				posY++;
 			}
-			case Directions.EAST -> {
+			case EAST -> {
 				posX++;
 			}
-			case Directions.WEST -> {
+			case WEST -> {
 				posX--;
 			}
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
+    public static Image getMonsterImage(Monster monster) {
+        switch (monster.getType()) {
+            case ARCHER:
+                return Images.IMAGE_ARCHER_X2 ;
+            case FIGHTER:
+                return Images.IMAGE_FIGHTER_x2;
+            case WIZARD:
+                return Images.IMAGE_WIZARD_x2;
+            default:
+                throw new IllegalArgumentException("Unknown monster type: " + monster.getType());
+        }
+    }
+
+    public int getX() {return posX;}
+    public int getY() {return posY;}
 
     public long getLastRuneTeleportation() {
         return lastRuneTeleportation;

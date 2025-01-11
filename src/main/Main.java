@@ -2,7 +2,6 @@ package main;
 
 import javafx.animation.*;
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -26,7 +25,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         // Main layout
         VBox mainMenu = new VBox(20);
-        mainMenu.setAlignment(Pos.CENTER);
+        mainMenu.setStyle("-fx-alignment: center;");
         mainMenu.setPadding(new javafx.geometry.Insets(30));
 
         // Adding Sound Effects

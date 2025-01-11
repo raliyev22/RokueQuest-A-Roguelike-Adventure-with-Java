@@ -2,9 +2,7 @@ package main.controller;
 
 import java.io.File;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -13,7 +11,7 @@ import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -39,7 +37,9 @@ public class PlayModeController extends Application {
     protected MonsterManager monsterManager;
     protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
-    
+    private List<Enchantment> activeEnchantments;
+
+
     private int runeXCoordinate;
     private int runeYCoordinate;
     private boolean mouseClicked = false;
@@ -185,9 +185,9 @@ public class PlayModeController extends Application {
     }
     
     public void initialize(Scene scene) {
-        scene.setOnKeyPressed(event -> handleKeyPressed(event.getCode()));
+        scene.setOnKeyPressed(event -> handleKeyPressed(event));
         scene.getRoot().requestFocus();
-        scene.setOnKeyReleased(event -> handleKeyReleased(event.getCode()));
+        scene.setOnKeyReleased(event -> handleKeyReleased(event));
         scene.getRoot().requestFocus();
         scene.setOnMouseClicked(event -> {
             mouseClicked = true;
@@ -196,37 +196,140 @@ public class PlayModeController extends Application {
         });
         scene.getRoot().requestFocus();
     }
-    
-    
-    private void handleKeyPressed(KeyCode code) {
-        //System.out.println("Key Pressed: " + code); // Debugging statement
-        switch (code) {
-            case UP, W -> upPressed = true;
-            case DOWN, S -> downPressed = true;
-            case LEFT, A -> leftPressed = true;
-            case RIGHT, D -> rightPressed = true;
-            case ESCAPE -> {
-                if (!escPressedFlag) {
-                    togglePause();
-                    escPressedFlag = true; 
-                }   
-            }         
-                default -> {
-                //System.out.println("Unhandled Key Pressed: " + code);
+
+    private void scheduleEnchantmentSpawns() {
+        Timer enchantmentTimer = new Timer(true);
+        enchantmentTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                spawnEnchantment();
+            }
+        }, 0, 12000); // Spawn every 12 seconds
+    }
+
+    private void spawnEnchantment() {
+        long currentTime = System.currentTimeMillis();
+        Enchantment enchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
+        activeEnchantments.add(enchantment);
+        view.displayEnchantment(enchantment);
+
+        enchantment.startExpirationTimer(6000, () -> {
+            activeEnchantments.remove(enchantment);
+            view.removeEnchantment(enchantment);
+        });
+    }
+
+    public void handleMouseClick(double mouseX, double mouseY) {
+        Tile clickedTile = playModeGrid.findTileUsingCoordinates(mouseX, mouseY);
+        if (clickedTile != null) {
+            for (Enchantment enchantment : new ArrayList<>(activeEnchantments)) {
+                if (enchantment.getPosX() == playModeGrid.findXofTile(clickedTile) &&
+                        enchantment.getPosY() == playModeGrid.findYofTile(clickedTile)) {
+
+                    hero.addEnchantment(enchantment.getType());
+                    activeEnchantments.remove(enchantment);
+                    view.removeEnchantment(enchantment);
+                    break;
+                }
             }
         }
     }
-    
-    private void handleKeyReleased(KeyCode code) {
-        switch (code) {
-            case UP, W -> upPressed = false;
-            case DOWN, S -> downPressed = false;
-            case LEFT, A -> leftPressed = false;
-            case RIGHT, D -> rightPressed = false;
-            case ESCAPE -> escPressedFlag = false;
-            default -> {
-                //System.out.println("Unhandled Key Released: " + code);
+
+    public void addTime(int seconds) {
+        view.updateTime(view.getTimeRemaining() + seconds);
+    }
+
+    public void useRevealEnchantment() {
+        Enchantment.Type type = Enchantment.Type.REVEAL;
+        if (hero.getEnchantments().containsKey(type)) {
+            Tile runeTile = playModeGrid.findTileWithIndex(view.getRuneXCoordinate(), view.getRuneYCoordinate());
+            Enchantment.highlightRevealArea(playModeGrid, runeTile, view);
+            hero.consumeEnchantment(type);
+        }
+    }
+
+    public void useCloakOfProtection() {
+        Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
+        if (hero.getEnchantments().containsKey(type)) {
+            hero.consumeEnchantment(type);
+            hero.setProtected(true);
+            Timer protectionTimer = new Timer();
+            protectionTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    hero.setProtected(false);
+                }
+            }, 20000); // Cloak lasts for 20 seconds
+        }
+    }
+
+    public void useLuringGem(String direction) {
+        Enchantment.Type type = Enchantment.Type.LURING_GEM;
+        if (hero.getEnchantments().containsKey(type)) {
+            hero.consumeEnchantment(type);
+            Directions dir = switch (direction.toUpperCase()) {
+                case "W" -> Directions.NORTH;
+                case "A" -> Directions.WEST;
+                case "S" -> Directions.SOUTH;
+                case "D" -> Directions.EAST;
+                default -> null;
+            };
+            if (dir != null) {
+                playModeGrid.lureMonsters(hero.getPosX(), hero.getPosY(), dir);
             }
+        }
+    }
+    private void handleKeyPressed(KeyEvent event) {
+        String keyText = event.getText().toLowerCase(); // Get the key text in lowercase
+
+        switch (keyText) {
+            case "w":
+                upPressed = true;
+                break;
+            case "s":
+                downPressed = true;
+                break;
+            case "a":
+                leftPressed = true;
+                break;
+            case "d":
+                rightPressed = true;
+                break;
+            case "\u001b": // Escape key (ASCII escape character)
+                if (!escPressedFlag) {
+                    togglePause();
+                    escPressedFlag = true;
+                }
+                break;
+            default:
+                // Handle unrecognized keys if necessary
+                break;
+        }
+    }
+
+
+    private void handleKeyReleased(KeyEvent event) {
+        String keyText = event.getText().toLowerCase(); // Get the key text in lowercase
+
+        switch (keyText) {
+            case "w":
+                upPressed = false;
+                break;
+            case "s":
+                downPressed = false;
+                break;
+            case "a":
+                leftPressed = false;
+                break;
+            case "d":
+                rightPressed = false;
+                break;
+            case "\u001b": // Escape key (ASCII escape character)
+                escPressedFlag = false;
+                break;
+            default:
+                // Handle unrecognized keys if necessary
+                break;
         }
     }
     
@@ -569,10 +672,21 @@ public class PlayModeController extends Application {
     }
 
     public void removeMonster(Monster monster) {
-        //monsters.remove(monster);
-        monsterIterator.remove();
-        playModeGrid.changeTileWithIndex(monster.getX(), monster.getY(), 'E');
-        view.removeFromPane(monster.getMonsterView());
+        // Remove monster from the grid
+        playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // 'E' for empty tile
+
+        // Remove monster from the list of active monsters
+        Iterator<Monster> iterator = monsterIterator;
+        while (iterator.hasNext()) {
+            Monster m = iterator.next();
+            if (m.equals(monster)) {
+                iterator.remove();
+                break;
+            }
+        }
+
+        // Remove the monster's visual representation from the view
+        view.removeMonsterView(monster);
     }
 }
 
