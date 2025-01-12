@@ -50,6 +50,15 @@ public class MonsterManager {
         return createMonster(xPosition, yPosition, type, now);
     }
     
+    
+    /** 
+     * Create a monster, add it to the grid and the list, and render it on the screen.
+     * @param xPosition x index that the monster is created on. Must be between 0 and playModeGrid.rowLength - 1 (inclusive)
+     * @param yPosition y index that the monster is created on. Must be between 0 and playModeGrid.columnLength - 1 (inclusive)
+     * @param type type of the monster.
+     * @param now the time that the monster is created at.
+     * @return Monster the monster created.
+     */
     protected Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
         Monster monster = null;
         
