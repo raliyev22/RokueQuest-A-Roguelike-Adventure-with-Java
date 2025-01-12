@@ -107,7 +107,6 @@ public class PlayModeView {
 	}
 
 
-
 	public void highlightTile(Tile tile, boolean highlight) {
 		Rectangle rect = new Rectangle(40, 40);
 		rect.setLayoutX(tile.getLeftSide());
@@ -117,9 +116,11 @@ public class PlayModeView {
 		rect.setId("highlight-" + tile.hashCode());
 
 		if (highlight) {
-			pane.getChildren().add(rect);
+			Platform.runLater(() -> pane.getChildren().add(rect)); // Ensure UI modification on the JavaFX thread
 		} else {
-			pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals("highlight-" + tile.hashCode()));
+			Platform.runLater(() -> pane.getChildren().removeIf(node ->
+					node.getId() != null && node.getId().equals("highlight-" + tile.hashCode())
+			)); // Remove on the JavaFX thread
 		}
 	}
 
@@ -145,10 +146,6 @@ public class PlayModeView {
 		initialize();
 	}
 
-
-	public void updateInventoryView(Inventory inventory) {
-		inventoryView.updateInventory(inventory); // Delegate to InventoryView
-	}
 	public void initialize() {
 		if (scene == null) {
 			scene = new Scene(pane);
@@ -158,11 +155,6 @@ public class PlayModeView {
 
         soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
 		enchantmentViews = new HashMap<Enchantment, Rectangle>();
-		uiContainer = new VBox(10); // Create a vertical box for UI
-		inventoryView = new InventoryView(); // Initialize InventoryView
-		uiContainer.getChildren().add(inventoryView.getInventoryBox()); // Add InventoryView to UI
-
-		pane.getChildren().add(uiContainer);
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
 			BackgroundRepeat.REPEAT,
@@ -250,12 +242,10 @@ public class PlayModeView {
     heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
     heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
 
-    Rectangle inventory = new Rectangle(200,400);
-    inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
-    inventory.setTranslateY(100);
+	inventoryView = new InventoryView();
+	inventoryView.setTranslateY(100);
+	uiContainer.getChildren().addAll(buttonContainer, timeLabelContainer, heartsContainer, inventoryView);
 
-
-    uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
     pane.getChildren().add(uiContainer);
 
 		initializePauseOverlay();
@@ -330,18 +320,36 @@ public class PlayModeView {
 		enchantmentViews.put(enchantment, enchantmentView);
 		pane.getChildren().add(enchantmentView);
 	}
+	public void updateInventoryUI(HashMap<Enchantment.Type, Integer> enchantments) {
+		inventoryView.updateInventory(enchantments);
+	}
 
-	/**
-	 * Removes an enchantment from the screen.
-	 *
-	 * @param enchantment The enchantment to remove.
-	 */
+
+	// Remove enchantment and add it to the inventory
+	public void collectEnchantment(Enchantment enchantment, Inventory inventory) {
+		if (!enchantmentViews.containsKey(enchantment)) {
+			System.out.println("Attempted to collect a non-existent enchantment.");
+			return; // Avoid duplicate processing
+		}
+
+		Platform.runLater(() -> {
+			inventory.addEnchantment(enchantment.getType());
+			updateInventoryUI(inventory.getEnchantments());
+			removeEnchantmentView(enchantment);
+			synchronized (enchantmentViews) {
+				enchantmentViews.remove(enchantment);
+			}
+
+		});
+	}
+
 	public void removeEnchantmentView(Enchantment enchantment) {
 		Rectangle enchantmentView = enchantmentViews.remove(enchantment);
 		if (enchantmentView != null) {
 			pane.getChildren().remove(enchantmentView);
 		}
 	}
+
 
 	/**
 	 * Updates the position of an enchantment on the screen.

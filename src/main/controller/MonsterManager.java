@@ -16,24 +16,30 @@ public class MonsterManager {
     // cannot shoot while moving, so we want for them to stay still for some time.
     protected final double MONSTER_STAY_RATE = 0.8;
     protected final double MONSTER_MOVE_INTERVAL = 1_000_000_000L;
-    
+    protected final double MONSTER_WAIT_PERIOD = 1_000_000_000L;
+    private static final long RUNE_TELEPORT_INTERVAL = 3_000_000_000L; // 3 seconds in nanoseconds
+
     protected Grid playModeGrid;
+    protected Hero hero;
     protected List<Monster> monsterList;
     protected PlayModeView playModeView;
-    
-    public MonsterManager(Grid grid) {
+
+    private SoundEffects soundPlayer = SoundEffects.getInstance();
+
+    public MonsterManager(Grid grid, Hero hero) {
         this.playModeGrid = grid;
+        this.hero = hero;
         this.monsterList = new ArrayList<>();
     }
-    
-    public Monster createMonster(int xPosition, int yPosition) {
+
+    public Monster createMonster(int xPosition, int yPosition, long now) {
         SecureRandom rng = new SecureRandom();
-        
+
         int luckyType = rng.nextInt(3);
-        
+
         MonsterType type = MonsterType.WIZARD;
-        
-        luckyType = 0;
+
+        // luckyType = 0;
         if (luckyType == 0) {
             type = MonsterType.WIZARD;
         } else if (luckyType == 1) {
@@ -41,13 +47,12 @@ public class MonsterManager {
         } else if (luckyType == 2) {
             type = MonsterType.FIGHTER;
         }
-        
-        return createMonster(xPosition, yPosition, type);
+
+        return createMonster(xPosition, yPosition, type, now);
     }
-    
-    protected Monster createMonster(int xPosition, int yPosition, MonsterType type) {
+    protected Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
         Monster monster = null;
-        
+
         switch (type) {
             case FIGHTER -> {
                 monster = new FighterMonster(xPosition, yPosition);
@@ -60,13 +65,68 @@ public class MonsterManager {
             }
             default -> throw new IllegalArgumentException("Invalid monster type");
         }
-        
+
+        monster.spawnTime = now;
+
         Tile monsterTile = playModeGrid.findTileWithIndex(xPosition, yPosition);
         monster.currentX = monsterTile.getLeftSide();
         monster.currentY = monsterTile.getTopSide();
         monster.targetX = monsterTile.getLeftSide();
         monster.targetY = monsterTile.getTopSide();
-        
+
+        playModeGrid.changeTileWithIndex(xPosition, yPosition, monster.getCharType());
+        this.monsterList.add(monster);
+        playModeView.createMonsterView(monster);
+        // playModeView.updateMonsterPosition(monsterList.size() - 1, xPosition, yPosition);
+        playModeView.redrawTallItems();
+
+        return monster;
+    }
+
+    public void archerAttack(long now, ArcherMonster archerMonster) {
+        if (!archerMonster.isMoving && !hero.isMoving && !hero.isTakingDamage && !hero.isProtected()) {
+            if (isArcherInRange(archerMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("archer");
+            }
+        }
+    }
+
+
+    public boolean isArcherInRange(ArcherMonster archerMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
+        if (manhattanDistance <= ArcherMonster.ARCHER_RANGE) {
+            return true;
+        }
+        return false;
+    }
+
+
+    protected Monster createMonster(int xPosition, int yPosition, MonsterType type) {
+        Monster monster = null;
+
+        switch (type) {
+            case FIGHTER -> {
+                monster = new FighterMonster(xPosition, yPosition);
+            }
+            case ARCHER -> {
+                monster = new ArcherMonster(xPosition, yPosition);
+            }
+            case WIZARD -> {
+                monster = new WizardMonster(xPosition, yPosition);
+            }
+            default -> throw new IllegalArgumentException("Invalid monster type");
+        }
+
+        Tile monsterTile = playModeGrid.findTileWithIndex(xPosition, yPosition);
+        monster.currentX = monsterTile.getLeftSide();
+        monster.currentY = monsterTile.getTopSide();
+        monster.targetX = monsterTile.getLeftSide();
+        monster.targetY = monsterTile.getTopSide();
+
         playModeGrid.changeTileWithIndex(xPosition, yPosition, monster.getCharType());
         this.monsterList.add(monster);
         playModeView.createMonsterView(monster);
@@ -83,14 +143,59 @@ public class MonsterManager {
         }
         return null; // No monster found at the given position
     }
+    public void lureFighterMonsters(int targetX, int targetY) {
+        for (Monster monster : monsterList) {
+            if (monster instanceof FighterMonster fighterMonster) {
+                fighterMonster.chaseLure(targetX, targetY, playModeGrid);
+            }
+        }
+    }
 
-    public void moveAndActAllMonsters(long now, PlayModeController controller) {
+    public void fighterAttack(long now, FighterMonster fighterMonster) {
+        if (!fighterMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
+            if (isFighterInRange(fighterMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("fighter");
+            }
+        }
+    }
+    public boolean isFighterInRange(FighterMonster fighterMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
+        if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
+            return true;
+        }
+        return false;
+    }
+
+    public void actAllMonsters(long now, PlayModeController controller) {
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
 
-            if (monster instanceof WizardMonster wizardMonster) {
-                wizardMonster.act(controller); // Execute wizard behavior
-                return ;
+            if (now - monster.spawnTime >= MONSTER_WAIT_PERIOD) {
+                if (monster instanceof WizardMonster wizardMonster) {
+                    long timeSinceLastAct = now - wizardMonster.getLastActTime();
+                    if (timeSinceLastAct >= RUNE_TELEPORT_INTERVAL) {
+                        wizardMonster.act(controller);
+                        wizardMonster.setLastActTime(now);
+                    }
+                } else if (monster instanceof ArcherMonster archerMonster) {
+                    archerAttack(now, archerMonster);
+                } else if (monster instanceof FighterMonster fighterMonster) {
+                    fighterAttack(now, fighterMonster);
+                }
+            }
+        }
+    }
+
+    public void moveAllMonsters(long now) {
+        for (int i = 0; i < monsterList.size(); i++) {
+            Monster monster = monsterList.get(i);
+
+            if (monster.type == MonsterType.WIZARD) {
+                continue;
             }
 
             if (monster.isMoving) {
@@ -104,7 +209,7 @@ public class MonsterManager {
             }
         }
     }
-    
+
     public void moveMonster(int monsterID) {
         Monster monster = monsterList.get(monsterID);
         if (monster == null) {
@@ -114,17 +219,17 @@ public class MonsterManager {
         Tile monsterTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
         int monsterViewLeftSide = monsterTile.getLeftSide();
         int monsterViewTopSide = monsterTile.getTopSide();
-        
+
         if (!monster.isMoving) {
             monster.currentX = monsterViewLeftSide;
             monster.currentY = monsterViewTopSide;
         }
-        
+
         if (!monster.isMoving) {
             Directions movementDirection = pickMovementDirection(monster);
             if (movementDirection != null) {
                 monsterTile.changeTileType('?');
-                
+
                 if (movementDirection == Directions.NORTH) {
                     Tile northTile = playModeGrid.findNorthTile(monsterTile);
                     if (northTile != null) {
@@ -157,7 +262,7 @@ public class MonsterManager {
                 monster.movingDirection = movementDirection;
             }
         }
-        
+
         if (monster.currentX < monster.targetX) {
             monster.currentX = Math.min(monster.currentX + monster.speed, monster.targetX);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
@@ -165,7 +270,7 @@ public class MonsterManager {
             monster.currentX = Math.max(monster.currentX - monster.speed, monster.targetX);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
         }
-        
+
         if (monster.currentY < monster.targetY) {
             monster.currentY = Math.min(monster.currentY + monster.speed, monster.targetY);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
@@ -173,38 +278,38 @@ public class MonsterManager {
             monster.currentY = Math.max(monster.currentY - monster.speed, monster.targetY);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
         }
-        
+
         if (monster.currentX == monster.targetX && monster.currentY == monster.targetY) {
             monster.isMoving = false;
             if (monster.movingDirection != null) {
                 // System.out.printf("Before moving x: %d y: %d%n", monster.posX, monster.posY);
                 // System.out.println(playModeGrid);
-                
+
                 moveMonsterOnGrid(monster.movingDirection, monster);
-                
+
                 // System.out.printf("After moving x: %d y: %d%n", monster.posX, monster.posY);
                 // System.out.println(playModeGrid);
                 monster.movingDirection = null;
             }
         }
     }
-    
-    
+
+
     public Directions pickMovementDirection(Monster monster) {
         SecureRandom rng = new SecureRandom();
-        
+
         if (rng.nextDouble() > MONSTER_STAY_RATE) {
             return null; // null means no direction
         }
-        
+
         Tile monsterTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
         if (monsterTile == null) {
             System.err.println("pickMovementDirection null pointer");
         }
-        
+
         List<Directions> moveableDirections = playModeGrid.findWalkableDirections(monsterTile);
         int moveableDirectionCount = moveableDirections.size();
-        
+
         if (moveableDirectionCount > 0) {
             int luckyDirectionIndex = rng.nextInt(moveableDirectionCount);
             return moveableDirections.get(luckyDirectionIndex);
@@ -212,19 +317,19 @@ public class MonsterManager {
 
         return null;
     }
-    
+
     public void moveMonsterOnGrid(Directions dir, Monster monster) {
         int xIndexOld = monster.posX;
         int yIndexOld = monster.posY;
         playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
-        
+
         monster.move(dir);
-        
+
         int xIndexNew = monster.posX;
         int yIndexNew = monster.posY;
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
-    
+
     public static Image getMonsterImage(Monster monster) {
         if (monster.getCharType() == 'A') {
             return Images.IMAGE_ARCHER_x4;

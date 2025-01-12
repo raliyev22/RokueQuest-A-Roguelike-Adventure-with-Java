@@ -9,6 +9,7 @@ import javax.sound.sampled.Clip;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -27,12 +28,12 @@ public class PlayModeController extends Application {
     protected final int tileHeight = 64;
     protected final int topLeftXCoordinate = 100;
     protected final int topLeftYCoordinate = 150;
-    
+
     public static Grid earthHall;
     public static Grid airHall;
     public static Grid waterHall;
     public static Grid fireHall;
-    
+
     public Grid playModeGrid;
     protected Hero hero;
     protected MonsterManager monsterManager;
@@ -40,16 +41,16 @@ public class PlayModeController extends Application {
     protected HallType hallType;
     private List<Enchantment> activeEnchantments;
 
-
+    private boolean luringGemActivated = false;
     private int runeXCoordinate;
     private int runeYCoordinate;
     private boolean mouseClicked = false;
     private double mouseX;
     private double mouseY;
-    
+
     public static double time;
     public static double totalTime;
-    
+
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
@@ -64,25 +65,25 @@ public class PlayModeController extends Application {
     private long lastMonsterSpawnTime = 0;
     private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
-	  private static final int TARGET_FPS = 120;
-	  private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
-  	private long lastFrameTime = 0;
+    private static final int TARGET_FPS = 120;
+    private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
+    private long lastFrameTime = 0;
 
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
-    
+
     private Random random = new Random();
-    
+
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
 
-    private boolean escPressedFlag = false; 
+    private boolean escPressedFlag = false;
 
     // public PlayModeController() {
     //     initializePlayMode();
     // }
-    
+
     public void initializePlayMode() {
         // Create a new empty grid
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
@@ -121,7 +122,7 @@ public class PlayModeController extends Application {
             }
         }
         this.totalTime = time;
-        
+
         //playModeGrid.copyTileMap(earthHall);
         // Find the first random tile that the hero will spawn on
         Tile initialHeroTile = getRandomEmptyTile();
@@ -129,58 +130,59 @@ public class PlayModeController extends Application {
         int randomYCoordinate = playModeGrid.findYofTile(initialHeroTile);
         Tile heroTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
         hero = initializeHero(randomXCoordinate, randomYCoordinate);
-        
+
         hero.targetX = heroTile.getLeftSide();
         hero.targetY = heroTile.getTopSide();
         activeEnchantments = new ArrayList<>(); // Initialize the list
 
         // Create monster manager
-        
+
         // Find the random object that the rune will spawn in
         Tile runeTile = getRandomHallObjectTile();
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
-        
-        monsterManager = new MonsterManager(playModeGrid);
-        
-        if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
+
+        monsterManager = new MonsterManager(playModeGrid, hero);
+
+        if (view != null) { // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.getPane().getChildren().add(inventoryView.getInventoryBox());
+//            view.getPane().getChildren().add(inventoryView.getInventoryBox());
             view.pauseButton.setOnAction(e -> {
                 togglePause();
                 soundPlayer.playSoundEffectInThread("blueButtons");
-            });                
+            });
             monsterManager.setPlayModeView(view);
         }
     }
-    
+
     public void start(Stage primaryStage) {
         initializePlayMode();
         initializeSoundEffects();
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         // If view is null (which means we are in the first hall), create a new one
-        if (view == null){
+        if (view == null) {
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
             view.pauseButton.setOnAction(e -> {
                 togglePause();
                 soundPlayer.playSoundEffectInThread("blueButtons");
-            });                  monsterManager.setPlayModeView(view);
+            });
+            monsterManager.setPlayModeView(view);
         }
 
         Scene scene = view.getScene();
         initialize(scene);
-        
+
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
-        
+
         startGameLoop();
     }
-    
+
     private void initializeSoundEffects() {
         soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
         soundPlayer.setVolume("step", -10);
@@ -195,7 +197,7 @@ public class PlayModeController extends Application {
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
         soundPlayer.setVolume("wizard", -10);
     }
-    
+
     public void initialize(Scene scene) {
         scene.setOnKeyPressed(event -> handleKeyPressed(event));
         scene.getRoot().requestFocus();
@@ -223,19 +225,39 @@ public class PlayModeController extends Application {
         long currentTime = System.nanoTime();
 
         if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
-            Tile tile = getRandomEmptyTile();
-            if (tile != null) {
-                Enchantment enchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
-                activeEnchantments.add(enchantment);
-                view.addEnchantmentView(enchantment, tile.getLeftSide(), tile.getTopSide());
+            // Ensure Extra Time enchantments only spawn at rune locations
+            Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+            Enchantment enchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
 
-                // Schedule expiration
-                enchantment.startExpirationTimer(6000, () -> {
-                    activeEnchantments.remove(enchantment);
-                    view.removeEnchantmentView(enchantment);
-                });
+            if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+                // Spawn Extra Time only at the rune location
+                if (runeTile != null) {
+                    activeEnchantments.add(enchantment);
+                    view.addEnchantmentView(enchantment, runeTile.getLeftSide(), runeTile.getTopSide());
 
-                lastEnchantmentSpawnTime = currentTime;
+                    // Schedule expiration
+                    enchantment.startExpirationTimer(6000, () -> {
+                        activeEnchantments.remove(enchantment);
+                        view.removeEnchantmentView(enchantment);
+                    });
+
+                    lastEnchantmentSpawnTime = currentTime;
+                }
+            } else {
+                // Spawn other enchantments at random empty tiles
+                Tile randomTile = getRandomEmptyTile();
+                if (randomTile != null) {
+                    activeEnchantments.add(enchantment);
+                    view.addEnchantmentView(enchantment, randomTile.getLeftSide(), randomTile.getTopSide());
+
+                    // Schedule expiration
+                    enchantment.startExpirationTimer(6000, () -> {
+                        activeEnchantments.remove(enchantment);
+                        view.removeEnchantmentView(enchantment);
+                    });
+
+                    lastEnchantmentSpawnTime = currentTime;
+                }
             }
         }
     }
@@ -247,37 +269,39 @@ public class PlayModeController extends Application {
             Rectangle enchantmentView = entry.getValue();
 
             if (enchantmentView.contains(mouseX, mouseY)) {
+                if (!activeEnchantments.contains(enchantment)) {
+                    System.out.println("Enchantment already collected or expired: " + enchantment.getType());
+                    return; // Avoid double collection
+                }
+
                 System.out.println("Clicked on enchantment: " + enchantment.getType());
 
                 // Process enchantment based on its type
                 switch (enchantment.getType()) {
                     case EXTRA_TIME -> {
-                        System.out.println(view.getTimeRemaining());
                         addTime(5);
-
-                        System.out.println("5 swconds added");
-                        //view.updateTime(time);// Add 5 seconds to the timer
-                        System.out.println(view.getTimeRemaining());
+                        System.out.println("5 seconds added");
+                        activeEnchantments.remove(enchantment);
                     }
                     case EXTRA_LIFE -> {
-                        hero.increaseLives(1); // Implement this method to increase hero life
+                        hero.increaseLives(1);
                         view.updateHeroLife(hero.getLiveCount());
+                        activeEnchantments.remove(enchantment);
                     }
-                    case REVEAL -> inventory.addEnchantment(Enchantment.Type.REVEAL);
-                    case CLOAK_OF_PROTECTION -> inventory.addEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION);
-                    case LURING_GEM -> inventory.addEnchantment(Enchantment.Type.LURING_GEM);
-                    default -> throw new IllegalStateException("Unexpected value: " + enchantment.getType());
+                    default -> {
+                        view.collectEnchantment(enchantment, inventory);
+                        activeEnchantments.remove(enchantment);
+                    }
                 }
 
-                // Update inventory view and remove the enchantment from the game
-                inventoryView.updateInventory(inventory);
-                activeEnchantments.remove(enchantment);
                 view.removeEnchantmentView(enchantment);
-                System.out.println(inventory.getEnchantments());
+
+                System.out.println("Updated inventory: " + inventory.getEnchantments());
                 break;
             }
         }
     }
+
 
 
     public void addTime(int seconds) {
@@ -308,37 +332,41 @@ public class PlayModeController extends Application {
         }
     }
 
-    public void useLuringGem(String direction) {
-        Enchantment.Type type = Enchantment.Type.LURING_GEM;
-        if (hero.getEnchantments().containsKey(type)) {
-            hero.consumeEnchantment(type);
-            Directions dir = switch (direction.toUpperCase()) {
-                case "W" -> Directions.NORTH;
-                case "A" -> Directions.WEST;
-                case "S" -> Directions.SOUTH;
-                case "D" -> Directions.EAST;
-                default -> null;
-            };
-            if (dir != null) {
-                playModeGrid.lureMonsters(hero.getPosX(), hero.getPosY(), dir);
-            }
-        }
-    }
     private void handleKeyPressed(KeyEvent event) {
         String keyText = event.getText().toLowerCase(); // Get the key text in lowercase
 
         switch (keyText) {
             case "w":
-                upPressed = true;
+                if (luringGemActivated) {
+                    useLuringGem("W");
+                    luringGemActivated = false; // Reset the activation
+                } else {
+                    upPressed = true;
+                }
                 break;
             case "s":
-                downPressed = true;
+                if (luringGemActivated) {
+                    useLuringGem("S");
+                    luringGemActivated = false;
+                } else {
+                    downPressed = true;
+                }
                 break;
             case "a":
-                leftPressed = true;
+                if (luringGemActivated) {
+                    useLuringGem("A");
+                    luringGemActivated = false;
+                } else {
+                    leftPressed = true;
+                }
                 break;
             case "d":
-                rightPressed = true;
+                if (luringGemActivated) {
+                    useLuringGem("D");
+                    luringGemActivated = false;
+                } else {
+                    rightPressed = true;
+                }
                 break;
             case "\u001b": // Escape key (ASCII escape character)
                 if (!escPressedFlag) {
@@ -346,37 +374,81 @@ public class PlayModeController extends Application {
                     escPressedFlag = true;
                 }
                 break;
-            case "r" : {
+            case "r" :{
                 if (inventory.useEnchantment(Enchantment.Type.REVEAL)) {
-                    inventoryView.updateInventory(inventory);
                     Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
                     Enchantment.highlightRevealArea(playModeGrid, runeTile, view);
-                    System.out.println("reveal used");
+                    view.updateInventoryUI(inventory.getEnchantments());
+                    System.out.println("Reveal used");
+                } else {
+                    System.out.println("No Reveal enchantment available!");
                 }
+                break;
             }
             case "p" : {
                 if (inventory.useEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION)) {
-                    inventoryView.updateInventory(inventory);
                     hero.setProtected(true);
-                    System.out.println("cloak used");
+                    view.updateInventoryUI(inventory.getEnchantments());
+                    System.out.println("Cloak of Protection used");
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             hero.setProtected(false);
                         }
                     }, 20000); // Cloak lasts for 20 seconds
+                } else {
+                    System.out.println("No Cloak of Protection enchantment available!");
                 }
+                break;
             }
             case "b" : {
                 if (inventory.useEnchantment(Enchantment.Type.LURING_GEM)) {
-                    inventoryView.updateInventory(inventory);
-                    System.out.println("lure used");
-                    // Add logic to determine direction and lure monsters
+                    luringGemActivated = true; // Enable direction selection
+                    view.updateInventoryUI(inventory.getEnchantments());
+                    System.out.println("Luring Gem activated! Choose a direction.");
+                } else {
+                    System.out.println("No Luring Gem enchantment available!");
                 }
+                break;
             }
+
             default:
                 // Handle unrecognized keys if necessary
                 break;
+        }
+    }
+
+    public void useLuringGem(String direction) {
+        if (luringGemActivated) {
+            // Get hero's current position
+            int heroX = hero.getPosX();
+            int heroY = hero.getPosY();
+
+            // Determine the target position based on direction
+            int targetX = heroX, targetY = heroY;
+            switch (direction.toUpperCase()) {
+                case "W" -> targetY--; // Up
+                case "A" -> targetX--; // Left
+                case "S" -> targetY++; // Down
+                case "D" -> targetX++; // Right
+            }
+
+            if (playModeGrid.indexInRange(targetX, targetY)) {
+                // Add visual indication of the lure
+                Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
+                view.highlightTile(targetTile, true);
+
+                // Notify MonsterManager to lure fighter monsters
+                monsterManager.lureFighterMonsters(targetX, targetY);
+
+                // Remove the lure highlight after 2 seconds
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Platform.runLater(() -> view.highlightTile(targetTile, false));
+                    }
+                }, 2000);
+            }
         }
     }
 
@@ -478,12 +550,15 @@ public class PlayModeController extends Application {
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
                     int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
 
-                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate);
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, now);
 
                     lastMonsterSpawnTime = now;
-                }
 
-                monsterManager.moveAndActAllMonsters(now, PlayModeController.this);
+
+                }
+                monsterManager.actAllMonsters(now, PlayModeController.this);
+
+                monsterManager.moveAllMonsters(now);
 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -528,7 +603,30 @@ public class PlayModeController extends Application {
         }
         System.out.println("Game loop stopped.");
     }
+    public Grid resolveAllMovingCharacters() {
+        Grid resolvedGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
+        resolvedGrid.copyTileMap(playModeGrid);
 
+        if (hero.isMoving) {
+            Tile heroTile = resolvedGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+            Tile destinationTile = resolvedGrid.findTileUsingDirection(heroTile, hero.movingDirection);
+
+            heroTile.changeTileType(hero.getCharType());
+            destinationTile.changeTileType('E');
+        }
+
+        for (Monster monster: monsterManager.monsterList) {
+            if (monster.isMoving) {
+                Tile monsterTile = resolvedGrid.findTileWithIndex(monster.posX, monster.posY);
+                Tile destinationTile = resolvedGrid.findTileUsingDirection(monsterTile, monster.movingDirection);
+
+                monsterTile.changeTileType('E');
+                destinationTile.changeTileType(monster.getCharType());
+            }
+        }
+
+        return resolvedGrid;
+    }
     private void togglePause() {
         if (isRunning){
             stopGameLoop();

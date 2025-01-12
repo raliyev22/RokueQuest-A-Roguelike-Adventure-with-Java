@@ -5,7 +5,8 @@ import javafx.scene.image.Image;
 public abstract class Monster {
     public final int speed = 5;
     public MonsterType type;
-
+    public long spawnTime = 0;
+    public long lastActTime = 0;
     public int posX, posY; // position on grid
 
     public int targetX, targetY; // location of where the monsterView will go to
@@ -68,6 +69,14 @@ public abstract class Monster {
 
     public int getX() {return posX;}
     public int getY() {return posY;}
+
+    public long getLastActTime() {
+        return lastActTime;
+    }
+
+    public void setLastActTime(long lastActTime) {
+        this.lastActTime = lastActTime;
+    }
 
     public long getLastRuneTeleportation() {
         return lastRuneTeleportation;

@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import main.controller.PlayModeController;
 import main.utils.Grid;
@@ -63,10 +64,10 @@ public class Enchantment {
     // Get the image representation for this enchantment
     public Image getImage() {
         return switch (type) {
-            case EXTRA_TIME -> Images.IMAGE_CUBE_x2;
+            case EXTRA_TIME ->  Images.IMAGE_TRANSPARENT;
             case EXTRA_LIFE -> Images.IMAGE_CHESTHEARTOPEN_x2;
             case CLOAK_OF_PROTECTION -> Images.IMAGE_CLOAK_x2;
-            case LURING_GEM -> Images.IMAGE_ALLURE_x4;
+            case LURING_GEM -> Images.IMAGE_ALLURE_X2;
             case REVEAL -> Images.IMAGE_REVEAL_x2;
         };
     }

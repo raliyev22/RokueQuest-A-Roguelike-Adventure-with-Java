@@ -1,5 +1,7 @@
 package main.model;
 
+import javafx.scene.image.Image;
+
 import java.util.HashMap;
 
 public class Hero {
@@ -17,10 +19,13 @@ public class Hero {
 	public Directions movingDirection;
 	public Directions facingDirection;
 	private boolean isProtected;
-
+	public long lastDamagedFrame = 0;
+	private boolean isTeleported=false;
+	private Image sprite;
+	private int takingDamageAnimationCounter = 0;
+	private final int TAKING_DAMAGE_ANIMATION_LOOP = 3;
 	private HashMap<Enchantment.Type, Integer> enchantments;
 
-	private boolean isTeleported = false;
 
 	public Hero(int posX, int posY) {
 		this.posX = posX;
@@ -31,6 +36,14 @@ public class Hero {
 		this.isProtected = false;
 		this.facingDirection = Directions.EAST;
 		this.enchantments = new HashMap<>();
+		sprite = Images.IMAGE_PLAYERRIGHT_x4;
+	}
+	public Image getSprite() {
+		return this.sprite;
+	}
+
+	public void setSprite(Image newSprite) {
+		this.sprite = newSprite;
 	}
 
 	public void move(Directions direction) {
@@ -40,6 +53,14 @@ public class Hero {
 			case EAST -> posX++;
 			case WEST -> posX--;
 			default -> throw new IllegalArgumentException("Invalid direction");
+		}
+	}
+
+	public void increaseTakingDamageAnimationCounter() {
+		if (this.takingDamageAnimationCounter <= this.TAKING_DAMAGE_ANIMATION_LOOP) {
+			this.takingDamageAnimationCounter += 1;
+		} else {
+			this.takingDamageAnimationCounter = 0;
 		}
 	}
 
@@ -78,11 +99,14 @@ public class Hero {
 	}
 
 	public void decreaseLives() {
-		if (remainingLives > 0) {
+		if (!isProtected && remainingLives > 0) { // Only decrease if not protected
 			remainingLives--;
 		}
 	}
 
+	public int getTakingDamageAnimationCounter() {
+		return this.takingDamageAnimationCounter;
+	}
 	public int getLiveCount() {
 		return remainingLives;
 	}
