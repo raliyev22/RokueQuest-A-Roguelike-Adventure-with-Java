@@ -4,26 +4,24 @@ import java.util.HashMap;
 
 public class Hero {
 	public final int maxLives = 4;
-    public final int speed = 4;
+	public final int speed = 4;
 
 	private int posX, posY;
-    private int remainingLives;
+	private int remainingLives;
 
-    public int targetX, targetY;
-    public int currentX, currentY;
+	public int targetX, targetY;
+	public int currentX, currentY;
 
 	public boolean isMoving;
 	public boolean isTakingDamage;
-    public Directions movingDirection;
+	public Directions movingDirection;
 	public Directions facingDirection;
 	private boolean isProtected;
 
 	private HashMap<Enchantment.Type, Integer> enchantments;
 
+	private boolean isTeleported = false;
 
-	private boolean isTeleported=false;
-	
-	
 	public Hero(int posX, int posY) {
 		this.posX = posX;
 		this.posY = posY;
@@ -37,21 +35,14 @@ public class Hero {
 
 	public void move(Directions direction) {
 		switch (direction) {
-			case NORTH -> {
-				posY--;
-			}
-			case SOUTH -> {
-				posY++;
-			}
-			case EAST -> {
-				posX++;
-			}
-			case WEST -> {
-				posX--;
-			}
+			case NORTH -> posY--;
+			case SOUTH -> posY++;
+			case EAST -> posX++;
+			case WEST -> posX--;
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
+
 	public boolean isProtected() {
 		return isProtected;
 	}
@@ -61,10 +52,6 @@ public class Hero {
 	}
 
 	public void addEnchantment(Enchantment.Type type) {
-		enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
-	}
-
-	public void addToBag(Enchantment.Type type) {
 		enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
 	}
 
@@ -82,52 +69,49 @@ public class Hero {
 	public HashMap<Enchantment.Type, Integer> getEnchantments() {
 		return enchantments;
 	}
-	public void increaseLives(int num){
+
+	public void increaseLives(int num) {
 		remainingLives += num;
-		if(remainingLives > maxLives){
+		if (remainingLives > maxLives) {
 			remainingLives = maxLives;
 		}
 	}
-	
+
 	public void decreaseLives() {
-		if(remainingLives>0){
+		if (remainingLives > 0) {
 			remainingLives--;
 		}
-		
 	}
-	
-	public int getLiveCount(){
+
+	public int getLiveCount() {
 		return remainingLives;
 	}
-	
+
 	public int getPosX() {
 		return posX;
 	}
-	
+
 	public int getPosY() {
 		return posY;
 	}
-	public void setPosY(int pos){
-		this.posY= pos;
-	}
-	public void setPosX(int pos){
-		this.posX = pos;
-	}
-	
-	public char getCharType() {
-		if (this.facingDirection == Directions.WEST) {
-			return 'L';
-		}
-		else {
-			return 'R';
-		}
+
+	public void setPosY(int pos) {
+		this.posY = pos;
 	}
 
-	public Boolean getIsTeleported(){
+	public void setPosX(int pos) {
+		this.posX = pos;
+	}
+
+	public char getCharType() {
+		return this.facingDirection == Directions.WEST ? 'L' : 'R';
+	}
+
+	public Boolean getIsTeleported() {
 		return this.isTeleported;
 	}
 
-	public void setIsTeleported(Boolean bool){
+	public void setIsTeleported(Boolean bool) {
 		this.isTeleported = bool;
 	}
 }

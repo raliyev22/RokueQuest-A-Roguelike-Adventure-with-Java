@@ -1,4 +1,5 @@
 package main.view;
+import javafx.scene.input.KeyEvent;
 import main.Main;
 import main.model.HallType;
 import main.model.Images;
@@ -23,7 +24,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
+// javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -183,7 +184,7 @@ public class BuildModeView extends Application {
 
 
         HBox buttonContainer = new HBox(10);
-		buttonContainer.setAlignment(javafx.geometry.Pos.CENTER);
+		buttonContainer.setStyle("-fx-alignment: center;");
         buttonContainer.setLayoutX(toolboxX+18);
         buttonContainer.setLayoutY(toolboxHeight-30);
 
@@ -327,16 +328,22 @@ public class BuildModeView extends Application {
     pane.getChildren().add(buttonContainer);
 
     //Hide the rune in one of the objects for each hall
-    scene.setOnKeyPressed(event -> {
-        if (event.getCode() == KeyCode.S) {
-            for (TiledHall hall : halls) {
-                runeLocationList.add(getRuneLocatiom(hall));
+        scene.setOnKeyPressed((KeyEvent event) -> {
+            switch (event.getText().toLowerCase()) {
+                case "s" -> {
+                    for (TiledHall hall : halls) {
+                        runeLocationList.add(getRuneLocatiom(hall));
+                    }
+                }
+                case "r" -> {
+                    if (!runeLocationList.isEmpty()) {
+                        useRevealEnchantment(runeLocationList.get(0), hall1);
+                    }
+                }
             }
-        } else if (event.getCode() == KeyCode.R) {
-            useRevealEnchantment(runeLocationList.get(0), hall1);
-        }
-    });
+        });
     }
+
 
     private void setHallPosition(TiledHall hall, int x, int y) {
         hall.setLayoutX(x);

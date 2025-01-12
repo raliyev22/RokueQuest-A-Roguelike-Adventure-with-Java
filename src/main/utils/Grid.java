@@ -79,13 +79,20 @@ public class Grid {
 		return tileType == 'A' || tileType == 'F' || tileType == 'W'; // Monster types
 	}
 
-	public Monster getMonsterFromTile(Tile tile) {
-		// Retrieve the monster instance based on tile coordinates
-		// Assuming monsters are managed elsewhere (e.g., MonsterManager)
-		return MonsterManager.getMonsterAtPosition(findXofTile(tile), findYofTile(tile));
+	public void setMonsterManager(MonsterManager monsterManager) {
+		this.monsterManager = monsterManager;
 	}
-    
-    // Creating a tile map using other variables
+
+	public Monster getMonsterFromTile(Tile tile) {
+		if (monsterManager == null) {
+			throw new IllegalStateException("MonsterManager is not set for Grid.");
+		}
+		int x = findXofTile(tile);
+		int y = findYofTile(tile);
+		return monsterManager.getMonsterAtPosition(x, y);
+	}
+
+	// Creating a tile map using other variables
     private List<Tile> createTileMap(int rowLength, int columnLength, 
     int tileWidth, int tileHeight, int topLeftXCoordinate, int topLeftYCoordinate) {
         

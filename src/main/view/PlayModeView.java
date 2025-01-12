@@ -32,6 +32,7 @@ import main.controller.MonsterManager;
 import main.controller.PlayModeController;
 import main.model.Enchantment;
 import main.model.Images;
+import main.model.Inventory;
 import main.model.Monster;
 import main.utils.Grid;
 import main.utils.SoundEffects;
@@ -39,6 +40,8 @@ import main.utils.Tile;
 
 
 public class PlayModeView {
+	protected InventoryView inventoryView; // Add InventoryView
+	private VBox uiContainer; // UI Containe
 	protected Pane pane;
 	protected Scene scene;
 	protected int tileSize = 64;
@@ -56,10 +59,10 @@ public class PlayModeView {
 	SoundEffects soundPlayer = SoundEffects.getInstance();
 	private PlayModeController playModeController;
 	private HashMap<Enchantment.Type, Label> bagLabels;
-
+	private HashMap<Enchantment, Rectangle> enchantmentViews;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
-	
+
 	public PlayModeView(Grid grid, double time, Stage primaryStage) {
 		this.grid = grid;
 		this.time = time;
@@ -93,18 +96,17 @@ public class PlayModeView {
 		}
 	}
 
-	public void displayEnchantment(Enchantment enchantment) {
-		Rectangle rect = new Rectangle(40, 40, Color.GOLD);
-		rect.setLayoutX(enchantment.getPosX() * 40);
-		rect.setLayoutY(enchantment.getPosY() * 40);
-		rect.setId("enchantment-" + enchantment.getType());
-		pane.getChildren().add(rect);
-	}
+
 
 	public void removeEnchantment(Enchantment enchantment) {
 		pane.getChildren().removeIf(node -> node.getId() != null &&
 				node.getId().equals("enchantment-" + enchantment.getType()));
 	}
+	public HashMap<Enchantment, Rectangle> getEnchantmentViews() {
+		return enchantmentViews;
+	}
+
+
 
 	public void highlightTile(Tile tile, boolean highlight) {
 		Rectangle rect = new Rectangle(40, 40);
@@ -121,13 +123,10 @@ public class PlayModeView {
 		}
 	}
 
-	public void updateTime(int timeRemaining) {
-		// Update a UI label showing the time remaining
-	}
 
-	public int getTimeRemaining() {
+	public double getTimeRemaining() {
 		// Return the current time remaining
-		return 0;
+		return time;
 	}
 
 	public int getRuneXCoordinate() {
@@ -145,8 +144,11 @@ public class PlayModeView {
 		pane.getChildren().clear();
 		initialize();
 	}
-	
 
+
+	public void updateInventoryView(Inventory inventory) {
+		inventoryView.updateInventory(inventory); // Delegate to InventoryView
+	}
 	public void initialize() {
 		if (scene == null) {
 			scene = new Scene(pane);
@@ -155,7 +157,12 @@ public class PlayModeView {
         monsterViews = new ArrayList<>();
 
         soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
-		
+		enchantmentViews = new HashMap<Enchantment, Rectangle>();
+		uiContainer = new VBox(10); // Create a vertical box for UI
+		inventoryView = new InventoryView(); // Initialize InventoryView
+		uiContainer.getChildren().add(inventoryView.getInventoryBox()); // Add InventoryView to UI
+
+		pane.getChildren().add(uiContainer);
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
 			BackgroundRepeat.REPEAT,
@@ -247,6 +254,7 @@ public class PlayModeView {
     inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
     inventory.setTranslateY(100);
 
+
     uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
     pane.getChildren().add(uiContainer);
 
@@ -311,6 +319,44 @@ public class PlayModeView {
 		pauseButton.setPrefWidth(40);
 		pauseButton.setPrefHeight(40);
     }
+
+	public void addEnchantmentView(Enchantment enchantment, double x, double y) {
+		Rectangle enchantmentView = new Rectangle(tileSize, tileSize);
+		enchantmentView.setFill(new ImagePattern(enchantment.getImage()));
+		enchantmentView.setX(x);
+		enchantmentView.setY(y);
+		enchantmentView.setId("enchantment-" + enchantment.hashCode());
+
+		enchantmentViews.put(enchantment, enchantmentView);
+		pane.getChildren().add(enchantmentView);
+	}
+
+	/**
+	 * Removes an enchantment from the screen.
+	 *
+	 * @param enchantment The enchantment to remove.
+	 */
+	public void removeEnchantmentView(Enchantment enchantment) {
+		Rectangle enchantmentView = enchantmentViews.remove(enchantment);
+		if (enchantmentView != null) {
+			pane.getChildren().remove(enchantmentView);
+		}
+	}
+
+	/**
+	 * Updates the position of an enchantment on the screen.
+	 *
+	 * @param enchantment The enchantment to update.
+	 * @param x The new x-coordinate of the enchantment.
+	 * @param y The new y-coordinate of the enchantment.
+	 */
+	public void updateEnchantmentPosition(Enchantment enchantment, double x, double y) {
+		Rectangle enchantmentView = enchantmentViews.get(enchantment);
+		if (enchantmentView != null) {
+			enchantmentView.setX(x);
+			enchantmentView.setY(y);
+		}
+	}
 
 	public void hidePauseGame() {
         pauseOverlay.setVisible(false);
@@ -390,12 +436,14 @@ public class PlayModeView {
             }
         }
     }
-    
+
+
+
     public Rectangle createMonsterView(Monster monster) {
         Rectangle monsterView = new Rectangle(monster.currentX, monster.currentY, tileSize, tileSize);
-        
-        monsterView.setFill(new ImagePattern(MonsterManager.getMonsterImage(monster)));
-        pane.getChildren().add(monsterView);
+
+		monsterView.setFill(new ImagePattern(MonsterManager.getMonsterImage(monster)));
+		pane.getChildren().add(monsterView);
         
         monsterViews.add(monsterView);
         updateMonsterPosition(monsterView, monster.currentX, monster.currentY);

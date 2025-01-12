@@ -247,7 +247,23 @@ public class Images extends Application {
 		
 		return null;
 	}
-	
+	public static Image convertEnchantmentToImage(Enchantment.Type type) {
+		switch (type) {
+			case EXTRA_TIME:
+				return IMAGE_CUBE_x2; // Replace with actual image
+			case REVEAL:
+				return IMAGE_REVEAL_x2;
+			case CLOAK_OF_PROTECTION:
+				return IMAGE_CLOAK_x2;
+			case LURING_GEM:
+				return IMAGE_ALLURE_x4;
+			case EXTRA_LIFE:
+				return IMAGE_CHESTHEARTOPEN_x2;
+			default:
+				return null;
+		}
+	}
+
 	public static void main(String[] args) {
 		for (char c = 'A'; c <= 'W'; c++) {
 			if (c == 'I' || c == 'U' || c == 'V') {
