@@ -1,6 +1,5 @@
 package main.utils;
 
-import java.awt.font.NumericShaper;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,10 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import javafx.util.Pair;
-import main.controller.PlayModeController;
 import main.model.Directions;
-import main.model.Monster;
-import main.controller.MonsterManager;
 
 // This class creates tile-maps. Maybe it will have utility functions too
 public class Grid {
@@ -23,13 +19,12 @@ public class Grid {
     public int topLeftXCoordinate;
     public int topLeftYCoordinate;
     protected List<Tile> tileMap;
-	protected MonsterManager monsterManager;
     
     public Grid(int rowLength, int columnLength, int tileWidth, int tileHeight, 
     int topLeftXCoordinate, int topLeftYCoordinate) {
         super();
         if ((rowLength <= 0) || (columnLength <= 0) || (tileWidth <= 0) || (tileHeight <= 0))
-        System.err.println("Non-positive number while creating tile map.");
+            System.err.println("Non-positive number while creating tile map.");
         
         this.rowLength = rowLength;
         this.columnLength = columnLength;
@@ -40,59 +35,8 @@ public class Grid {
         this.tileMap = createTileMap(rowLength, columnLength, 
         tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
     }
-
-	public void lureMonsters(int heroPosX, int heroPosY, Directions dir) {
-		List<Monster> nearbyMonsters = findMonstersAdjacentToHero(heroPosX, heroPosY);
-
-		for (Monster monster : nearbyMonsters) {
-			Tile currentTile = findTileWithIndex(monster.getX(), monster.getY());
-			Tile targetTile = findTileUsingDirection(currentTile, dir);
-
-			if (targetTile != null && isWalkableTile(targetTile)) {
-				// Move monster to the new tile
-				changeTileWithIndex(monster.getX(), monster.getY(), 'E'); // Clear current tile
-				monster.move(dir);
-				changeTileWithIndex(monster.getX(), monster.getY(), monster.getCharType());
-			}
-		}
-	}
-
-	private List<Monster> findMonstersAdjacentToHero(int heroPosX, int heroPosY) {
-		List<Monster> adjacentMonsters = new ArrayList<>();
-		Tile heroTile = findTileWithIndex(heroPosX, heroPosY);
-
-		for (Directions dir : Directions.values()) {
-			Tile adjacentTile = findTileUsingDirection(heroTile, dir);
-			if (adjacentTile != null && isMonsterTile(adjacentTile)) {
-				Monster monster = getMonsterFromTile(adjacentTile);
-				if (monster != null) {
-					adjacentMonsters.add(monster);
-				}
-			}
-		}
-
-		return adjacentMonsters;
-	}
-
-	private boolean isMonsterTile(Tile tile) {
-		char tileType = tile.getTileType();
-		return tileType == 'A' || tileType == 'F' || tileType == 'W'; // Monster types
-	}
-
-	public void setMonsterManager(MonsterManager monsterManager) {
-		this.monsterManager = monsterManager;
-	}
-
-	public Monster getMonsterFromTile(Tile tile) {
-		if (monsterManager == null) {
-			throw new IllegalStateException("MonsterManager is not set for Grid.");
-		}
-		int x = findXofTile(tile);
-		int y = findYofTile(tile);
-		return monsterManager.getMonsterAtPosition(x, y);
-	}
-
-	// Creating a tile map using other variables
+    
+    // Creating a tile map using other variables
     private List<Tile> createTileMap(int rowLength, int columnLength, 
     int tileWidth, int tileHeight, int topLeftXCoordinate, int topLeftYCoordinate) {
         
@@ -126,6 +70,13 @@ public class Grid {
         return tileM;
     }
     
+    
+    /** 
+     * Copy a tile map of one grid to another. Note that the dimensions of the grids must match in
+     * order to copy from one onto another. Note that this function also changes '!'s into 'E's,
+     * as '!'s are only useful within build mode and should be changed into 'E's before being used.
+     * @param otherGrid the other grid that supplies the copied tileMap
+     */
     public void copyTileMap(Grid otherGrid) {
         if (otherGrid == null) {
             return ;
@@ -169,365 +120,404 @@ public class Grid {
     
     public boolean indexInRange(int x, int y) {
         return ((x >= 0) && (x < this.rowLength) && (y >= 0) && (y < this.columnLength));
-	}
-	
-	public Tile findTileWithIndex(int x, int y) {
-		if (indexInRange(x, y)) {
-			return tileMap.get(tileIndex(x, y));
-		} else {
-			return null;
-		}
-	}
-	
-	public void changeTileWithIndex(int x, int y, char c) {
-		if (indexInRange(tileIndex(x, y))) {
-			Tile currentTile = findTileWithIndex(x, y);
-			currentTile.changeTileType(c);
-		}
-	}
-
-	public Pair<Integer, Integer> findCoordinatesofTile(int index) {
-		int x = index % this.rowLength;
-		int y = index / this.rowLength;
-
-		Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
-		return coordinates;
-	}
-
-	public int findXofTile(Tile tile) {
-		int leftSide = tile.leftSide;
-
-		int x = (leftSide - this.topLeftXCoordinate) / this.tileWidth;
-		return x;
-	}
-
-	public int findYofTile(Tile tile) {
-		int topSide = tile.topSide;
-
-		int y = (topSide - this.topLeftYCoordinate) / this.tileHeight;
-		return y;
-	}
-
-	public boolean twoTilesAreNeighbours(Tile firstTile, Tile secondTile) {
-		int firstTileX = findXofTile(firstTile);
-		int firstTileY = findYofTile(firstTile);
-		int secondTileX = findXofTile(secondTile);
-		int secondTileY = findYofTile(secondTile);
-		if (((firstTileX - secondTileX) <= 1) && ((firstTileY - secondTileY) <= 1)) {
-			return true;
-		}
-		return false;
-	}
-
-	public Pair<Integer, Integer> findCoordinatesofTile(Tile tile) {
-		int x = findXofTile(tile);
-		int y = findYofTile(tile);
-
-		Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
-		return coordinates;
-	}
-
-	public boolean isTopTile(Tile tile) {
-		int y = findYofTile(tile);
-
-		return (y == 0);
-	}
-
-	public boolean isLeftTile(Tile tile) {
-		int x = findXofTile(tile);
-
-		return (x == 0);
-	}
-
-	public boolean isBottomTile(Tile tile) {
-		int y = findYofTile(tile);
-
-		return (y == this.columnLength - 1);
-	}
-
-	public boolean isRightTile(Tile tile) {
-		int x = findXofTile(tile);
-
-		return (x == this.rowLength - 1);
-	}
-
-	// Finds the above tile
-	public Tile findNorthTile(Tile currentTile) {
-		if (isTopTile(currentTile)) {
-			return null;
-		} else {
-			int x = findXofTile(currentTile);
-			int y = findYofTile(currentTile);
-			int newY = y - 1;
-
-			Tile aboveTile = findTileWithIndex(x, newY);
-			return aboveTile;
-		}
-	}
-
-	// Finds the below tile
-	public Tile findSouthTile(Tile currentTile) {
-		if (isBottomTile(currentTile)) {
-			return null;
-		} else {
-			int x = findXofTile(currentTile);
-			int y = findYofTile(currentTile);
-			int newY = y + 1;
-
-			Tile belowTile = findTileWithIndex(x, newY);
-			return belowTile;
-		}
-	}
-
-	// Finds the right tile
-	public Tile findEastTile(Tile currentTile) {
-		if (isRightTile(currentTile)) {
-			return null;
-		} else {
-			int x = findXofTile(currentTile);
-			int y = findYofTile(currentTile);
-			int newX = x + 1;
-
-			Tile rightTile = findTileWithIndex(newX, y);
-			return rightTile;
-		}
-	}
-
-	// Finds the left tile
-	public Tile findWestTile(Tile currentTile) {
-		if (isLeftTile(currentTile)) {
-			return null;
-		} else {
-			int x = findXofTile(currentTile);
-			int y = findYofTile(currentTile);
-			int newX = x - 1;
-
-			Tile leftTile = findTileWithIndex(newX, y);
-			return leftTile;
-		}
-	}
-
+    }
+    
+    
+    /** 
+    * Return the tile from the tileMap using the given indices.
+    * @param x X index of the tile, x must be between 0 and rowLength - 1 (inclusive)
+    * @param y Y index of the tile, y must be between 0 and columnLength - 1 (inclusive)
+    * @return Tile the desired tile. Returns null if the index is not in range.
+    */
+    public Tile findTileWithIndex(int x, int y) {
+        if (indexInRange(x, y)) {
+            return tileMap.get(tileIndex(x, y));
+        } else {
+            return null;
+        }
+    }
+    
+    
+    /** 
+    * Find and change the type of a tile using the x and y indices.
+    * @param x X index of the tile, x must be between 0 and rowLength - 1 (inclusive)
+    * @param y Y index of the tile, y must be between 0 and columnLength - 1 (inclusive)
+    * @param c the character that the type will change into.
+    */
+    public void changeTileWithIndex(int x, int y, char c) {
+        if (indexInRange(x, y)) {
+            Tile currentTile = findTileWithIndex(x, y);
+            currentTile.changeTileType(c);
+        }
+    }
+    
+    public Pair<Integer, Integer> findCoordinatesofTile(int index) {
+        int x = index % this.rowLength;
+        int y = index / this.rowLength;
+        
+        Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
+        return coordinates;
+    }
+    
+    public int findXofTile(Tile tile) {
+        int leftSide = tile.leftSide;
+        
+        int x = (leftSide - this.topLeftXCoordinate) / this.tileWidth;
+        return x;
+    }
+    
+    public int findYofTile(Tile tile) {
+        int topSide = tile.topSide;
+        
+        int y = (topSide - this.topLeftYCoordinate) / this.tileHeight;
+        return y;
+    }
+    
+    
+    /** 
+    * Returns whether or not two tiles are neighbours. Neighbour in this context means that they share
+    * a common vertex. Note that by convention a tile is neighbours with itself.
+    * @param firstTile the first tile that is checked.
+    * @param secondTile the second tile that is checked.
+    * @return boolean returns true if two tiles are neighbours, false otherwise.
+    */
+    public boolean twoTilesAreNeighbours(Tile firstTile, Tile secondTile) {
+        int firstTileX = findXofTile(firstTile);
+        int firstTileY = findYofTile(firstTile);
+        int secondTileX = findXofTile(secondTile);
+        int secondTileY = findYofTile(secondTile);
+        if ((Math.abs(firstTileX - secondTileX) <= 1) && (Math.abs(firstTileY - secondTileY) <= 1)) {
+            return true;
+        }
+        return false;
+    }
+    
+    public Pair<Integer, Integer> findCoordinatesofTile(Tile tile) {
+        int x = findXofTile(tile);
+        int y = findYofTile(tile);
+        
+        Pair<Integer, Integer> coordinates = new Pair<Integer,Integer>(x, y);
+        return coordinates;
+    }
+    
+    public boolean isTopTile(Tile tile) {
+        int y = findYofTile(tile);
+        
+        return (y == 0);
+    }
+    
+    public boolean isLeftTile(Tile tile) {
+        int x = findXofTile(tile);
+        
+        return (x == 0);
+    }
+    
+    public boolean isBottomTile(Tile tile) {
+        int y = findYofTile(tile);
+        
+        return (y == this.columnLength - 1);
+    }
+    
+    public boolean isRightTile(Tile tile) {
+        int x = findXofTile(tile);
+        
+        return (x == this.rowLength - 1);
+    }
+    
+    
+    /** 
+     * Finds above/north tile.
+     * @param currentTile the tile that is used as reference.
+     * @return Tile the above tile.
+     */
+    public Tile findNorthTile(Tile currentTile) {
+        if (isTopTile(currentTile)) {
+            return null;
+        } else {
+            int x = findXofTile(currentTile);
+            int y = findYofTile(currentTile);
+            int newY = y - 1;
+            
+            Tile aboveTile = findTileWithIndex(x, newY);
+            return aboveTile;
+        }
+    }
+    
+    /** 
+     * Finds below/south tile.
+     * @param currentTile the tile that is used as reference.
+     * @return Tile the below tile.
+     */
+    public Tile findSouthTile(Tile currentTile) {
+        if (isBottomTile(currentTile)) {
+            return null;
+        } else {
+            int x = findXofTile(currentTile);
+            int y = findYofTile(currentTile);
+            int newY = y + 1;
+            
+            Tile belowTile = findTileWithIndex(x, newY);
+            return belowTile;
+        }
+    }
+    
+    /** 
+     * Finds right/east tile.
+     * @param currentTile the tile that is used as reference.
+     * @return Tile the right tile.
+     */
+    public Tile findEastTile(Tile currentTile) {
+        if (isRightTile(currentTile)) {
+            return null;
+        } else {
+            int x = findXofTile(currentTile);
+            int y = findYofTile(currentTile);
+            int newX = x + 1;
+            
+            Tile rightTile = findTileWithIndex(newX, y);
+            return rightTile;
+        }
+    }
+    
+    /** 
+     * Finds left/west tile.
+     * @param currentTile the tile that is used as reference.
+     * @return Tile the left tile.
+     */
+    public Tile findWestTile(Tile currentTile) {
+        if (isLeftTile(currentTile)) {
+            return null;
+        } else {
+            int x = findXofTile(currentTile);
+            int y = findYofTile(currentTile);
+            int newX = x - 1;
+            
+            Tile leftTile = findTileWithIndex(newX, y);
+            return leftTile;
+        }
+    }
+    
     // Finds walkable directions
     public List<Directions> findWalkableDirections(Tile tile) {
         ArrayList<Directions> walkableDirections = new ArrayList<>();
-		
-		Tile aboveTile = findNorthTile(tile);
-		if (aboveTile != null) {
+        
+        Tile aboveTile = findNorthTile(tile);
+        if (aboveTile != null) {
             if (isWalkableTile(aboveTile)) {
                 walkableDirections.add(Directions.NORTH);
             }
-		}
-
-		Tile belowTile = findSouthTile(tile);
-		if (belowTile != null) {
+        }
+        
+        Tile belowTile = findSouthTile(tile);
+        if (belowTile != null) {
             if (isWalkableTile(belowTile)) {
-			    walkableDirections.add(Directions.SOUTH);
+                walkableDirections.add(Directions.SOUTH);
             }
-		}
-
-		Tile rightTile = findEastTile(tile);
-		if (rightTile != null) {
+        }
+        
+        Tile rightTile = findEastTile(tile);
+        if (rightTile != null) {
             if (isWalkableTile(rightTile)) {
-			    walkableDirections.add(Directions.EAST);
+                walkableDirections.add(Directions.EAST);
             }
-		}
-		
-		Tile leftTile = findWestTile(tile);
-		if (leftTile != null) {
+        }
+        
+        Tile leftTile = findWestTile(tile);
+        if (leftTile != null) {
             if (isWalkableTile(leftTile)) {
-			    walkableDirections.add(Directions.WEST);
+                walkableDirections.add(Directions.WEST);
             }
-		}
-
-		return walkableDirections;
+        }
+        
+        return walkableDirections;
     }
-
-	// Finds which directions we can go to, only considering out of bounds.
-	public Set<Directions> findAvailableDirections(Tile tile) {
-		HashSet<Directions> availableDirections = new HashSet<>();
-		
-		Tile aboveTile = findNorthTile(tile);
-		if (aboveTile != null) {
-			availableDirections.add(Directions.NORTH);
-		}
-
-		Tile belowTile = findSouthTile(tile);
-		if (belowTile != null) {
-			availableDirections.add(Directions.SOUTH);
-		}
-
-		Tile rightTile = findEastTile(tile);
-		if (rightTile != null) {
-			availableDirections.add(Directions.EAST);
-		}
-		
-		Tile leftTile = findWestTile(tile);
-		if (leftTile != null) {
-			availableDirections.add(Directions.WEST);
-		}
-
-		return availableDirections;
-	}
-
-	public Set<Directions> findAvailableDirectionsWithIndex(int x, int y) {
-		Tile currentTile = findTileWithIndex(x, y);
-		
-		return findAvailableDirections(currentTile);
-	}
-
-	// Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
-	public Set<Tile> findAdjacentTiles(Tile tile) {
-		int x = findXofTile(tile);
-		int y = findYofTile(tile);
-
-		return findAdjacentTilesWithIndex(x, y);
-	}
-
-	// Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
-	public Set<Tile> findAdjacentTilesWithIndex(int x, int y) {
-		HashSet<Tile> adjacentTiles = new HashSet<>();
-
-		if (y > 0) {
-			Tile aboveTile = findTileWithIndex(x, y - 1);
-			adjacentTiles.add(aboveTile);
-		}
-		if (y + 1 < this.columnLength) {
-			Tile belowTile = findTileWithIndex(x, y + 1);
-			adjacentTiles.add(belowTile);
-		}
-		if (x > 0) {
-			Tile leftTile = findTileWithIndex(x - 1, y);
-			adjacentTiles.add(leftTile);
-		}
-		if (x + 1 < this.rowLength) {
-			Tile rightTile = findTileWithIndex(x + 1, y);
-			adjacentTiles.add(rightTile);
-		}
-
-		return adjacentTiles;
-	}
-
-	//Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
-	public Set<Tile> findNeighbouringTiles(Tile tile) {
-		int x = findXofTile(tile);
-		int y = findYofTile(tile);
-
-		return findNeighbouringTilesWithIndex(x, y);
-	}
-
-	//Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
-	public Set<Tile> findNeighbouringTilesWithIndex(int x, int y) {
-		HashSet<Tile> neighbouringTiles = new HashSet<>();
-
-		if (y > 0) {
-			Tile aboveTile = findTileWithIndex(x, y - 1);
-			neighbouringTiles.add(aboveTile);
-			if (x > 0) {
-				Tile aboveLeftTile = findTileWithIndex(x - 1, y - 1);
-				neighbouringTiles.add(aboveLeftTile);
-			}
-			if (x + 1 < this.rowLength) {
-				Tile aboveRightTile = findTileWithIndex(x + 1, y - 1);
-				neighbouringTiles.add(aboveRightTile);
-			}
-		}
-		if (y + 1 < this.columnLength) {
-			Tile belowTile = findTileWithIndex(x, y + 1);
-			neighbouringTiles.add(belowTile);
-
-			if (x > 0) {
-				Tile belowLeftTile = findTileWithIndex(x - 1, y + 1);
-				neighbouringTiles.add(belowLeftTile);
-			}
-			if (x + 1 < this.rowLength) {
-				Tile belowRightTile = findTileWithIndex(x + 1, y + 1);
-				neighbouringTiles.add(belowRightTile);
-			}
-		}
-		if (x > 0) {
-			Tile leftTile = findTileWithIndex(x - 1, y);
-			neighbouringTiles.add(leftTile);
-		}
-		if (x + 1 < this.rowLength) {
-			Tile rightTile = findTileWithIndex(x + 1, y);
-			neighbouringTiles.add(rightTile);
-		}
-
-		return neighbouringTiles;
-	}
-
-	// Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
-	public Set<Tile> findNxNSquare(Tile tile, int N) {
-		int x = findXofTile(tile);
-		int y = findYofTile(tile);
-
-		return findNxNSquareWithIndex(x, y, N);
-	}
-
-	// Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
-	public Set<Tile> findNxNSquareWithIndex(int x, int y, int N) {
-		if ((N > this.rowLength) || (N > this.columnLength)) {
-			Set<Tile> foo = new HashSet<>(this.tileMap);
-			return foo;
-		}
-
-		SecureRandom rng = new SecureRandom();
-
-		// The square needs to be within these bounds
-		int leftStart = Math.max(x - N + 1, 0);
-		int leftEnd = Math.min(x, this.rowLength - N);
-
-		int topStart = Math.max(y - N + 1, 0);
-		int topEnd = Math.min(y, this.columnLength - N);
-
-		// int possibleSquaresCount = (leftEnd - leftStart) * (topEnd - topStart);
-
-		int luckySquareX = rng.nextInt(leftStart, leftEnd + 1);
-		int luckySquareY = rng.nextInt(topStart, topEnd + 1);
-
-		HashSet<Tile> square = (HashSet<Tile>) constructRectangleOfTiles
-		(luckySquareX, luckySquareX + N - 1, luckySquareY, luckySquareY + N - 1);
-
-		return square;
-	}
-
-	public Set<Tile> constructRectangleOfTiles(int left, int right, int top, int bottom)  {
-		HashSet<Tile> rectangle = new HashSet<>();
-		for (int x = left; x <= right; x++) {
-			for (int y = top; y <= bottom; y++) {
-				Tile currTile = findTileWithIndex(x, y);
-
-				rectangle.add(currTile);
-			}
-		}
-
-		return rectangle;
-	}
-
-	// For coordinates x,y check if they are inside the grid or not
-	public boolean coordinatesAreInGrid(double x, double y) {
-		return ((x >= this.topLeftXCoordinate) 
-		&& (y >= this.topLeftYCoordinate)
-		&& (x < this.topLeftXCoordinate + this.rowLength * this.tileWidth)
-		&& (y < this.topLeftYCoordinate + this.columnLength * this.tileHeight));
-	}
-
-	// For coordinates x,y check which tile it is in
-	public Tile findTileUsingCoordinates(double x, double y) {
-		if (!coordinatesAreInGrid(x, y)) {
-			return null;
-		}
-
-		double tileX = Math.floor((x - this.topLeftXCoordinate) / this.tileWidth);
-		double tileY = Math.floor((y - this.topLeftYCoordinate) / this.tileHeight);
-
-		return findTileWithIndex((int) tileX, (int) tileY);
-	}
-
+    
+    // Finds which directions we can go to, only considering out of bounds.
+    public Set<Directions> findAvailableDirections(Tile tile) {
+        HashSet<Directions> availableDirections = new HashSet<>();
+        
+        Tile aboveTile = findNorthTile(tile);
+        if (aboveTile != null) {
+            availableDirections.add(Directions.NORTH);
+        }
+        
+        Tile belowTile = findSouthTile(tile);
+        if (belowTile != null) {
+            availableDirections.add(Directions.SOUTH);
+        }
+        
+        Tile rightTile = findEastTile(tile);
+        if (rightTile != null) {
+            availableDirections.add(Directions.EAST);
+        }
+        
+        Tile leftTile = findWestTile(tile);
+        if (leftTile != null) {
+            availableDirections.add(Directions.WEST);
+        }
+        
+        return availableDirections;
+    }
+    
+    public Set<Directions> findAvailableDirectionsWithIndex(int x, int y) {
+        Tile currentTile = findTileWithIndex(x, y);
+        
+        return findAvailableDirections(currentTile);
+    }
+    
+    // Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
+    public Set<Tile> findAdjacentTiles(Tile tile) {
+        int x = findXofTile(tile);
+        int y = findYofTile(tile);
+        
+        return findAdjacentTilesWithIndex(x, y);
+    }
+    
+    // Find adjacent tiles, i.e. tiles with connected edge. So this returns 4 tiles, plus shaped.
+    public Set<Tile> findAdjacentTilesWithIndex(int x, int y) {
+        HashSet<Tile> adjacentTiles = new HashSet<>();
+        
+        if (y > 0) {
+            Tile aboveTile = findTileWithIndex(x, y - 1);
+            adjacentTiles.add(aboveTile);
+        }
+        if (y + 1 < this.columnLength) {
+            Tile belowTile = findTileWithIndex(x, y + 1);
+            adjacentTiles.add(belowTile);
+        }
+        if (x > 0) {
+            Tile leftTile = findTileWithIndex(x - 1, y);
+            adjacentTiles.add(leftTile);
+        }
+        if (x + 1 < this.rowLength) {
+            Tile rightTile = findTileWithIndex(x + 1, y);
+            adjacentTiles.add(rightTile);
+        }
+        
+        return adjacentTiles;
+    }
+    
+    //Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
+    public Set<Tile> findNeighbouringTiles(Tile tile) {
+        int x = findXofTile(tile);
+        int y = findYofTile(tile);
+        
+        return findNeighbouringTilesWithIndex(x, y);
+    }
+    
+    //Find neighbouring tiles, i.e. tiles with common point. Returns 8 tiles for a tile in the middle.
+    public Set<Tile> findNeighbouringTilesWithIndex(int x, int y) {
+        HashSet<Tile> neighbouringTiles = new HashSet<>();
+        
+        if (y > 0) {
+            Tile aboveTile = findTileWithIndex(x, y - 1);
+            neighbouringTiles.add(aboveTile);
+            if (x > 0) {
+                Tile aboveLeftTile = findTileWithIndex(x - 1, y - 1);
+                neighbouringTiles.add(aboveLeftTile);
+            }
+            if (x + 1 < this.rowLength) {
+                Tile aboveRightTile = findTileWithIndex(x + 1, y - 1);
+                neighbouringTiles.add(aboveRightTile);
+            }
+        }
+        if (y + 1 < this.columnLength) {
+            Tile belowTile = findTileWithIndex(x, y + 1);
+            neighbouringTiles.add(belowTile);
+            
+            if (x > 0) {
+                Tile belowLeftTile = findTileWithIndex(x - 1, y + 1);
+                neighbouringTiles.add(belowLeftTile);
+            }
+            if (x + 1 < this.rowLength) {
+                Tile belowRightTile = findTileWithIndex(x + 1, y + 1);
+                neighbouringTiles.add(belowRightTile);
+            }
+        }
+        if (x > 0) {
+            Tile leftTile = findTileWithIndex(x - 1, y);
+            neighbouringTiles.add(leftTile);
+        }
+        if (x + 1 < this.rowLength) {
+            Tile rightTile = findTileWithIndex(x + 1, y);
+            neighbouringTiles.add(rightTile);
+        }
+        
+        return neighbouringTiles;
+    }
+    
+    // Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
+    public Set<Tile> findNxNSquare(Tile tile, int N) {
+        int x = findXofTile(tile);
+        int y = findYofTile(tile);
+        
+        return findNxNSquareWithIndex(x, y, N);
+    }
+    
+    // Find a random NxN square that contains the tile. Useful for Reveal Enchantment.
+    public Set<Tile> findNxNSquareWithIndex(int x, int y, int N) {
+        if ((N > this.rowLength) || (N > this.columnLength)) {
+            Set<Tile> foo = new HashSet<>(this.tileMap);
+            return foo;
+        }
+        
+        SecureRandom rng = new SecureRandom();
+        
+        // The square needs to be within these bounds
+        int leftStart = Math.max(x - N + 1, 0);
+        int leftEnd = Math.min(x, this.rowLength - N);
+        
+        int topStart = Math.max(y - N + 1, 0);
+        int topEnd = Math.min(y, this.columnLength - N);
+        
+        // int possibleSquaresCount = (leftEnd - leftStart) * (topEnd - topStart);
+        
+        int luckySquareX = rng.nextInt(leftStart, leftEnd + 1);
+        int luckySquareY = rng.nextInt(topStart, topEnd + 1);
+        
+        HashSet<Tile> square = (HashSet<Tile>) constructRectangleOfTiles
+        (luckySquareX, luckySquareX + N - 1, luckySquareY, luckySquareY + N - 1);
+        
+        return square;
+    }
+    
+    public Set<Tile> constructRectangleOfTiles(int left, int right, int top, int bottom)  {
+        HashSet<Tile> rectangle = new HashSet<>();
+        for (int x = left; x <= right; x++) {
+            for (int y = top; y <= bottom; y++) {
+                Tile currTile = findTileWithIndex(x, y);
+                
+                rectangle.add(currTile);
+            }
+        }
+        
+        return rectangle;
+    }
+    
+    // For coordinates x,y check if they are inside the grid or not
+    public boolean coordinatesAreInGrid(double x, double y) {
+        return ((x >= this.topLeftXCoordinate) 
+        && (y >= this.topLeftYCoordinate)
+        && (x < this.topLeftXCoordinate + this.rowLength * this.tileWidth)
+        && (y < this.topLeftYCoordinate + this.columnLength * this.tileHeight));
+    }
+    
+    // For coordinates x,y check which tile it is in
+    public Tile findTileUsingCoordinates(double x, double y) {
+        if (!coordinatesAreInGrid(x, y)) {
+            return null;
+        }
+        
+        double tileX = Math.floor((x - this.topLeftXCoordinate) / this.tileWidth);
+        double tileY = Math.floor((y - this.topLeftYCoordinate) / this.tileHeight);
+        
+        return findTileWithIndex((int) tileX, (int) tileY);
+    }
+    
     public Tile getRandomEmptyTile() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> emptyTiles = getEmptyTiles();
-
+        
         if (emptyTiles.size() <= 0) {
             System.err.println("No empty tiles according to getRandomEmptyTile in Grid");
         }
@@ -535,7 +525,7 @@ public class Grid {
         
         return emptyTiles.get(luckyTileInd);
     }
-
+    
     public ArrayList<Tile> getEmptyTiles() {
         ArrayList<Tile> emptyTiles = new ArrayList<>();
         
@@ -547,7 +537,7 @@ public class Grid {
         
         return emptyTiles;
     }
-
+    
     public static boolean isWalkableTile(Tile tile){
         if(tile == null){
             return false;
@@ -561,18 +551,18 @@ public class Grid {
         }
         return false;
     }
-
+    
     public static boolean isEmptyTileType(char c) {
         if (c == 'E' || c == 'e') {
             return true;
         }
         return false;
     }
-
-	public List<Tile> getTileMap() {
-		return this.tileMap;
-	}
-
+    
+    public List<Tile> getTileMap() {
+        return this.tileMap;
+    }
+    
     public static boolean isHallObjectTile(Tile tile) {
         return isHallObjectTileType(tile.getTileType());
     }
@@ -596,7 +586,7 @@ public class Grid {
         
         return hallObjectTiles;
     }
-
+    
     public Tile findTileUsingDirection(Tile tile, Directions dir) {
         if (null != dir) switch (dir) {
             case NORTH:
@@ -612,33 +602,42 @@ public class Grid {
         }
         return null;
     }
-
+    
     public int getTileHeight() {
         return tileHeight;
     }
-
+    
     public int getTileWidth() {
         return tileWidth;
     }
-	
-	@Override
-	public String toString() {
-		String str = "TileMap:\n";
-		for (int i = 0; i < this.columnLength; i++) {
-			for (int j = 0; j < this.rowLength; j++) {
-				int index = i * this.rowLength + j;
-				Tile printTile = tileMap.get(index);
-				char onTile = printTile.tileType;
-				String add = "";
-				if (index < 10)
-					add += "0";
-				add += String.valueOf(index) + " " + onTile;
-				str += add;
-				if (j < this.rowLength - 1)
-					str+= ", ";
-			}
-			str += "\n";
-		}
-		return str;
-	}
+    
+    public int getRowLength() {
+        return rowLength;
+    }
+    
+    public int getColumnLength() {
+        return columnLength;
+    }
+    
+    @Override
+    public String toString() {
+        String str = "TileMap:\n";
+        for (int i = 0; i < this.columnLength; i++) {
+            for (int j = 0; j < this.rowLength; j++) {
+                int index = i * this.rowLength + j;
+                Tile printTile = tileMap.get(index);
+                char onTile = printTile.tileType;
+                String add = "";
+                if (index < 10)
+                add += "0";
+                add += String.valueOf(index) + " " + onTile;
+                str += add;
+                if (j < this.rowLength - 1)
+                str+= ", ";
+            }
+            str += "\n";
+        }
+        return str;
+    }
+    
 }

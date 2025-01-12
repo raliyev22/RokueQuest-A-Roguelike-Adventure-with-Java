@@ -3,10 +3,7 @@ package main.controller;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javax.swing.text.View;
 import main.model.*;
@@ -21,27 +18,26 @@ public class MonsterManager {
     protected final double MONSTER_MOVE_INTERVAL = 1_000_000_000L;
     protected final double MONSTER_WAIT_PERIOD = 1_000_000_000L;
     private static final long RUNE_TELEPORT_INTERVAL = 3_000_000_000L; // 3 seconds in nanoseconds
-
+    
     protected Grid playModeGrid;
     protected Hero hero;
     protected List<Monster> monsterList;
     protected PlayModeView playModeView;
-
     private SoundEffects soundPlayer = SoundEffects.getInstance();
-
+    
     public MonsterManager(Grid grid, Hero hero) {
         this.playModeGrid = grid;
         this.hero = hero;
         this.monsterList = new ArrayList<>();
     }
-
+    
     public Monster createMonster(int xPosition, int yPosition, long now) {
         SecureRandom rng = new SecureRandom();
-
+        
         int luckyType = rng.nextInt(3);
-
+        
         MonsterType type = MonsterType.WIZARD;
-
+        
         // luckyType = 0;
         if (luckyType == 0) {
             type = MonsterType.WIZARD;
@@ -50,33 +46,43 @@ public class MonsterManager {
         } else if (luckyType == 2) {
             type = MonsterType.FIGHTER;
         }
-
+        
         return createMonster(xPosition, yPosition, type, now);
     }
+    
+    
+    /** 
+     * Create a monster, add it to the grid and the list, and render it on the screen.
+     * @param xPosition x index that the monster is created on. Must be between 0 and playModeGrid.rowLength - 1 (inclusive)
+     * @param yPosition y index that the monster is created on. Must be between 0 and playModeGrid.columnLength - 1 (inclusive)
+     * @param type type of the monster.
+     * @param now the time that the monster is created at.
+     * @return Monster the monster created.
+     */
     protected Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
         Monster monster = null;
-
+        
         switch (type) {
-            case FIGHTER -> {
+            case MonsterType.FIGHTER -> {
                 monster = new FighterMonster(xPosition, yPosition);
             }
-            case ARCHER -> {
+            case MonsterType.ARCHER -> {
                 monster = new ArcherMonster(xPosition, yPosition);
             }
-            case WIZARD -> {
+            case MonsterType.WIZARD -> {
                 monster = new WizardMonster(xPosition, yPosition);
             }
             default -> throw new IllegalArgumentException("Invalid monster type");
         }
 
         monster.spawnTime = now;
-
+        
         Tile monsterTile = playModeGrid.findTileWithIndex(xPosition, yPosition);
         monster.currentX = monsterTile.getLeftSide();
         monster.currentY = monsterTile.getTopSide();
         monster.targetX = monsterTile.getLeftSide();
         monster.targetY = monsterTile.getTopSide();
-
+        
         playModeGrid.changeTileWithIndex(xPosition, yPosition, monster.getCharType());
         this.monsterList.add(monster);
         playModeView.createMonsterView(monster);
@@ -84,128 +90,6 @@ public class MonsterManager {
         playModeView.redrawTallItems();
 
         return monster;
-    }
-    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
-        if (monster == null || playModeGrid == null || playModeView == null) {
-            System.err.println("Invalid parameters for luring monster");
-            return;
-        }
-
-        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
-        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
-
-        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
-            // Update the monster's attributes for movement
-            monster.targetX = targetTile.getLeftSide();
-            monster.targetY = targetTile.getTopSide();
-            monster.isMoving = true;
-
-            // Highlight the target tile visually for 2 seconds
-            playModeView.highlightTile(targetTile, true);
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    Platform.runLater(() -> playModeView.highlightTile(targetTile, false));
-                }
-            }, 2000);
-
-            // Move monster logically in the grid
-            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
-            monster.posX = targetX; // Update position
-            monster.posY = targetY;
-            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
-
-            System.out.println("Monster lured to position: (" + targetX + ", " + targetY + ")");
-        } else {
-            System.err.println("Invalid target position for luring");
-        }
-    }
-
-    public void archerAttack(long now, ArcherMonster archerMonster) {
-        if (!archerMonster.isMoving && !hero.isMoving && !hero.isTakingDamage && !hero.isProtected()) {
-            if (isArcherInRange(archerMonster)) {
-                hero.isTakingDamage = true;
-                hero.decreaseLives();
-                hero.lastDamagedFrame = now;
-                playModeView.updateHeroLife(hero.getLiveCount());
-                soundPlayer.playSoundEffectInThread("archer");
-            }
-        }
-    }
-
-
-    public boolean isArcherInRange(ArcherMonster archerMonster) {
-        int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
-        if (manhattanDistance <= ArcherMonster.ARCHER_RANGE) {
-            return true;
-        }
-        return false;
-    }
-
-
-    protected Monster createMonster(int xPosition, int yPosition, MonsterType type) {
-        Monster monster = null;
-
-        switch (type) {
-            case FIGHTER -> {
-                monster = new FighterMonster(xPosition, yPosition);
-            }
-            case ARCHER -> {
-                monster = new ArcherMonster(xPosition, yPosition);
-            }
-            case WIZARD -> {
-                monster = new WizardMonster(xPosition, yPosition);
-            }
-            default -> throw new IllegalArgumentException("Invalid monster type");
-        }
-
-        Tile monsterTile = playModeGrid.findTileWithIndex(xPosition, yPosition);
-        monster.currentX = monsterTile.getLeftSide();
-        monster.currentY = monsterTile.getTopSide();
-        monster.targetX = monsterTile.getLeftSide();
-        monster.targetY = monsterTile.getTopSide();
-
-        playModeGrid.changeTileWithIndex(xPosition, yPosition, monster.getCharType());
-        this.monsterList.add(monster);
-        playModeView.createMonsterView(monster);
-        // playModeView.updateMonsterPosition(monsterList.size() - 1, xPosition, yPosition);
-        playModeView.redrawTallItems();
-
-        return monster;
-    }
-    public Monster getMonsterAtPosition(int x, int y) {
-        for (Monster monster : monsterList) {
-            if (monster.posX == x && monster.posY == y) {
-                return monster;
-            }
-        }
-        return null; // No monster found at the given position
-    }
-    public void lureFighterMonsters(int targetX, int targetY) {
-        for (Monster monster : monsterList) {
-            if (monster instanceof FighterMonster fighterMonster) {
-                fighterMonster.chaseLure(targetX, targetY, playModeGrid);
-            }
-        }
-    }
-
-    public void fighterAttack(long now, FighterMonster fighterMonster) {
-        if (!fighterMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
-            if (isFighterInRange(fighterMonster)) {
-                hero.isTakingDamage = true;
-                hero.decreaseLives();
-                hero.lastDamagedFrame = now;
-                playModeView.updateHeroLife(hero.getLiveCount());
-                soundPlayer.playSoundEffectInThread("fighter");
-            }
-        }
-    }
-    public boolean isFighterInRange(FighterMonster fighterMonster) {
-        int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
-        if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
-            return true;
-        }
-        return false;
     }
 
     public void actAllMonsters(long now, PlayModeController controller) {
@@ -228,7 +112,47 @@ public class MonsterManager {
         }
     }
 
-    public void moveAllMonsters(long now) {
+    public void archerAttack(long now, ArcherMonster archerMonster) {
+        if (!archerMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
+            if (isArcherInRange(archerMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("archer");
+            }
+        }
+    }
+
+    public boolean isArcherInRange(ArcherMonster archerMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
+        if (manhattanDistance <= ArcherMonster.ARCHER_RANGE) {
+            return true;
+        }
+        return false;
+    }
+
+    public void fighterAttack(long now, FighterMonster fighterMonster) {
+        if (!fighterMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
+            if (isFighterInRange(fighterMonster)) {
+                hero.isTakingDamage = true;
+                hero.decreaseLives();
+                hero.lastDamagedFrame = now;
+                playModeView.updateHeroLife(hero.getLiveCount());
+                soundPlayer.playSoundEffectInThread("fighter");
+            }
+        }
+    }
+
+    public boolean isFighterInRange(FighterMonster fighterMonster) {
+        int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
+        if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
+            return true;
+        }
+        return false;
+    }
+    
+    public void moveAllMonsters(long now) { 
         for (int i = 0; i < monsterList.size(); i++) {
             Monster monster = monsterList.get(i);
 
@@ -247,7 +171,7 @@ public class MonsterManager {
             }
         }
     }
-
+    
     public void moveMonster(int monsterID) {
         Monster monster = monsterList.get(monsterID);
         if (monster == null) {
@@ -257,23 +181,17 @@ public class MonsterManager {
         Tile monsterTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
         int monsterViewLeftSide = monsterTile.getLeftSide();
         int monsterViewTopSide = monsterTile.getTopSide();
-
+        
         if (!monster.isMoving) {
             monster.currentX = monsterViewLeftSide;
             monster.currentY = monsterViewTopSide;
         }
-
+        
         if (!monster.isMoving) {
-            // If the monster was lured, reset its lured state and do not calculate a new direction
-            if (monster.isLured()) {
-                monster.setLured(false);
-                return;
-            }
-
             Directions movementDirection = pickMovementDirection(monster);
             if (movementDirection != null) {
                 monsterTile.changeTileType('?');
-
+                
                 if (movementDirection == Directions.NORTH) {
                     Tile northTile = playModeGrid.findNorthTile(monsterTile);
                     if (northTile != null) {
@@ -306,7 +224,7 @@ public class MonsterManager {
                 monster.movingDirection = movementDirection;
             }
         }
-
+        
         if (monster.currentX < monster.targetX) {
             monster.currentX = Math.min(monster.currentX + monster.speed, monster.targetX);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
@@ -314,7 +232,7 @@ public class MonsterManager {
             monster.currentX = Math.max(monster.currentX - monster.speed, monster.targetX);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
         }
-
+        
         if (monster.currentY < monster.targetY) {
             monster.currentY = Math.min(monster.currentY + monster.speed, monster.targetY);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
@@ -322,33 +240,38 @@ public class MonsterManager {
             monster.currentY = Math.max(monster.currentY - monster.speed, monster.targetY);
             playModeView.updateMonsterPosition(monsterID, monster.currentX, monster.currentY);
         }
-
+        
         if (monster.currentX == monster.targetX && monster.currentY == monster.targetY) {
             monster.isMoving = false;
             if (monster.movingDirection != null) {
+                // System.out.printf("Before moving x: %d y: %d%n", monster.posX, monster.posY);
+                // System.out.println(playModeGrid);
+                
                 moveMonsterOnGrid(monster.movingDirection, monster);
+                
+                // System.out.printf("After moving x: %d y: %d%n", monster.posX, monster.posY);
+                // System.out.println(playModeGrid);
                 monster.movingDirection = null;
             }
         }
     }
-
-
-
+    
+    
     public Directions pickMovementDirection(Monster monster) {
         SecureRandom rng = new SecureRandom();
-
+        
         if (rng.nextDouble() > MONSTER_STAY_RATE) {
             return null; // null means no direction
         }
-
+        
         Tile monsterTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
         if (monsterTile == null) {
             System.err.println("pickMovementDirection null pointer");
         }
-
+        
         List<Directions> moveableDirections = playModeGrid.findWalkableDirections(monsterTile);
         int moveableDirectionCount = moveableDirections.size();
-
+        
         if (moveableDirectionCount > 0) {
             int luckyDirectionIndex = rng.nextInt(moveableDirectionCount);
             return moveableDirections.get(luckyDirectionIndex);
@@ -356,19 +279,19 @@ public class MonsterManager {
 
         return null;
     }
-
+    
     public void moveMonsterOnGrid(Directions dir, Monster monster) {
         int xIndexOld = monster.posX;
         int yIndexOld = monster.posY;
         playModeGrid.changeTileWithIndex(xIndexOld, yIndexOld, 'E');
-
+        
         monster.move(dir);
-
+        
         int xIndexNew = monster.posX;
         int yIndexNew = monster.posY;
         playModeGrid.changeTileWithIndex(xIndexNew, yIndexNew, monster.getCharType());
     }
-
+    
     public static Image getMonsterImage(Monster monster) {
         if (monster.getCharType() == 'A') {
             return Images.IMAGE_ARCHER_x4;
@@ -380,6 +303,7 @@ public class MonsterManager {
             return null;
         }
     }
+    
     public void setPlayModeView(PlayModeView view) {
         this.playModeView = view;
     }
