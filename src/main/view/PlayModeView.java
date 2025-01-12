@@ -49,6 +49,7 @@ public class PlayModeView {
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
+	public Rectangle walls;
 	private StackPane pauseOverlay;
 	private StackPane exitOverlay;
 	public Button pauseButton;
@@ -320,10 +321,11 @@ public class PlayModeView {
 		int wallY = grid.topLeftYCoordinate - 80;
 
 		int wallLengthX = 680;
-		int wallLengthY = 736;
+		int wallLengthY = 780;
 		
-		Rectangle walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
-		walls.setFill(new ImagePattern(Images.IMAGE_WALLS_X4));
+		walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
+		walls.setFill(new ImagePattern(Images.IMAGE_WATERHALL_X4));
+		walls.toFront();;
 		pane.getChildren().add(walls);
 	}
 	

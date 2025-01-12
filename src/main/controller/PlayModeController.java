@@ -344,7 +344,7 @@ public class PlayModeController extends Application {
                     
                     mouseClicked = false;
                 }
-                
+                view.walls.toFront();;
             }
         };
         gameLoop.start();

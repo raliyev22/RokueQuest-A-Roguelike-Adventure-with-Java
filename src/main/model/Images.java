@@ -35,6 +35,7 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
+	public static final Image IMAGE_WATERHALL_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_770.png");
     
     public static final Image IMAGE_PLAYERLEFTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerLeftTakingDamage_x4_64_64.png");
     public static final Image IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerRightTakingDamage_x4_64_64.png");
