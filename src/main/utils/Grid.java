@@ -145,7 +145,7 @@ public class Grid {
     * @param c the character that the type will change into.
     */
     public void changeTileWithIndex(int x, int y, char c) {
-        if (indexInRange(tileIndex(x, y))) {
+        if (indexInRange(x, y)) {
             Tile currentTile = findTileWithIndex(x, y);
             currentTile.changeTileType(c);
         }
