@@ -176,7 +176,7 @@ public class Grid {
     
     /** 
     * Returns whether or not two tiles are neighbours. Neighbour in this context means that they share
-    * a common edge. Note that by convention a tile is neighbours with itself.
+    * a common vertex. Note that by convention a tile is neighbours with itself.
     * @param firstTile the first tile that is checked.
     * @param secondTile the second tile that is checked.
     * @return boolean returns true if two tiles are neighbours, false otherwise.
@@ -186,7 +186,7 @@ public class Grid {
         int firstTileY = findYofTile(firstTile);
         int secondTileX = findXofTile(secondTile);
         int secondTileY = findYofTile(secondTile);
-        if (((firstTileX - secondTileX) <= 1) && ((firstTileY - secondTileY) <= 1)) {
+        if ((Math.abs(firstTileX - secondTileX) <= 1) && (Math.abs(firstTileY - secondTileY) <= 1)) {
             return true;
         }
         return false;
