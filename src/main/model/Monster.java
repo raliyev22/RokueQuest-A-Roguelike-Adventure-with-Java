@@ -15,6 +15,8 @@ public abstract class Monster {
     public Directions movingDirection = null;
     public Boolean isMoving = false;
 
+    private boolean lured = false;
+
     private long lastRuneTeleportation = 0; // For wizard monster
     public long lastMovedTime = 0;
     
@@ -66,7 +68,13 @@ public abstract class Monster {
                 throw new IllegalArgumentException("Unknown monster type: " + monster.getType());
         }
     }
+    public boolean isLured() {
+        return lured;
+    }
 
+    public void setLured(boolean lured) {
+        this.lured = lured;
+    }
     public int getX() {return posX;}
     public int getY() {return posY;}
 

@@ -311,6 +311,12 @@ public class PlayModeView {
     }
 
 	public void addEnchantmentView(Enchantment enchantment, double x, double y) {
+		// Skip rendering for EXTRA_TIME_ENCHANTMENT
+		if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+			enchantmentViews.put(enchantment, null); // Logical presence without rendering
+			return;
+		}
+
 		Rectangle enchantmentView = new Rectangle(tileSize, tileSize);
 		enchantmentView.setFill(new ImagePattern(enchantment.getImage()));
 		enchantmentView.setX(x);
@@ -335,13 +341,19 @@ public class PlayModeView {
 		Platform.runLater(() -> {
 			inventory.addEnchantment(enchantment.getType());
 			updateInventoryUI(inventory.getEnchantments());
-			removeEnchantmentView(enchantment);
+
+			// Remove from screen only if it was rendered
+			Rectangle enchantmentView = enchantmentViews.get(enchantment);
+			if (enchantmentView != null) {
+				pane.getChildren().remove(enchantmentView);
+			}
+
 			synchronized (enchantmentViews) {
 				enchantmentViews.remove(enchantment);
 			}
-
 		});
 	}
+
 
 	public void removeEnchantmentView(Enchantment enchantment) {
 		Rectangle enchantmentView = enchantmentViews.remove(enchantment);
@@ -520,6 +532,25 @@ public class PlayModeView {
 		this.time = time;
 		timeLabel.setText("Time: " + (int)time);
 		return time;
+	}
+	public void highlightArea(int x, int y, int width, int height, boolean highlight) {
+		String highlightId = "highlight-" + x + "-" + y;
+
+		if (highlight) {
+			Rectangle highlightRectangle = new Rectangle(x, y, width, height);
+			highlightRectangle.setStroke(Color.GOLD); // Border color
+			highlightRectangle.setFill(Color.TRANSPARENT); // Transparent fill
+			highlightRectangle.setId(highlightId);
+
+			// Add the rectangle to the pane if it doesn't already exist
+			Platform.runLater(() -> {
+				pane.getChildren().removeIf(node -> highlightId.equals(node.getId()));
+				pane.getChildren().add(highlightRectangle);
+			});
+		} else {
+			// Remove the rectangle by ID
+			Platform.runLater(() -> pane.getChildren().removeIf(node -> highlightId.equals(node.getId())));
+		}
 	}
 
 	public void updateHeroLife(int life) {

@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import main.model.*;
 import main.utils.*;
 import main.view.InventoryView;
@@ -40,6 +42,8 @@ public class PlayModeController extends Application {
     protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
     private List<Enchantment> activeEnchantments;
+    private Map<Tile, Integer> runeExtraTimeMap; // Tracks extra time added per rune
+
 
     private boolean luringGemActivated = false;
     private int runeXCoordinate;
@@ -55,7 +59,7 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     private long lastEnchantmentSpawnTime = 0; // Tracks the last time an enchantment was spawned
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 6_000_000_000L; // 12 seconds in nanoseconds
     private Inventory inventory;
     private InventoryView inventoryView;
 
@@ -130,6 +134,7 @@ public class PlayModeController extends Application {
         int randomYCoordinate = playModeGrid.findYofTile(initialHeroTile);
         Tile heroTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
         hero = initializeHero(randomXCoordinate, randomYCoordinate);
+        runeExtraTimeMap = new HashMap<>();
 
         hero.targetX = heroTile.getLeftSide();
         hero.targetY = heroTile.getTopSide();
@@ -263,59 +268,56 @@ public class PlayModeController extends Application {
     }
 
     public void handleMouseClick(double mouseX, double mouseY) {
-        // Check if the mouse click intersects any enchantment
         for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
             Enchantment enchantment = entry.getKey();
             Rectangle enchantmentView = entry.getValue();
 
-            if (enchantmentView.contains(mouseX, mouseY)) {
+            if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
                 if (!activeEnchantments.contains(enchantment)) {
                     System.out.println("Enchantment already collected or expired: " + enchantment.getType());
                     return; // Avoid double collection
                 }
 
-                System.out.println("Clicked on enchantment: " + enchantment.getType());
-
-                // Process enchantment based on its type
                 switch (enchantment.getType()) {
                     case EXTRA_TIME -> {
-                        addTime(5);
-                        System.out.println("5 seconds added");
-                        activeEnchantments.remove(enchantment);
+                        Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+
+                        if (runeTile != null) {
+                            int currentExtraTime = runeExtraTimeMap.getOrDefault(runeTile, 0);
+
+                            if (currentExtraTime < 5) {
+                                addTime(1); // Increment by 1 second
+                                runeExtraTimeMap.put(runeTile, currentExtraTime + 1);
+                                System.out.println("Extra Time collected. Rune: " + runeTile + ", Total: " + (currentExtraTime + 1) + " seconds");
+                            } else {
+                                System.out.println("This rune has reached the maximum Extra Time.");
+                            }
+                        }
                     }
-                    case EXTRA_LIFE -> {
-                        hero.increaseLives(1);
-                        view.updateHeroLife(hero.getLiveCount());
-                        activeEnchantments.remove(enchantment);
-                    }
-                    default -> {
-                        view.collectEnchantment(enchantment, inventory);
-                        activeEnchantments.remove(enchantment);
-                    }
+                    case EXTRA_LIFE -> {hero.increaseLives(1); view.updateHeroLife(hero.getLiveCount());}
+                    default -> view.collectEnchantment(enchantment, inventory);
                 }
 
+                // Remove the enchantment from the grid and active list
+                activeEnchantments.remove(enchantment);
                 view.removeEnchantmentView(enchantment);
-
-                System.out.println("Updated inventory: " + inventory.getEnchantments());
                 break;
             }
         }
     }
 
-
-
     public void addTime(int seconds) {
         view.updateTime(view.getTimeRemaining() + seconds);
     }
 
-    public void useRevealEnchantment() {
-        Enchantment.Type type = Enchantment.Type.REVEAL;
-        if (hero.getEnchantments().containsKey(type)) {
-            Tile runeTile = playModeGrid.findTileWithIndex(view.getRuneXCoordinate(), view.getRuneYCoordinate());
-            Enchantment.highlightRevealArea(playModeGrid, runeTile, view);
-            hero.consumeEnchantment(type);
-        }
-    }
+//    public void useRevealEnchantment() {
+//        Enchantment.Type type = Enchantment.Type.REVEAL;
+//        if (hero.getEnchantments().containsKey(type)) {
+//            Tile runeTile = playModeGrid.findTileWithIndex(view.getRuneXCoordinate(), view.getRuneYCoordinate());
+//            Enchantment.highlightArea(playModeGrid, runeTile, view);
+//            hero.consumeEnchantment(type);
+//        }
+//    }
 
     public void useCloakOfProtection() {
         Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
@@ -374,10 +376,27 @@ public class PlayModeController extends Application {
                     escPressedFlag = true;
                 }
                 break;
-            case "r" :{
+            case "r": {
                 if (inventory.useEnchantment(Enchantment.Type.REVEAL)) {
+                    // Find the rune tile
                     Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
-                    Enchantment.highlightRevealArea(playModeGrid, runeTile, view);
+
+                    if (runeTile != null) {
+                        int tileWidth = playModeGrid.getTileWidth();
+                        int tileHeight = playModeGrid.getTileHeight();
+
+                        // Calculate the top-left corner for the 4x4 highlight area
+                        int xPoint = runeTile.getLeftSide() - tileWidth;
+                        int yPoint = runeTile.getTopSide() - tileHeight;
+
+                        // Ensure the points are within grid boundaries
+                        xPoint = Math.max(playModeGrid.topLeftXCoordinate, xPoint);
+                        yPoint = Math.max(playModeGrid.topLeftYCoordinate, yPoint);
+
+                        // Highlight the area
+                        Enchantment.highlightArea(xPoint, yPoint, 4 * tileWidth, 4 * tileHeight, view);
+                    }
+
                     view.updateInventoryUI(inventory.getEnchantments());
                     System.out.println("Reveal used");
                 } else {
@@ -385,6 +404,7 @@ public class PlayModeController extends Application {
                 }
                 break;
             }
+
             case "p" : {
                 if (inventory.useEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION)) {
                     hero.setProtected(true);
@@ -404,6 +424,7 @@ public class PlayModeController extends Application {
             case "b" : {
                 if (inventory.useEnchantment(Enchantment.Type.LURING_GEM)) {
                     luringGemActivated = true; // Enable direction selection
+                    handleKeyPressed(event);
                     view.updateInventoryUI(inventory.getEnchantments());
                     System.out.println("Luring Gem activated! Choose a direction.");
                 } else {
@@ -420,36 +441,123 @@ public class PlayModeController extends Application {
 
     public void useLuringGem(String direction) {
         if (luringGemActivated) {
-            // Get hero's current position
             int heroX = hero.getPosX();
             int heroY = hero.getPosY();
 
-            // Determine the target position based on direction
-            int targetX = heroX, targetY = heroY;
-            switch (direction.toUpperCase()) {
-                case "W" -> targetY--; // Up
-                case "A" -> targetX--; // Left
-                case "S" -> targetY++; // Down
-                case "D" -> targetX++; // Right
+            // Find the closest Fighter Monster
+            Monster closestFighter = findClosestFighterMonster(heroX, heroY);
+
+            if (closestFighter != null) {
+                // Determine the target position based on direction
+                int targetX = closestFighter.getX();
+                int targetY = closestFighter.getY();
+
+                switch (direction.toUpperCase()) {
+                    case "W" -> targetY--; // Up
+                    case "A" -> targetX--; // Left
+                    case "S" -> targetY++; // Down
+                    case "D" -> targetX++; // Right
+                }
+
+                if (playModeGrid.indexInRange(targetX, targetY)) {
+                    lureSpecificMonster(closestFighter, targetX, targetY);
+                } else {
+                    System.out.println("Target position is out of range.");
+                }
+            } else {
+                System.out.println("No Fighter Monster found to lure.");
             }
 
-            if (playModeGrid.indexInRange(targetX, targetY)) {
-                // Add visual indication of the lure
-                Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
-                view.highlightTile(targetTile, true);
+            luringGemActivated = false;
+        }
+    }
 
-                // Notify MonsterManager to lure fighter monsters
-                monsterManager.lureFighterMonsters(targetX, targetY);
+    private Monster findClosestFighterMonster(int heroX, int heroY) {
+        Monster closestFighter = null;
+        double minDistance = Double.MAX_VALUE;
 
-                // Remove the lure highlight after 2 seconds
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Platform.runLater(() -> view.highlightTile(targetTile, false));
-                    }
-                }, 2000);
+        for (Monster monster : monsterManager.monsterList) {
+            if (monster.getType() == MonsterType.FIGHTER) { // Only consider Fighter Monsters
+                double distance = calculateManhattanDistance(heroX, heroY, monster.getX(), monster.getY());
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestFighter = monster;
+                }
             }
         }
+
+        return closestFighter;
+    }
+    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
+        if (monster == null || playModeGrid == null || view == null) {
+            System.err.println("Invalid parameters for luring monster");
+            return;
+        }
+
+        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
+        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
+
+        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
+            // Update the monster's attributes for movement
+            monster.targetX = targetTile.getLeftSide();
+            monster.targetY = targetTile.getTopSide();
+            monster.isMoving = true;
+            monster.setLured(true); // Indicate that the monster was lured
+
+            // Highlight the target tile
+            int highlightWidth = playModeGrid.getTileWidth();
+            int highlightHeight = playModeGrid.getTileHeight();
+
+            view.highlightArea(
+                    targetTile.getLeftSide(),
+                    targetTile.getTopSide(),
+                    highlightWidth,
+                    highlightHeight,
+                    true // Enable highlighting
+            );
+
+            // Schedule removal of the highlight after 2 seconds
+            Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            });
+
+            // Remove the rectangle after a set time
+            // Schedule removal of the highlight after 2 seconds
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.setOnFinished(event -> Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            }));
+            pause.play();
+
+
+            // Move monster logically in the grid
+            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
+            monster.posX = targetX; // Update position
+            monster.posY = targetY;
+            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
+
+            System.out.println("Monster lured to position: (" + targetX + ", " + targetY + ")");
+        } else {
+            System.err.println("Invalid target position for luring");
+        }
+    }
+
+
+
+    private double calculateManhattanDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
     }
 
 

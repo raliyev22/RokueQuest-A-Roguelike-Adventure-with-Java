@@ -3,7 +3,10 @@ package main.controller;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javax.swing.text.View;
 import main.model.*;
@@ -81,6 +84,41 @@ public class MonsterManager {
         playModeView.redrawTallItems();
 
         return monster;
+    }
+    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
+        if (monster == null || playModeGrid == null || playModeView == null) {
+            System.err.println("Invalid parameters for luring monster");
+            return;
+        }
+
+        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
+        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
+
+        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
+            // Update the monster's attributes for movement
+            monster.targetX = targetTile.getLeftSide();
+            monster.targetY = targetTile.getTopSide();
+            monster.isMoving = true;
+
+            // Highlight the target tile visually for 2 seconds
+            playModeView.highlightTile(targetTile, true);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    Platform.runLater(() -> playModeView.highlightTile(targetTile, false));
+                }
+            }, 2000);
+
+            // Move monster logically in the grid
+            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
+            monster.posX = targetX; // Update position
+            monster.posY = targetY;
+            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
+
+            System.out.println("Monster lured to position: (" + targetX + ", " + targetY + ")");
+        } else {
+            System.err.println("Invalid target position for luring");
+        }
     }
 
     public void archerAttack(long now, ArcherMonster archerMonster) {
@@ -226,6 +264,12 @@ public class MonsterManager {
         }
 
         if (!monster.isMoving) {
+            // If the monster was lured, reset its lured state and do not calculate a new direction
+            if (monster.isLured()) {
+                monster.setLured(false);
+                return;
+            }
+
             Directions movementDirection = pickMovementDirection(monster);
             if (movementDirection != null) {
                 monsterTile.changeTileType('?');
@@ -282,17 +326,12 @@ public class MonsterManager {
         if (monster.currentX == monster.targetX && monster.currentY == monster.targetY) {
             monster.isMoving = false;
             if (monster.movingDirection != null) {
-                // System.out.printf("Before moving x: %d y: %d%n", monster.posX, monster.posY);
-                // System.out.println(playModeGrid);
-
                 moveMonsterOnGrid(monster.movingDirection, monster);
-
-                // System.out.printf("After moving x: %d y: %d%n", monster.posX, monster.posY);
-                // System.out.println(playModeGrid);
                 monster.movingDirection = null;
             }
         }
     }
+
 
 
     public Directions pickMovementDirection(Monster monster) {

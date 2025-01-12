@@ -1,10 +1,12 @@
 package main.model;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import main.controller.PlayModeController;
 import main.utils.Grid;
@@ -12,6 +14,7 @@ import main.utils.Tile;
 import main.view.PlayModeView;
 
 import java.security.SecureRandom;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Set;
@@ -26,6 +29,9 @@ public class Enchantment {
     private int posY;
     private long spawnTime;
     private boolean isActive;
+    private Set<Tile> extraTimeRunes = new HashSet<>();
+    private static final int MAX_EXTRA_TIME_SECONDS = 5;
+    private int totalExtraTimeGained = 0;
 
     public Enchantment(Type type, int posX, int posY, long spawnTime) {
         this.type = type;
@@ -109,21 +115,20 @@ public class Enchantment {
 //    }
 
     // Highlight a 4x4 area around the rune tile
-    public static void highlightRevealArea(Grid grid, Tile runeTile, PlayModeView view) {
-        Set<Tile> highlightTiles = grid.findNxNSquare(runeTile, 4);
-        for (Tile tile : highlightTiles) {
-            view.highlightTile(tile, true); // Custom method to visually highlight
-        }
+    public static void highlightArea(int xPoint, int yPoint, int width, int height, PlayModeView view) {
+        Rectangle highlightRectangle = new Rectangle(xPoint, yPoint, width, height);
+        highlightRectangle.setStroke(Color.GOLD); // Border color
+        highlightRectangle.setFill(Color.TRANSPARENT); // Transparent fill
 
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                for (Tile tile : highlightTiles) {
-                    view.highlightTile(tile, false); // Remove highlight after 10 seconds
-                }
-            }
-        }, 10000); // Highlight lasts for 10 seconds
+        // Add the rectangle to the view
+        Platform.runLater(() -> view.getPane().getChildren().add(highlightRectangle));
+
+        // Remove the rectangle after a set time
+        PauseTransition pause = new PauseTransition(Duration.seconds(10));
+        pause.setOnFinished(event -> Platform.runLater(() -> view.getPane().getChildren().remove(highlightRectangle)));
+        pause.play();
     }
+
 
     @Override
     public String toString() {
