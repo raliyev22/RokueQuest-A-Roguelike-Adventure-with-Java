@@ -20,7 +20,7 @@ public class Hero {
     
     public long lastDamagedFrame = 0;
 	private boolean isTeleported=false;
-	private Image sprite;
+	protected Image sprite;
     private int takingDamageAnimationCounter = 0;
     private final int TAKING_DAMAGE_ANIMATION_LOOP = 3;
 	
@@ -32,7 +32,7 @@ public class Hero {
 		this.isTakingDamage = false;
 		this.facingDirection = Directions.EAST;
 
-        sprite = Images.IMAGE_PLAYERRIGHT_x4;
+        // sprite = Images.IMAGE_PLAYERRIGHT_x4;
 	}
 
 	public void move(Directions direction) {
