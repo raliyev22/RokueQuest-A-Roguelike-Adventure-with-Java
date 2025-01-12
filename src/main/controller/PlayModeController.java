@@ -230,42 +230,33 @@ public class PlayModeController extends Application {
         long currentTime = System.nanoTime();
 
         if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
-            // Ensure Extra Time enchantments only spawn at rune locations
             Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
-            Enchantment enchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
 
-            if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
-                // Spawn Extra Time only at the rune location
-                if (runeTile != null) {
-                    activeEnchantments.add(enchantment);
-                    view.addEnchantmentView(enchantment, runeTile.getLeftSide(), runeTile.getTopSide());
+            // Ensure the runeTile is valid
+            if (runeTile != null) {
+                Enchantment enchantment = new Enchantment(Enchantment.Type.EXTRA_TIME,
+                        runeTile.getLeftSide(),
+                        runeTile.getTopSide(),
+                        currentTime);
+                activeEnchantments.add(enchantment); // Add to active enchantments
+                view.addEnchantmentView(enchantment, runeTile.getLeftSide(), runeTile.getTopSide());
 
-                    // Schedule expiration
-                    enchantment.startExpirationTimer(6000, () -> {
-                        activeEnchantments.remove(enchantment);
-                        view.removeEnchantmentView(enchantment);
-                    });
+                // Log the spawn for debugging
+                System.out.println("Extra Time Enchantment spawned at Rune!");
 
-                    lastEnchantmentSpawnTime = currentTime;
-                }
+                // Schedule expiration
+                enchantment.startExpirationTimer(6000, () -> {
+                    activeEnchantments.remove(enchantment);
+                    view.removeEnchantmentView(enchantment);
+                });
+
+                lastEnchantmentSpawnTime = currentTime; // Update spawn time
             } else {
-                // Spawn other enchantments at random empty tiles
-                Tile randomTile = getRandomEmptyTile();
-                if (randomTile != null) {
-                    activeEnchantments.add(enchantment);
-                    view.addEnchantmentView(enchantment, randomTile.getLeftSide(), randomTile.getTopSide());
-
-                    // Schedule expiration
-                    enchantment.startExpirationTimer(6000, () -> {
-                        activeEnchantments.remove(enchantment);
-                        view.removeEnchantmentView(enchantment);
-                    });
-
-                    lastEnchantmentSpawnTime = currentTime;
-                }
+                System.err.println("Rune tile is null. Cannot spawn Extra Time Enchantment.");
             }
         }
     }
+
 
     public void handleMouseClick(double mouseX, double mouseY) {
         for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
@@ -274,37 +265,34 @@ public class PlayModeController extends Application {
 
             if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
                 if (!activeEnchantments.contains(enchantment)) {
+                    System.out.println("Enchantment not active: " + enchantment.getType());
                     return; // Avoid double collection
                 }
 
-                switch (enchantment.getType()) {
-                    case EXTRA_TIME -> {
-                        Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+                if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+                    // Increment time
+                    addTime(1); // Add 1 second
 
-                        if (runeTile != null) {
-                            int currentExtraTime = runeExtraTimeMap.getOrDefault(runeTile, 0);
-
-                            if (currentExtraTime < 5) {
-                                addTime(1); // Increment by 1 second
-                                runeExtraTimeMap.put(runeTile, currentExtraTime + 1);
-                               }
-                        }
-                    }
-                    case EXTRA_LIFE -> {hero.increaseLives(1); view.updateHeroLife(hero.getLiveCount());}
-                    default -> view.collectEnchantment(enchantment, inventory);
+                    // Remove enchantment after use
+                    activeEnchantments.remove(enchantment);
+                    view.removeEnchantmentView(enchantment);
+                    System.out.println("Extra Time enchantment clicked. Current time: " + time);
+                } else {
+                    // Handle other enchantments
+                    view.collectEnchantment(enchantment, inventory);
                 }
-
-                // Remove the enchantment from the grid and active list
-                activeEnchantments.remove(enchantment);
-                view.removeEnchantmentView(enchantment);
-                break;
+                break; // Exit loop after handling
             }
         }
     }
 
+
     public void addTime(int seconds) {
-        view.updateTime(view.getTimeRemaining() + seconds);
+        time += seconds; // Update the time
+        view.updateTime(time); // Reflect the change in the view
+        System.out.println("Time updated: " + time); // Debug log
     }
+
 
 //    public void useRevealEnchantment() {
 //        Enchantment.Type type = Enchantment.Type.REVEAL;
@@ -848,6 +836,7 @@ public class PlayModeController extends Application {
     public void  teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();
+
 
         int luckyHallObjectIndex = rng.nextInt(hallObjects.size());
         Tile luckyHallObjectTile = hallObjects.get(luckyHallObjectIndex);

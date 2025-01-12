@@ -528,11 +528,12 @@ public class PlayModeView {
 		return scene;
 	}
 
-	public double updateTime(double time){
-		this.time = time;
-		timeLabel.setText("Time: " + (int)time);
-		return time;
+	public double updateTime(double time) {
+		this.time = time; // Update the local time variable
+		Platform.runLater(() -> timeLabel.setText("Time: " + (int) time)); // Update the label on the JavaFX thread
+		return this.time;
 	}
+
 	public void highlightArea(int x, int y, int width, int height, boolean highlight) {
 		String highlightId = "highlight-" + x + "-" + y;
 
