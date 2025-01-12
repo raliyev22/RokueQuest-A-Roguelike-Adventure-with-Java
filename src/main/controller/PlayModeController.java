@@ -36,8 +36,8 @@ public class PlayModeController extends Application {
     protected MonsterManager monsterManager;
     protected HallType hallType;
     
-    private int runeXCoordinate;
-    private int runeYCoordinate;
+    public int runeXCoordinate;
+    public int runeYCoordinate;
     private boolean mouseClicked = false;
     private double mouseX;
     private double mouseY;
@@ -519,6 +519,20 @@ public class PlayModeController extends Application {
     //     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     // }
     
+    /**
+     * Requires:
+     * - `playModeGrid` must be properly initialized.
+     * - The list returned by `getHallObjectTiles()` must not be empty (hallObjects.size() > 0).
+     * 
+     * Modifies:
+     * - `runeXCoordinate`
+     * - `runeYCoordinate`
+     * 
+     * Effects:
+     * - Randomly selects a hall object from the available hall objects and updates the rune's coordinates.
+     * - If only one hall object exists, the rune may remain in the same location.
+     * - Updates `runeXCoordinate` and `runeYCoordinate` to the position of the selected hall object.
+     */
     public void teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();

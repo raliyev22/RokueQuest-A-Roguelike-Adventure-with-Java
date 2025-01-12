@@ -10,6 +10,26 @@ import main.model.*;
 import main.utils.*;
 import main.view.PlayModeView;
 
+/**
+ * Overview: Manages all monsters in the game, including their creation, positions, movements, 
+ * and interactions with the hero. Provides methods to create monsters, move them across the grid, 
+ * and handle their specific behaviors (e.g., attacking the hero or teleporting runes).
+ */
+/**
+ * Abstract Function: 
+ * AF(c) = A mapping between each monster `m` in `c.monsterList` and a position `(x, y)` on the grid `c.playModeGrid`.
+ * - Each monster is represented on the grid at its current position.
+ * - The list `c.monsterList` maintains the active monsters in the game.
+ * - The grid `c.playModeGrid` represents the current state of the game world, including monsters and obstacles.
+ */
+/**
+ * Representation Invariant: 
+ * RI(c) = 
+ * - No two monsters can occupy the same position at the same time on `c.playModeGrid`.
+ * - All monsters in `c.monsterList` must have valid positions within the bounds of `c.playModeGrid`.
+ * - `c.monsterList` should not contain null references.
+ */
+
 public class MonsterManager {
     // How much of the time monster stays in place, i.e. if it is 0.1,
     // monster does not move 90 percent of the time. Note that a monster 
@@ -59,7 +79,7 @@ public class MonsterManager {
      * @param now the time that the monster is created at.
      * @return Monster the monster created.
      */
-    protected Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
+    public Monster createMonster(int xPosition, int yPosition, MonsterType type, long now) {
         Monster monster = null;
         
         switch (type) {
@@ -85,9 +105,11 @@ public class MonsterManager {
         
         playModeGrid.changeTileWithIndex(xPosition, yPosition, monster.getCharType());
         this.monsterList.add(monster);
-        playModeView.createMonsterView(monster);
+        if (playModeView != null) {
+            playModeView.createMonsterView(monster);
+            playModeView.redrawTallItems();
+        }        
         // playModeView.updateMonsterPosition(monsterList.size() - 1, xPosition, yPosition);
-        playModeView.redrawTallItems();
 
         return monster;
     }
@@ -307,4 +329,32 @@ public class MonsterManager {
     public void setPlayModeView(PlayModeView view) {
         this.playModeView = view;
     }
+
+    /**
+     * Checks the representation invariant of the MonsterManager class.
+     * @return true if the representation invariant holds, false otherwise.
+     */
+    public boolean repOk() {
+        // Ensure no two monsters occupy the same position
+        for (int i = 0; i < monsterList.size(); i++) {
+            Monster monster1 = monsterList.get(i);
+            for (int j = i + 1; j < monsterList.size(); j++) {
+                Monster monster2 = monsterList.get(j);
+                if (monster1.posX == monster2.posX && monster1.posY == monster2.posY) {
+                    return false; // Two monsters occupy the same position
+                }
+            }
+        }
+
+        // Ensure all monsters are within grid bounds
+        for (Monster monster : monsterList) {
+            if (monster.posX < 0 || monster.posX >= playModeGrid.getRowLength() ||
+                monster.posY < 0 || monster.posY >= playModeGrid.getColumnLength()) {
+                return false; // Monster is out of grid bounds
+            }
+        }
+
+        return true; // Representation invariant holds
+    }
+
 }
