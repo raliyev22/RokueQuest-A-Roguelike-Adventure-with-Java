@@ -59,7 +59,7 @@ public class PlayModeController extends Application {
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
     private long lastEnchantmentSpawnTime = 0; // Tracks the last time an enchantment was spawned
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 6_000_000_000L; // 12 seconds in nanoseconds
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
     private Inventory inventory;
     private InventoryView inventoryView;
 
@@ -274,7 +274,6 @@ public class PlayModeController extends Application {
 
             if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
                 if (!activeEnchantments.contains(enchantment)) {
-                    System.out.println("Enchantment already collected or expired: " + enchantment.getType());
                     return; // Avoid double collection
                 }
 
@@ -288,10 +287,7 @@ public class PlayModeController extends Application {
                             if (currentExtraTime < 5) {
                                 addTime(1); // Increment by 1 second
                                 runeExtraTimeMap.put(runeTile, currentExtraTime + 1);
-                                System.out.println("Extra Time collected. Rune: " + runeTile + ", Total: " + (currentExtraTime + 1) + " seconds");
-                            } else {
-                                System.out.println("This rune has reached the maximum Extra Time.");
-                            }
+                               }
                         }
                     }
                     case EXTRA_LIFE -> {hero.increaseLives(1); view.updateHeroLife(hero.getLiveCount());}
@@ -398,9 +394,6 @@ public class PlayModeController extends Application {
                     }
 
                     view.updateInventoryUI(inventory.getEnchantments());
-                    System.out.println("Reveal used");
-                } else {
-                    System.out.println("No Reveal enchantment available!");
                 }
                 break;
             }
@@ -409,15 +402,12 @@ public class PlayModeController extends Application {
                 if (inventory.useEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION)) {
                     hero.setProtected(true);
                     view.updateInventoryUI(inventory.getEnchantments());
-                    System.out.println("Cloak of Protection used");
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             hero.setProtected(false);
                         }
                     }, 20000); // Cloak lasts for 20 seconds
-                } else {
-                    System.out.println("No Cloak of Protection enchantment available!");
                 }
                 break;
             }
@@ -426,9 +416,7 @@ public class PlayModeController extends Application {
                     luringGemActivated = true; // Enable direction selection
                     handleKeyPressed(event);
                     view.updateInventoryUI(inventory.getEnchantments());
-                    System.out.println("Luring Gem activated! Choose a direction.");
-                } else {
-                    System.out.println("No Luring Gem enchantment available!");
+
                 }
                 break;
             }
@@ -461,11 +449,7 @@ public class PlayModeController extends Application {
 
                 if (playModeGrid.indexInRange(targetX, targetY)) {
                     lureSpecificMonster(closestFighter, targetX, targetY);
-                } else {
-                    System.out.println("Target position is out of range.");
                 }
-            } else {
-                System.out.println("No Fighter Monster found to lure.");
             }
 
             luringGemActivated = false;
@@ -548,9 +532,6 @@ public class PlayModeController extends Application {
             monster.posY = targetY;
             playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
 
-            System.out.println("Monster lured to position: (" + targetX + ", " + targetY + ")");
-        } else {
-            System.err.println("Invalid target position for luring");
         }
     }
 
@@ -709,7 +690,7 @@ public class PlayModeController extends Application {
         if (gameLoop != null) {
             gameLoop.stop();
         }
-        System.out.println("Game loop stopped.");
+
     }
     public Grid resolveAllMovingCharacters() {
         Grid resolvedGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
