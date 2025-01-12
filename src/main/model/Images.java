@@ -9,12 +9,12 @@ public class Images extends Application {
 	public static final Image IMAGE_UI_CHEST = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
 	public static final Image IMAGE_INVENTORY = new Image("/rokue-like_assets/Inventory.png");
 	
-	public static final Image IMAGE_DOORSOPEN = new Image("/rokue-like_assets/DoorOpenWithoutWalls_32_32.png");
-	public static final Image IMAGE_DOORSOPEN_x2 = new Image("/rokue-like_assets/DoorOpenWithoutWalls_x2_64_64.png");
-	public static final Image IMAGE_DOORSCLOSED = new Image("/rokue-like_assets/DoorWithoutWalls_32_32.png");
-	public static final Image IMAGE_DOORSCLOSED_x2 = new Image("/rokue-like_assets/DoorWithoutWalls_x2_64_64.png");
-	public static final Image IMAGE_DOORSCLOSEDWALLS = new Image("/rokue-like_assets/DoorWithWalls_64_32.png");
-	public static final Image IMAGE_DOORSCLOSEDWALLS_x2 = new Image("/rokue-like_assets/DoorWithWalls_x2_128_64.png");
+	// public static final Image IMAGE_DOORSOPEN = new Image("/rokue-like_assets/DoorOpenWithoutWalls_32_32.png");
+	// public static final Image IMAGE_DOORSOPEN_x2 = new Image("/rokue-like_assets/DoorOpenWithoutWalls_x2_64_64.png");
+	// public static final Image IMAGE_DOORSCLOSED = new Image("/rokue-like_assets/DoorWithoutWalls_32_32.png");
+	// public static final Image IMAGE_DOORSCLOSED_x2 = new Image("/rokue-like_assets/DoorWithoutWalls_x2_64_64.png");
+	// public static final Image IMAGE_DOORSCLOSEDWALLS = new Image("/rokue-like_assets/DoorWithWalls_64_32.png");
+	// public static final Image IMAGE_DOORSCLOSEDWALLS_x2 = new Image("/rokue-like_assets/DoorWithWalls_x2_128_64.png");
 	
 	public static final Image IMAGE_EXITBUTTON_x2 = new Image("/rokue-like_assets/ExitButton_x2_32_32.png");
 	public static final Image IMAGE_EXITBUTTON_x4 = new Image("/rokue-like_assets/ExitButton_x4_64_64.png");
