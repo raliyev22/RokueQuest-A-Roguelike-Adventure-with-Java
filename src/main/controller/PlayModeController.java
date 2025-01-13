@@ -344,7 +344,7 @@ public class PlayModeController extends Application {
                     
                     mouseClicked = false;
                 }
-                view.walls.toFront();;
+                view.walls.toFront();
             }
         };
         gameLoop.start();
@@ -382,6 +382,7 @@ public class PlayModeController extends Application {
 
     public Hero initializeHero(int xCoordinate, int yCoordinate) {
         Hero hero = new Hero(xCoordinate, yCoordinate);
+        hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }

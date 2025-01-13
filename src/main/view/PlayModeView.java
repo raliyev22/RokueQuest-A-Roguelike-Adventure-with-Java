@@ -325,7 +325,7 @@ public class PlayModeView {
 		
 		walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
 		walls.setFill(new ImagePattern(Images.IMAGE_WATERHALL_X4));
-		walls.toFront();;
+		walls.toFront();
 		pane.getChildren().add(walls);
 	}
 	
