@@ -377,106 +377,25 @@ public class BuildModeView extends Application {
         Rectangle object = new Rectangle(x, y, width, height);
         object.setFill(new ImagePattern(image));
         
-        object.setOnMouseClicked(event -> {
-            Rectangle clone = new Rectangle(width, height);
-            clone.setFill(new ImagePattern(image));
-            root.getChildren().add(clone);
-            clone.setX(event.getSceneX() - width / 2); // Center the clone around the mouse
-            clone.setY(event.getSceneY() - height / 2);
-
-            
-            clone.setOnMouseMoved(dragEvent -> {
-                clone.setVisible(true);
-                clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
-                clone.setY(dragEvent.getSceneY() - height / 2);
-            });
-            clone.setOnMouseClicked(e -> {
-                boolean snappedToTile = false;
-    
-                // Get the scene coordinates where the object was released
-                double sceneX = e.getSceneX();
-                double sceneY = e.getSceneY();
-
-                int adjustmentForBigObjects=0;
-                boolean flag=false;
-    
-                // Adjust the Y-coordinate for tall objects (32x64)
-                if (height == 64) {
-                    flag=true;
-                    adjustmentForBigObjects=32;
-                    sceneY += adjustmentForBigObjects; // Align the bottom part with the grid
-                }
-    
-                for (TiledHall hall : halls) {
-                    Grid grid = hall.getGrid();
-    
-                    // Check if the adjusted position is within the grid
-                    if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
-                        Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
-    
-                        if (targetTile != null && targetTile.getTileType() == 'E') {
-                            // Update the tile's type to match the dragged object
-                            targetTile.changeTileType(tileType);
-
-
-                            //add the target tile to the tileList
-                            if(!tileMap.get(hall).contains(targetTile)){tileMap.get(hall).add(targetTile);}
-
-
-                            if (flag){
-                            Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
-                            if(flagTile!=null){
-                                flagTile.changeTileType('!');
-                            }
-                            }
-    
-                            // Snap the clone to the target tile
-                            Rectangle targetRect = new Rectangle(width, height);
-                            targetRect.setFill(new ImagePattern(image));
-                            // root.getChildren().add(targetRect);
-                            targetRect.setX(targetTile.getLeftSide());
-                            targetRect.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
-                            hall.getChildren().add(targetRect);
-    
-                            snappedToTile = true;
-
-                            soundPlayer.playSoundEffectInThread("putting");
-                            
-                            break;
-                        }
-                    }
-                }
-    
-                // If not snapped to a grid, remove the clone
-                if (!snappedToTile) {
-                    root.getChildren().remove(clone);
-                }
-            });
-        });
-
-
-        // object.setOnMousePressed(event -> {
-        //     // Create a new copy when dragging starts
+        // object.setOnMouseClicked(event -> {
         //     Rectangle clone = new Rectangle(width, height);
         //     clone.setFill(new ImagePattern(image));
         //     root.getChildren().add(clone);
-        //     clone.setVisible(false);
-    
-        //     // Update the position of the clone in real time
-        //     object.setOnMouseDragged(dragEvent -> {
+        //     clone.setX(event.getSceneX() - width / 2); // Center the clone around the mouse
+        //     clone.setY(event.getSceneY() - height / 2);
+
+            
+        //     clone.setOnMouseMoved(dragEvent -> {
         //         clone.setVisible(true);
-        //         // Position the clone to follow the mouse cursor
         //         clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
         //         clone.setY(dragEvent.getSceneY() - height / 2);
         //     });
-    
-        //     // Handle release for snapping or discarding
-        //     object.setOnMouseReleased(releaseEvent -> {
+        //     clone.setOnMouseClicked(e -> {
         //         boolean snappedToTile = false;
     
         //         // Get the scene coordinates where the object was released
-        //         double sceneX = releaseEvent.getSceneX();
-        //         double sceneY = releaseEvent.getSceneY();
+        //         double sceneX = e.getSceneX();
+        //         double sceneY = e.getSceneY();
 
         //         int adjustmentForBigObjects=0;
         //         boolean flag=false;
@@ -512,9 +431,12 @@ public class BuildModeView extends Application {
         //                     }
     
         //                     // Snap the clone to the target tile
-        //                     clone.setX(targetTile.getLeftSide());
-        //                     clone.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
-        //                     hall.getChildren().add(clone);
+        //                     Rectangle targetRect = new Rectangle(width, height);
+        //                     targetRect.setFill(new ImagePattern(image));
+        //                     // root.getChildren().add(targetRect);
+        //                     targetRect.setX(targetTile.getLeftSide());
+        //                     targetRect.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
+        //                     hall.getChildren().add(targetRect);
     
         //                     snappedToTile = true;
 
@@ -531,6 +453,84 @@ public class BuildModeView extends Application {
         //         }
         //     });
         // });
+
+
+        object.setOnMousePressed(event -> {
+            // Create a new copy when dragging starts
+            Rectangle clone = new Rectangle(width, height);
+            clone.setFill(new ImagePattern(image));
+            root.getChildren().add(clone);
+            clone.setVisible(false);
+    
+            // Update the position of the clone in real time
+            object.setOnMouseDragged(dragEvent -> {
+                clone.setVisible(true);
+                // Position the clone to follow the mouse cursor
+                clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
+                clone.setY(dragEvent.getSceneY() - height / 2);
+            });
+    
+            // Handle release for snapping or discarding
+            object.setOnMouseReleased(releaseEvent -> {
+                boolean snappedToTile = false;
+    
+                // Get the scene coordinates where the object was released
+                double sceneX = releaseEvent.getSceneX();
+                double sceneY = releaseEvent.getSceneY();
+
+                int adjustmentForBigObjects=0;
+                boolean flag=false;
+    
+                // Adjust the Y-coordinate for tall objects (32x64)
+                if (height == 64) {
+                    flag=true;
+                    adjustmentForBigObjects=32;
+                    sceneY += adjustmentForBigObjects; // Align the bottom part with the grid
+                }
+    
+                for (TiledHall hall : halls) {
+                    Grid grid = hall.getGrid();
+    
+                    // Check if the adjusted position is within the grid
+                    if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
+                        Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
+    
+                        if (targetTile != null && targetTile.getTileType() == 'E') {
+                            // Update the tile's type to match the dragged object
+                            targetTile.changeTileType(tileType);
+
+
+                            //add the target tile to the tileList
+                            if(!tileMap.get(hall).contains(targetTile)){tileMap.get(hall).add(targetTile);}
+
+
+                            if (flag){
+                            Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
+                            if(flagTile!=null){
+                                flagTile.changeTileType('!');
+                            }
+                            }
+    
+                            // Snap the clone to the target tile
+                            clone.setX(targetTile.getLeftSide());
+                            clone.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
+                            hall.getChildren().add(clone);
+    
+                            snappedToTile = true;
+
+                            soundPlayer.playSoundEffectInThread("putting");
+                            
+                            break;
+                        }
+                    }
+                }
+    
+                // If not snapped to a grid, remove the clone
+                if (!snappedToTile) {
+                    root.getChildren().remove(clone);
+                }
+            });
+        });
     
         root.getChildren().add(object);
     }
