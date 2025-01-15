@@ -55,4 +55,46 @@ public class MonsterManagerTest {
 
         assertTrue("repOk should return true for a monster placed at the boundary", manager.repOk());
     }
+
+    @Test
+    public void testRepOkWithSingleMonsterMovementIteration() {
+        Grid grid = new Grid(10, 9, 64, 64, 100, 150);
+        Hero hero = new Hero(0, 0);
+        MonsterManager manager = new MonsterManager(grid, hero);
+
+        // Create three monsters that are close to one another and at the border of the hall.
+        manager.createMonster(9, 8, MonsterType.ARCHER, System.nanoTime());
+        manager.createMonster(9, 7, MonsterType.FIGHTER, System.nanoTime());
+        manager.createMonster(8, 8, MonsterType.WIZARD, System.nanoTime());
+
+        manager.moveAllMonsters(System.nanoTime());
+
+        assertTrue("repOk should return true after the monsters move", manager.repOk());
+    }
+
+
+    @Test
+    public void testRepOkWithValidFighterMonsterAttack() {
+        Grid grid = new Grid(10, 9, 64, 64, 100, 150);
+        Hero hero = new Hero(4, 5);
+        MonsterManager manager = new MonsterManager(grid, hero);
+
+        int heroLife = hero.getLiveCount();
+
+        PlayModeController controller = new PlayModeController();
+        controller.playModeGrid = grid;
+
+        // Create a fighter monster near the hero
+        Monster monster =manager.createMonster(3, 5, MonsterType.FIGHTER, System.nanoTime());
+
+        if(monster instanceof FighterMonster){
+            manager.fighterTestAttack((FighterMonster)monster);
+        }
+        
+
+        assertTrue("repOkHeroLife should return true after the attack", manager.repOkHeroLife(hero, heroLife));
+    }
+
+
+
 }

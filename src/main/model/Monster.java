@@ -66,6 +66,6 @@ public abstract class Monster {
         this.lastActTime = lastActTime;
     }
 
-    public abstract void act(PlayModeController controller);
+    //public abstract void act(PlayModeController controller);
 }
 

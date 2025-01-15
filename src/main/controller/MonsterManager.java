@@ -166,6 +166,12 @@ public class MonsterManager {
         }
     }
 
+    public void fighterTestAttack(FighterMonster fighterMonster) {
+        if (isFighterInRange(fighterMonster)) {
+            hero.decreaseLives();
+        }
+    }
+
     public boolean isFighterInRange(FighterMonster fighterMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
         if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
@@ -355,6 +361,19 @@ public class MonsterManager {
         }
 
         return true; // Representation invariant holds
+    }
+
+
+
+
+    public boolean repOkHeroLife(Hero hero,int initialLifeCount) {
+        // Ensure hero life is decreased after a succesfull attack
+
+        if(hero.getLiveCount()<initialLifeCount){
+            return true;// Representation invariant holds
+        }
+
+        return false; 
     }
 
 }
