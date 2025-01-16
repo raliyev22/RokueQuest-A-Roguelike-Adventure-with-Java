@@ -313,7 +313,6 @@ public class PlayModeView {
 		pauseButton.setPrefHeight(40);
     }
 	
-	
 	public void showWalls(Grid grid, Boolean doorClosed) {
 		int wallX = grid.topLeftXCoordinate - 20;
 		int wallY = grid.topLeftYCoordinate - 109;
@@ -512,16 +511,19 @@ public class PlayModeView {
 			Button exitButton = new Button("Exit the Game");
 			mainMenuButton.setPrefWidth(150);
 			exitButton.setPrefWidth(150);
-	
+			
 			mainMenuButton.setOnAction(e -> {
-				
+				soundPlayer.pauseSoundEffect("gameWinner");
+				soundPlayer.pauseSoundEffect("gameLoser");
+				soundPlayer.playSoundEffect("menuButtons");
 				Main mainPage = new Main();
 				primaryStage.close();
 				mainPage.start(primaryStage);
 				alert.close();
 			});
-	
+			
 			exitButton.setOnAction(e -> {
+				soundPlayer.playSoundEffect("menuButtons");
 				System.exit(0);
 			});
 	

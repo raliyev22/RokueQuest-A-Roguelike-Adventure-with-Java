@@ -50,6 +50,18 @@ public class SoundEffects {
         }
     }
 
+    public void stopSoundEffect(String label) {
+        Clip clip = soundEffects.get(label);
+        if (clip != null && clip.isRunning()) {
+            clip.stop();
+            System.out.println("Sound effect stopped for label: " + label);
+        } else if (clip == null) {
+            System.err.println("No sound effects found with the specified tag: " + label);
+        } else {
+            System.out.println("Sound effect is not currently running for label: " + label);
+        }
+    }
+
     public void loopSoundEffect(String label) {
         Clip clip = soundEffects.get(label);
         if (clip != null && !clip.isRunning()) { 
