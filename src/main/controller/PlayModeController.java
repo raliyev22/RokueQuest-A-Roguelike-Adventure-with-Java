@@ -693,10 +693,15 @@ public class PlayModeController extends Application {
         }catch (IOException e){
             System.out.println("An error occurred: " + e.getMessage());
         }
-        StringBuilder str = new StringBuilder(saves.get(saves.size()-1));
-        str.delete(0,4);
-        str.delete(str.length()-4,str.length());
-        int num = Integer.valueOf(str.toString()) + 1;
+        int num = 1;
+        if (!saves.isEmpty()){
+            StringBuilder str = new StringBuilder(saves.get(saves.size()-1));
+            str.delete(0,4);
+            str.delete(str.length()-4,str.length());
+            num = Integer.valueOf(str.toString()) + 1;
+
+        }
+        
         try (FileWriter writer = new FileWriter(file, true)){
             writer.write("\nsave" + String.valueOf(num) + ".txt");
         }catch(IOException e){
