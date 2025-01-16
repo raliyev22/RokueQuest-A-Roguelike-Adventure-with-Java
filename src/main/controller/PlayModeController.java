@@ -198,6 +198,7 @@ public class PlayModeController extends Application {
         
         view.saveButton.setOnAction(e -> {
             soundPlayer.playSoundEffectInThread("blueButtons");
+            soundPlayer.playSoundEffectInThread("save");
             save();
         });    
     }
@@ -378,6 +379,7 @@ public class PlayModeController extends Application {
             startGameLoop();
             view.hidePauseGame();
             soundPlayer.resumeSoundEffect("background");
+            initialize(view.getScene());
         }
     }
 

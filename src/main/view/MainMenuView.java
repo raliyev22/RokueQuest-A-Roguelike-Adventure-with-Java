@@ -202,6 +202,7 @@ public class MainMenuView extends Application {
         soundPlayer.setVolume("background", -20);   
         soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
         soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
+        soundPlayer.addSoundEffect("save", "src/main/sounds/save.wav");
         soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
         soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
         soundPlayer.setVolume("step", -10);
