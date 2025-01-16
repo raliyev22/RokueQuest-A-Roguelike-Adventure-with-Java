@@ -195,8 +195,9 @@ public class PlayModeController extends Application {
             mainPage.start(primaryStage);
             soundPlayer.playSoundEffectInThread("blueButtons");
         });
-
+        
         view.saveButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
             save();
         });    
     }
@@ -368,7 +369,7 @@ public class PlayModeController extends Application {
 
         if (isRunning){
             stopGameLoop();
-            view.showPauseGame();    
+            view.showPauseGame();
             soundPlayer.pauseSoundEffect("background");
             pauseStartTime = System.nanoTime();
         }

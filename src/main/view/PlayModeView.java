@@ -53,7 +53,6 @@ public class PlayModeView {
 	private StackPane pauseOverlay;
 	private StackPane exitOverlay;
 	public Button pauseButton;
-	public Button resumeButton;
 	private HBox buttonContainer;
 	public Button sureExitButton;
 	public Button exitButton;
@@ -87,8 +86,6 @@ public class PlayModeView {
 		}
 
         monsterViews = new ArrayList<>();
-
-        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
 		
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
@@ -288,9 +285,6 @@ public class PlayModeView {
 		//Added to first index of button container
 		buttonContainer.getChildren().add(1, saveButton);
 
-		saveButton.setOnAction(e -> {
-            soundPlayer.playSoundEffectInThread("blueButtons");
-        });
 		//Changing pause button's image to play button image
 		ImageView resumeImageView = new ImageView(Images.IMAGE_PLAYBUTTON_x4);
 		resumeImageView.setFitHeight(40);
