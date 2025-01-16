@@ -5,6 +5,7 @@ import main.model.Images;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import javafx.util.Pair;
 
@@ -611,6 +612,38 @@ public class BuildModeView extends Application {
     public void addTiledHall(TiledHall hall, HallType type) {
         tileMap.put(hall, new ArrayList<>());
         hallTypeMap.put(hall, type); // Tür eşlemesi
+    }
+    public boolean repOk() {
+        // Check for null references in tileMap and hallTypeMap
+        if (tileMap == null || hallTypeMap == null) {
+            return false;
+        }
+
+        // Check that each TiledHall in tileMap exists in hallTypeMap
+        for (TiledHall hall : tileMap.keySet()) {
+            if (!hallTypeMap.containsKey(hall) || hall.getGrid() == null) {
+                return false;
+            }
+        }
+
+        // Check for unique object placement within each TiledHall
+        for (TiledHall hall : tileMap.keySet()) {
+            List<Tile> placedTiles = tileMap.get(hall);
+            HashSet<Tile> uniqueTiles = new HashSet<>(placedTiles);
+            if (uniqueTiles.size() != placedTiles.size()) {
+                return false; // Duplicate objects in the same tile
+            }
+
+            // Ensure all objects are within the hall's grid boundaries
+            for (Tile tile : placedTiles) {
+                if (!hall.getGrid().coordinatesAreInGrid(tile.getLeftSide(), tile.getTopSide())) {
+                    return false; // Object placed outside the hall
+                }
+            }
+        }
+
+        // All checks passed
+        return true;
     }
     
     public static void main(String[] args) {
