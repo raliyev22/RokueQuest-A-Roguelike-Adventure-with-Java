@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-
+import javafx.util.Duration;
 import main.Main;
 import main.model.*;
 import main.utils.*;
@@ -103,7 +105,7 @@ public class PlayModeController extends Application {
                 playModeGrid.copyTileMap(fireHall);
                 this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
             }
-            case FIRE -> { // Add game over screen here
+            case FIRE -> {
                 stopGameLoop();
                 view.showGameOverPopup(true);
                 System.err.println("playmodecontroller line 103 fire hall bug");
@@ -133,7 +135,7 @@ public class PlayModeController extends Application {
         monsterManager = new MonsterManager(playModeGrid, hero);
         
         if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
-            view.refresh(playModeGrid, time);
+            view.refresh(playModeGrid, time, hallType);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
             initializeSetOnActions();
             monsterManager.setPlayModeView(view);
@@ -145,7 +147,7 @@ public class PlayModeController extends Application {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         // If view is null (which means we are in the first hall), create a new one
         if (view == null){
-            view = new PlayModeView(playModeGrid, time, primaryStage);
+            view = new PlayModeView(playModeGrid, time, primaryStage,hallType);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
             initializeSetOnActions();
             monsterManager.setPlayModeView(view);
@@ -326,6 +328,9 @@ public class PlayModeController extends Application {
                             hero.isMoving = false;
                             lastMonsterSpawnTime = 0;
                             lastUpdateTime = 0;
+
+                            view.showWalls(playModeGrid, false);
+                            view.walls.toFront();
                             
                             if(hallType == HallType.FIRE){
                                 soundPlayer.playSoundEffectInThread("gameWinner");
@@ -333,14 +338,12 @@ public class PlayModeController extends Application {
                             }
                             else{
                                 soundPlayer.playSoundEffectInThread("door");
-                                try {
-                                    Thread.sleep(1500);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                startGameLoop();
+
+                                new Timeline(new KeyFrame(Duration.seconds(1.75), e -> {
+                                    startGameLoop();
+                                    initializePlayMode();
+                                })).play();
                             }
-                            initializePlayMode();
                         }
                     }
                     
@@ -888,7 +891,7 @@ public class PlayModeController extends Application {
                 throw new RuntimeException("RemainingMonsterSpawnTime data missing or corrupted.");
 }
             
-            view = new PlayModeView(playModeGrid, time, primaryStage);
+            view = new PlayModeView(playModeGrid, time, primaryStage,hallType);
             
             monsterManager = new MonsterManager(playModeGrid, hero);
             

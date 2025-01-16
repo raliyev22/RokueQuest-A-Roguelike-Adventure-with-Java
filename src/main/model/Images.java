@@ -35,7 +35,14 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
-	public static final Image IMAGE_WATERHALL_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_770(1).png");
+	public static final Image IMAGE_EARTHHALL_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_799.png");
+	public static final Image IMAGE_EARTHHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Earth_Open_Door_x4_680_799.png");
+	public static final Image IMAGE_AIRHALL_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_799.png");
+	public static final Image IMAGE_AIRHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Air_Open_Door_x4_680_799.png");
+	public static final Image IMAGE_WATERHALL_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_799.png");
+	public static final Image IMAGE_WATERHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Water_Open_Door_x4_680_799.png");
+	public static final Image IMAGE_FIREHALL_X4 = new Image("/rokue-like_assets/Walls_Fire_x4_680_799.png");
+	public static final Image IMAGE_FIREHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Fire_Open_Door_x4_680_799.png");
     
     public static final Image IMAGE_PLAYERLEFTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerLeftTakingDamage_x4_64_64.png");
     public static final Image IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerRightTakingDamage_x4_64_64.png");

@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import main.Main;
 import main.controller.MonsterManager;
 import main.controller.PlayModeController;
+import main.model.HallType;
 import main.model.Images;
 import main.model.Monster;
 import main.utils.Grid;
@@ -43,6 +44,7 @@ public class PlayModeView {
 	protected Scene scene;
 	protected int tileSize = 64;
 	protected Grid grid;
+	private HallType hallType;
 	protected Rectangle heroView;
 	protected double time;
   	protected List<Rectangle> monsterViews;
@@ -63,18 +65,20 @@ public class PlayModeView {
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
-	public PlayModeView(Grid grid, double time, Stage primaryStage) {
+	public PlayModeView(Grid grid, double time, Stage primaryStage, HallType hallType) {
 		this.grid = grid;
 		this.time = time;
+		this.hallType = hallType;
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
 		initialize();
 	}
-
-	public void refresh(Grid newGrid, double time) {
+	
+	public void refresh(Grid newGrid, double time, HallType hallType) {
 		this.grid = newGrid;
 		this.time = time;
+		this.hallType = hallType;
 		pane.getChildren().clear();
 		initialize();
 	}
@@ -95,7 +99,7 @@ public class PlayModeView {
 			BackgroundSize.DEFAULT
 		)));
 
-        showWalls(grid);
+        showWalls(grid,true);
         heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         pane.getChildren().add(heroView);
         showGrid(grid);
@@ -310,17 +314,41 @@ public class PlayModeView {
     }
 	
 	
-	private void showWalls(Grid grid) {
+	public void showWalls(Grid grid, Boolean doorClosed) {
 		int wallX = grid.topLeftXCoordinate - 20;
-		int wallY = grid.topLeftYCoordinate - 80;
+		int wallY = grid.topLeftYCoordinate - 109;
 
 		int wallLengthX = 680;
-		int wallLengthY = 780;
-		
+		int wallLengthY = 799;
+
+		ImagePattern wallImage = getWallImage(hallType, doorClosed);
+
+		if (walls != null) {
+			pane.getChildren().remove(walls);
+		}
+
 		walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
-		walls.setFill(new ImagePattern(Images.IMAGE_WATERHALL_X4));
+		walls.setFill(wallImage);
 		walls.toFront();
 		pane.getChildren().add(walls);
+	}
+	
+	private ImagePattern getWallImage(HallType hallType, boolean doorClosed) {
+		return switch (hallType) {
+			case EARTH -> doorClosed ? 
+				new ImagePattern(Images.IMAGE_EARTHHALL_X4) : 
+				new ImagePattern(Images.IMAGE_EARTHHALL_OPENDOOR_X4);
+			case AIR -> doorClosed ? 
+				new ImagePattern(Images.IMAGE_AIRHALL_X4) : 
+				new ImagePattern(Images.IMAGE_AIRHALL_OPENDOOR_X4);
+			case WATER -> doorClosed ? 
+				new ImagePattern(Images.IMAGE_WATERHALL_X4) : 
+				new ImagePattern(Images.IMAGE_WATERHALL_OPENDOOR_X4);
+			case FIRE -> doorClosed ? 
+				new ImagePattern(Images.IMAGE_FIREHALL_X4) : 
+				new ImagePattern(Images.IMAGE_FIREHALL_OPENDOOR_X4);
+			default -> null;
+		};
 	}
 	
 	public void showGrid(Grid grid) {
