@@ -172,6 +172,15 @@ public class MonsterManager {
         }
     }
 
+
+    public void archerTestAttack(ArcherMonster archerMonster) {
+        if (isArcherInRange(archerMonster)) {
+            hero.decreaseLives();
+        }
+    }
+
+
+
     public boolean isFighterInRange(FighterMonster fighterMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
         if (manhattanDistance <= FighterMonster.FIGHTER_RANGE) {
@@ -369,11 +378,18 @@ public class MonsterManager {
     public boolean repOkHeroLife(Hero hero,int initialLifeCount) {
         // Ensure hero life is decreased after a succesfull attack
 
-        if(hero.getLiveCount()<initialLifeCount){
-            return true;// Representation invariant holds
-        }
+        return hero.getLiveCount()==initialLifeCount-1; 
+    }
 
-        return false; 
+
+
+    public boolean repOkTeleportation(int x,int y,PlayModeController controller) {
+        // Check if the teleported location contains an object
+
+        Grid grid = controller.getPlayModeGrid();
+        Tile targetTile = grid.findTileWithIndex(x, y);
+
+        return Grid.isHallObjectTile(targetTile);
     }
 
 }
