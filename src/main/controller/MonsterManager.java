@@ -135,6 +135,12 @@ public class MonsterManager {
     }
 
     public void archerAttack(long now, ArcherMonster archerMonster) {
+        // Check if the hero is protected from Archers
+        if (hero.isProtectedFrom(MonsterType.ARCHER)) {
+            System.out.println("Hero is protected from Archer attacks.");
+            return; // Skip attack logic
+        }
+    
         if (!archerMonster.isMoving && !hero.isMoving && !hero.isTakingDamage) {
             if (isArcherInRange(archerMonster)) {
                 hero.isTakingDamage = true;
@@ -145,6 +151,7 @@ public class MonsterManager {
             }
         }
     }
+    
 
     public boolean isArcherInRange(ArcherMonster archerMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);

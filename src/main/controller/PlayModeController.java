@@ -52,6 +52,7 @@ public class PlayModeController extends Application {
     private List<Enchantment> activeEnchantments;
     private Map<Tile, Integer> runeExtraTimeMap; // Tracks extra time added per rune
     private boolean luringGemActivated = false;
+    public int activeExtraTimeEnchantments = 0;
 
     private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
 
@@ -333,17 +334,19 @@ public class PlayModeController extends Application {
         Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
         if (hero.getEnchantments().containsKey(type)) {
             hero.consumeEnchantment(type);
-            hero.setProtected(true);
+            hero.setProtectedFrom(MonsterType.ARCHER); // Protect from Archer monsters
+    
             Timer protectionTimer = new Timer();
             protectionTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    hero.setProtected(false);
+                    hero.removeProtectionFrom(MonsterType.ARCHER);
+                    System.out.println("Hero is no longer protected from Archer attacks.");
                 }
-            }, 20000); // Cloak lasts for 20 seconds
+            }, 20000); // Protection lasts for 20 seconds
         }
     }
-
+    
 
 
     private void handleKeyPressed(KeyCode code) {
@@ -407,7 +410,7 @@ public class PlayModeController extends Application {
                     view.updateInventoryUI(inventory.getEnchantments());
                 }
                 break;
-            case P:
+                case P:
                 if (inventory.useEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION)) {
                     hero.setProtectedFrom(MonsterType.ARCHER); // Protect only from archers
                     view.updateInventoryUI(inventory.getEnchantments());
@@ -418,7 +421,7 @@ public class PlayModeController extends Application {
                         }
                     }, 20000); // Cloak lasts for 20 seconds
                 }
-                break;
+                break;            
             case B:
                 if (inventory.useEnchantment(Enchantment.Type.LURING_GEM)) {
                     luringGemActivated = true; // Enable direction selection
@@ -628,51 +631,70 @@ public class PlayModeController extends Application {
         };
         gameLoop.start();
     }
-    private void spawnEnchantment() {
+     
+    public void spawnEnchantment() {
         long currentTime = System.nanoTime();
-
+    
         // Check if enough time has passed since the last enchantment spawn
         if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
+            // Get the maximum allowed "Extra Time" enchantments
+            int maxExtraTimeEnchantments = getHallObjectTiles().size();
+    
+            // If the limit is reached, skip spawning "Extra Time" enchantments
+            if (activeExtraTimeEnchantments >= maxExtraTimeEnchantments) {
+                System.out.println("Maximum Extra Time enchantments reached. Skipping spawn.");
+                return;
+            }
+    
+            // Spawn a new enchantment
             Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
-
-            // Try spawning Extra Time on the rune if available
+    
+            // Handle "Extra Time" enchantment specifically
             if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
                 Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
-
-                if (runeTile != null && checkRune(runeTile)) { // Ensure the rune is still available and valid
+    
+                if (runeTile != null && checkRune(runeTile)) {
+                    // Ensure the rune is valid and available
                     activeEnchantments.add(enchantmentToSpawn);
                     view.addEnchantmentView(enchantmentToSpawn, runeTile.getLeftSide(), runeTile.getTopSide());
-                    final Enchantment finalEnchantment = enchantmentToSpawn; // Effectively final for lambda
+                    activeExtraTimeEnchantments++; // Increment the counter
+    
+                    // Schedule expiration
+                    final Enchantment finalEnchantment = enchantmentToSpawn;
                     enchantmentToSpawn.startExpirationTimer(6000, () -> {
                         activeEnchantments.remove(finalEnchantment);
+                        activeExtraTimeEnchantments--; // Decrement the counter
                         view.removeEnchantmentView(finalEnchantment);
                     });
-
+    
                     lastEnchantmentSpawnTime = currentTime;
-                    return; // Exit early since the Extra Time enchantment was successfully spawned
+                    return; // Exit early since "Extra Time" enchantment was spawned
                 }
             }
+    
+            // Spawn other enchantments if the above logic didn't apply
             Tile randomTile = getRandomEmptyTile();
             if (randomTile != null) {
                 Enchantment newEnchantment = enchantmentToSpawn;
-
-                if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
-                    newEnchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
-                }
-
-                final Enchantment finalFallbackEnchantment = newEnchantment; // Effectively final for lambda
+    
+                final Enchantment finalFallbackEnchantment = newEnchantment;
                 activeEnchantments.add(finalFallbackEnchantment);
                 view.addEnchantmentView(finalFallbackEnchantment, randomTile.getLeftSide(), randomTile.getTopSide());
-
+    
                 // Schedule expiration
                 finalFallbackEnchantment.startExpirationTimer(6000, () -> {
                     activeEnchantments.remove(finalFallbackEnchantment);
+                    if (finalFallbackEnchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+                        activeExtraTimeEnchantments--; // Decrement the counter if it's an Extra Time enchantment
+                    }
                     view.removeEnchantmentView(finalFallbackEnchantment);
                 });
+    
                 lastEnchantmentSpawnTime = currentTime;
             }
         }
     }
+    
 
     
 
