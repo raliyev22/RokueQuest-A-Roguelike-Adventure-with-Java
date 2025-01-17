@@ -40,6 +40,7 @@ public class MainMenuView extends Application {
         Button startButton = createStyledButton("Start a New Game");
         Button loadGameButton = createStyledButton("Load Game");
         Button helpButton = createStyledButton("Help");
+        Button soundSettingsButton = createStyledButton("Sound Settings");
         Button exitButton = createStyledButton("Exit");
 
         // Button Actions
@@ -57,6 +58,11 @@ public class MainMenuView extends Application {
             soundPlayer.playSoundEffectInThread("menuButtons");
             showHelp(primaryStage);
         });
+
+        soundSettingsButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
+            showSoundSettingsMenu(primaryStage);
+        });
         
         exitButton.setOnAction(e -> {
             soundPlayer.playSoundEffectInThread("menuButtons");
@@ -64,7 +70,7 @@ public class MainMenuView extends Application {
         });
 
         // Add elements to VBox
-        mainMenu.getChildren().addAll(title, startButton,loadGameButton, helpButton, exitButton);
+        mainMenu.getChildren().addAll(title, startButton,loadGameButton, helpButton, soundSettingsButton, exitButton);
 
         // Background styling
         StackPane root = new StackPane();
@@ -189,6 +195,12 @@ public class MainMenuView extends Application {
         // Show Help Window
         HelpView helpMenuView = new HelpView();
         helpMenuView.start(primaryStage);
+    }    
+    
+    private void showSoundSettingsMenu(Stage primaryStage) {
+        // Show Help Window
+        SoundSettingsView soundSettingsView = new SoundSettingsView();
+        soundSettingsView.start(primaryStage);
     }
 
     private void showLoadMenu(Stage primaryStage) {
