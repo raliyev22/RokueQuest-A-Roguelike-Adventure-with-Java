@@ -41,6 +41,13 @@ public class Grid {
         tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
     }
 
+	public int getRowLength() {
+		return rowLength;
+	}
+
+	public int getColumnLength() {
+		return columnLength;
+	}
 	public void lureMonsters(int heroPosX, int heroPosY, Directions dir) {
 		List<Monster> nearbyMonsters = findMonstersAdjacentToHero(heroPosX, heroPosY);
 
