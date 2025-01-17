@@ -457,13 +457,6 @@ public class PlayModeController extends Application {
                     view.updateInventoryUI(inventory.getEnchantments());
                 }
                 break;
-            case ESCAPE :
-                if (!escPressedFlag) {
-                    soundPlayer.playSoundEffectInThread("escButton");
-                    togglePause();
-                    escPressedFlag = true;
-                }
-            }
             default:
                 // Handle unrecognized keys if necessary
                 break;
@@ -499,6 +492,11 @@ public class PlayModeController extends Application {
                 }
                 lastFrameTime = adjustedNow;
                 spawnEnchantment();
+
+                if (mouseClicked) {
+                    handleMouseClick(mouseX, mouseY);
+                    mouseClicked = false;
+                }
                 if (lastMonsterSpawnTime == 0) {
                     lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
                 }

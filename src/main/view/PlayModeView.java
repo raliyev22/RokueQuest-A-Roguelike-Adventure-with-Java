@@ -75,6 +75,7 @@ public class PlayModeView {
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
+		bagLabels = new HashMap<>();
 		initializeBagUI();
 		initialize();
 	}
