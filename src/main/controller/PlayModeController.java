@@ -20,6 +20,7 @@ import javafx.util.Duration;
 import main.Main;
 import main.model.*;
 import main.utils.*;
+import main.view.InventoryView;
 import main.view.PlayModeView;
 
 public class PlayModeController extends Application {
@@ -456,7 +457,7 @@ public class PlayModeController extends Application {
                     view.updateInventoryUI(inventory.getEnchantments());
                 }
                 break;
-            case ESCAPE -> {
+            case ESCAPE :
                 if (!escPressedFlag) {
                     soundPlayer.playSoundEffectInThread("escButton");
                     togglePause();
