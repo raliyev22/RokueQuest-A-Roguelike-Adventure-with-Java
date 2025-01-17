@@ -63,14 +63,14 @@ public class BuildModeView extends Application {
     public static HashMap<TiledHall, HallType> hallTypeMap = new HashMap<>(); // Yeni ekleme
 
     private List<TiledHall> halls;
-    private Stage primaryStage;
+    Pane pane;
 
     SoundEffects soundPlayer = SoundEffects.getInstance();
 
     public void start(Stage primaryStage) {
 
         // Create a pane
-        Pane pane = new Pane();
+        pane = new Pane();
 
         //Create the background grid
         for (int a = 0; a < 1200; a += tileSize) {
@@ -104,6 +104,7 @@ public class BuildModeView extends Application {
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2, hall3, hall4);
         //pane.getChildren().add(hall1);
+        showWalls();
 
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
@@ -645,6 +646,30 @@ public class BuildModeView extends Application {
         // All checks passed
         return true;
     }
+
+
+	public void showWalls() {
+		ImagePattern earthHallImage = new ImagePattern(Images.IMAGE_EARTHHALL_X4);
+		ImagePattern airHallImage = new ImagePattern(Images.IMAGE_AIRHALL_X4);
+		ImagePattern waterHallImage = new ImagePattern(Images.IMAGE_WATERHALL_X4);
+		ImagePattern fireHallImage = new ImagePattern(Images.IMAGE_FIREHALL_X4);
+
+		Rectangle earthWalls = new Rectangle(151, 12, 340, 400);
+		Rectangle airWalls = new Rectangle(551, 12, 340, 400);
+		Rectangle waterWalls = new Rectangle(151, 410, 340, 400);
+		Rectangle fireWalls = new Rectangle(551, 410, 340, 400);
+
+		earthWalls.setFill(earthHallImage);
+		airWalls.setFill(airHallImage);
+		waterWalls.setFill(waterHallImage);
+		fireWalls.setFill(fireHallImage);
+
+		pane.getChildren().add(earthWalls);
+		pane.getChildren().add(airWalls);
+		pane.getChildren().add(waterWalls);
+		pane.getChildren().add(fireWalls);
+	}
+	
     
     public static void main(String[] args) {
         launch(args);
