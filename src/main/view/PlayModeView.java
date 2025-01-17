@@ -256,17 +256,14 @@ public class PlayModeView {
 			System.out.println("Attempted to collect a non-existent enchantment.");
 			return; // Avoid duplicate processing
 		}
-
 		Platform.runLater(() -> {
 			inventory.addEnchantment(enchantment.getType());
 			updateInventoryUI(inventory.getEnchantments());
-
 			// Remove from screen only if it was rendered
 			Rectangle enchantmentView = enchantmentViews.get(enchantment);
 			if (enchantmentView != null) {
 				pane.getChildren().remove(enchantmentView);
 			}
-
 			synchronized (enchantmentViews) {
 				enchantmentViews.remove(enchantment);
 			}
