@@ -20,7 +20,6 @@ import javafx.util.Duration;
 import main.Main;
 import main.model.*;
 import main.utils.*;
-import main.view.InventoryView;
 import main.view.PlayModeView;
 
 public class PlayModeController extends Application {
