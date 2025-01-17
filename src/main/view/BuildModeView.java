@@ -14,6 +14,7 @@ import javafx.util.Duration;
 import javafx.scene.paint.ImagePattern;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.scene.Cursor;
@@ -32,7 +33,7 @@ import javafx.stage.Stage;
 import main.utils.Grid;
 import main.utils.SoundEffects;
 import main.utils.Tile;
-import main.utils.TiledHall;
+import test.TiledHall;
 
 import java.util.Random;
 
