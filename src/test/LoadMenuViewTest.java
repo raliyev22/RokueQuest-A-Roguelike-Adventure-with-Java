@@ -1,9 +1,8 @@
 package test;
 
 import main.view.LoadMenuView;
-import main.controller.PlayModeController;
 
-import org.junit.After;
+
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -107,6 +106,13 @@ public class LoadMenuViewTest {
 
         // Ensure the list is empty
         assertTrue("Save file list should be empty", savedFiles.isEmpty());
+        try {
+            loadMenuView.updateSaveFileList(savedFiles, "save4.txt", filePath);
+
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Simulate adding a new save file (save5.txt)
         try (FileWriter writer = new FileWriter(filePath, true)) {
