@@ -62,39 +62,41 @@ public class SoundSettingsView extends Application {
         sliderGrid.setAlignment(Pos.CENTER);
 
         // Add sliders with labels
-        addSliderToGrid("Background Music", "background", -50, 0, -20, sliderGrid, 0);
-        addSliderToGrid("Step", "step", -50, 0, -10, sliderGrid, 1);
-        addSliderToGrid("Winning Sound", "gameWinner", -50, 0, -15, sliderGrid, 2);
-        addSliderToGrid("Losing Sound", "gameLoser", -50, 0, -15, sliderGrid, 3);
-        addSliderToGrid("Wizard", "wizard", -50, 0, -10, sliderGrid, 4);
-        addSliderToGrid("Archer", "archer", -50, 0, -10, sliderGrid, 5);
-        addSliderToGrid("Fighter", "fighter", -50, 0, -10, sliderGrid, 6);
-        addSliderToGrid("Sparkle", "sparkle", -50, 0, -15, sliderGrid, 7);
+        addSliderToGrid("Background Music", "background", -80, 6, soundPlayer.getVolume("background"), sliderGrid, 0);
+        addSliderToGrid("Step", "step", -80, 6, soundPlayer.getVolume("step"), sliderGrid, 1);
+        addSliderToGrid("Winning Sound", "gameWinner", -80, 6, soundPlayer.getVolume("gameWinner"), sliderGrid, 2);
+        addSliderToGrid("Losing Sound", "gameLoser", -80, 6, soundPlayer.getVolume("gameLoser"), sliderGrid, 3);
+        addSliderToGrid("Wizard", "wizard", -80, 6, soundPlayer.getVolume("wizard"), sliderGrid, 4);
+        addSliderToGrid("Archer", "archer", -80, 6, soundPlayer.getVolume("archer"), sliderGrid, 5);
+        addSliderToGrid("Fighter", "fighter", -80, 6, soundPlayer.getVolume("fighter"), sliderGrid, 6);
+        addSliderToGrid("Sparkle", "sparkle", -80, 6, soundPlayer.getVolume("sparkle"), sliderGrid, 7);
 
         // Mute Toggle Button
         muteToggle = new ToggleButton("Mute All");
         muteToggle.setStyle("-fx-background-color: #555; -fx-text-fill: white;");
-        muteToggle.setPrefWidth(150); // Set button width
+        muteToggle.setPrefWidth(150);
         muteToggle.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
             boolean muted = muteToggle.isSelected();
             if (muted) {
-                muteAll(); // Mute all sounds by setting volume sliders to minimum
+                muteAll();
             } else {
-                unmuteAll(); // Restore the volume sliders to their current values
+                unmuteAll();
             }
         });
 
         // Reset Button
         resetButton = new Button("Reset to Default");
         resetButton.setStyle("-fx-background-color: #444; -fx-text-fill: white;");
-        resetButton.setPrefWidth(150); // Set button width
+        resetButton.setPrefWidth(150); 
         resetButton.setOnAction(e -> resetToDefault());
 
         // Back Button
         backButton = new Button("Back");
         backButton.setStyle("-fx-background-color: #444; -fx-text-fill: white;");
-        backButton.setPrefWidth(150); // Set button width
+        backButton.setPrefWidth(150);
         backButton.setOnAction(e -> {
+            soundPlayer.playSoundEffectInThread("menuButtons");
             Main mainPage = new Main();
             mainPage.start(primaryStage);
         });
@@ -103,13 +105,12 @@ public class SoundSettingsView extends Application {
         HBox buttonsBox = new HBox(15, muteToggle, resetButton, backButton);
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setTranslateY(-15);
-        // buttonsBox.setPadding(new Insets(10));
 
         // Add everything to the root
         root.getChildren().addAll(titleLabel, sliderGrid, buttonsBox);
 
         // Create and set the scene
-        Scene scene = new Scene(root, 600, 400); // Fixed size
+        Scene scene = new Scene(root, 600, 400);
         primaryStage.setScene(scene);
     }
 
@@ -118,7 +119,7 @@ public class SoundSettingsView extends Application {
         label.setStyle("-fx-text-fill: white;");
 
         Slider slider = createSlider(min, max, defaultValue);
-        slider.setId(key); // Set the ID to match the sound key
+        slider.setId(key);
         soundSliders.put(key, slider);
 
         grid.add(label, 0, row);
@@ -131,7 +132,7 @@ public class SoundSettingsView extends Application {
         slider.setShowTickLabels(false);
         slider.setMajorTickUnit(10);
         slider.setBlockIncrement(5);
-        slider.setPrefWidth(200); // Compact width for smaller space
+        slider.setPrefWidth(200);
         slider.setStyle("-fx-control-inner-background: #555;");
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -148,14 +149,16 @@ public class SoundSettingsView extends Application {
     }
 
     private void resetToDefault() {
+        soundPlayer.playSoundEffectInThread("menuButtons");
+
         soundSliders.get("background").setValue(-20);
         soundSliders.get("step").setValue(-10);
         soundSliders.get("gameWinner").setValue(-15);
         soundSliders.get("gameLoser").setValue(-15);
+        soundSliders.get("archer").setValue(-5);
+        soundSliders.get("fighter").setValue(-5);
         soundSliders.get("wizard").setValue(-10);
-        soundSliders.get("archer").setValue(-10);
-        soundSliders.get("fighter").setValue(-10);
-        soundSliders.get("sparkle").setValue(-15);
+        soundSliders.get("sparkle").setValue(-5);
 
         if (muteToggle.isSelected()) {
             muteToggle.setSelected(false);
@@ -163,20 +166,22 @@ public class SoundSettingsView extends Application {
     }
 
     private void muteAll() {
+        muteToggle.setText("Unmute All");
         soundSliders.values().forEach(slider -> {
-            slider.setDisable(true); // Disable sliders while muted
-            soundPlayer.setVolume(slider.getId(), -80f); // Set all volumes to minimum
+            slider.setDisable(true);
+            soundPlayer.setVolume(slider.getId(), -80f);
         });
     }
-
+    
     private void unmuteAll() {
-        soundSliders.values().forEach(slider -> slider.setDisable(false)); // Re-enable sliders
-        applyVolumeSettings(); // Apply the current volume settings
+        muteToggle.setText("Mute All");
+        soundSliders.values().forEach(slider -> slider.setDisable(false));
+        applyVolumeSettings();
     }
 
     private void applyVolumeSettings() {
         soundSliders.forEach((key, slider) -> {
-            float volume = (float) slider.getValue(); // Convert slider value to float
+            float volume = (float) slider.getValue();
             soundPlayer.setVolume(key, volume);
         });
     }

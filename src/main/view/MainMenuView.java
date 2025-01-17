@@ -28,7 +28,7 @@ public class MainMenuView extends Application {
         mainMenu.setPadding(new javafx.geometry.Insets(30));
 
         // Adding Sound Effects
-        initializeSoundEffects();
+        soundPlayer.loadSounds();
 
         // Title with animations
         Text title = new Text("Rokue-Like Adventure");
@@ -209,28 +209,6 @@ public class MainMenuView extends Application {
         loadMenuView.start(primaryStage);
     }
 
-    private void initializeSoundEffects() {
-        soundPlayer.addSoundEffect("background", "src/main/sounds/background.wav");
-        soundPlayer.setVolume("background", -20);   
-        soundPlayer.addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
-        soundPlayer.addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
-        soundPlayer.addSoundEffect("save", "src/main/sounds/save.wav");
-        soundPlayer.addSoundEffect("putting", "src/main/sounds/putting.wav");
-        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
-        soundPlayer.setVolume("step", -10);
-        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
-        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
-        soundPlayer.setVolume("gameWinner", -15);
-        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
-        soundPlayer.setVolume("gameLoser", -15);
-        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
-        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
-        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
-        soundPlayer.setVolume("wizard", -10);
-        soundPlayer.addSoundEffect("escButton","src/main/sounds/escButton.wav");
-        soundPlayer.addSoundEffect("sparkle","src/main/sounds/sparkle.wav");
-    }
-    
     private void showExitConfirmation(Stage primaryStage) {
         System.exit(0);
         // CustomAlertView.showAlert(

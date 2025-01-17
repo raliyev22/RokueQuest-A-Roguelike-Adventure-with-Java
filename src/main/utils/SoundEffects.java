@@ -13,6 +13,7 @@ public class SoundEffects {
     private static SoundEffects instance;
     private Map<String, Clip> soundEffects = new HashMap<>();
     private Map<String, Integer> pausedPositions = new HashMap<>();
+    private boolean isInitialized = false;
 
     private SoundEffects() {}
 
@@ -21,6 +22,39 @@ public class SoundEffects {
             instance = new SoundEffects();
         }
         return instance;
+    }
+
+    public void loadSounds() {
+        if (isInitialized) return;
+
+        try {
+            addSoundEffect("background", "src/main/sounds/background.wav");
+            setVolume("background", -20);
+            addSoundEffect("menuButtons", "src/main/sounds/menuButtons.wav");
+            addSoundEffect("blueButtons", "src/main/sounds/blueButtons.wav");
+            addSoundEffect("save", "src/main/sounds/save.wav");
+            addSoundEffect("putting", "src/main/sounds/putting.wav");
+            addSoundEffect("step", "src/main/sounds/step.wav");
+            setVolume("step", -10);
+            addSoundEffect("door", "src/main/sounds/door.wav");
+            addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
+            setVolume("gameWinner", -15);
+            addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
+            setVolume("gameLoser", -15);
+            addSoundEffect("archer", "src/main/sounds/archer.wav");
+            setVolume("archer", -5);
+            addSoundEffect("fighter", "src/main/sounds/fighter.wav");
+            setVolume("fighter", -5);
+            addSoundEffect("wizard", "src/main/sounds/wizard.wav");
+            setVolume("wizard", -10);
+            addSoundEffect("escButton", "src/main/sounds/escButton.wav");
+            addSoundEffect("sparkle", "src/main/sounds/sparkle.wav");
+            setVolume("sparkle", -5);
+
+            isInitialized = true;
+        } catch (Exception e) {
+            System.err.println("Error loading sounds: " + e.getMessage());
+        }
     }
     
     public void addSoundEffect(String label, String filePath) {
@@ -75,9 +109,13 @@ public class SoundEffects {
     public void setVolume(String label, float volume) {
         Clip clip = soundEffects.get(label);
         if (clip != null) {
-            FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            volume = Math.max(gainControl.getMinimum(), Math.min(gainControl.getMaximum(), volume));
-            gainControl.setValue(volume);
+            if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                volume = Math.max(gainControl.getMinimum(), Math.min(gainControl.getMaximum(), volume));
+                gainControl.setValue(volume);
+            } else {
+                System.err.println("Volume control not supported for: " + label);
+            }
         } else {
             System.err.println("No sound effects found with the specified tag: " + label);
         }
@@ -122,6 +160,23 @@ public class SoundEffects {
             System.err.println("No paused sound effects found with the specified tag: " + label);
         }
     }
+
+    public float getVolume(String key) {
+        Clip clip = soundEffects.get(key);
+        if (clip != null) {
+            try {
+                // FloatControl'un mevcut olup olmadığını kontrol et
+                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                return gainControl.getValue(); // dB olarak mevcut sesi döndür
+            } catch (IllegalArgumentException e) {
+                System.err.println("MASTER_GAIN control not supported for sound: " + key);
+            }
+        } else {
+            System.err.println("No sound effects found with the specified tag: " + key);
+        }
+        return -80.0f; // Varsayılan olarak -80 dB döndür
+    }
+    
 
     public static void main(String[] args) throws InterruptedException {
 
