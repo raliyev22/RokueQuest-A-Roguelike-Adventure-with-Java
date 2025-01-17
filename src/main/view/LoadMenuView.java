@@ -179,7 +179,7 @@ public class LoadMenuView extends Application{
         ParallelTransition animation = new ParallelTransition(gradientAnimation, glowAnimation);
         animation.play();
     }
-    private void updateSaveFileList(ArrayList<String> saves, String saveToDelete, String filePath) {
+    public void updateSaveFileList(ArrayList<String> saves, String saveToDelete, String filePath) {
         saves.remove(saveToDelete); // Remove from the list
         try (PrintWriter writer = new PrintWriter(new FileWriter(filePath, false))) {
             for (String save : saves) {
