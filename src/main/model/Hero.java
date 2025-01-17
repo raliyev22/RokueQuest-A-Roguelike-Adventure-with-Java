@@ -33,7 +33,7 @@ public class Hero {
 	public Hero(int posX, int posY) {
 		this.posX = posX;
 		this.posY = posY;
-		this.remainingLives = 4;
+		this.remainingLives = 3;
 		this.isMoving = false;
 		this.isTakingDamage = false;
 		this.facingDirection = Directions.EAST;

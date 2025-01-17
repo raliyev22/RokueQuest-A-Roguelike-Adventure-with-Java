@@ -216,12 +216,10 @@ public class PlayModeView {
 		heart1 = new Rectangle(32,32);
 		heart2 = new Rectangle(32,32);
 		heart3 = new Rectangle(32,32);
-		heart4 = new Rectangle(32,32);
 		heart1.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
 		heart2.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
 		heart3.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-		heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
-		heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
+		heartsContainer.getChildren().addAll(heart1,heart2,heart3);
 
 		inventoryView = new InventoryView();
 		inventoryView.setTranslateY(100);
