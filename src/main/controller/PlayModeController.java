@@ -4,24 +4,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
-import javafx.animation.AnimationTimer;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.Main;
 import main.model.*;
 import main.utils.*;
+import main.view.InventoryView;
 import main.view.PlayModeView;
 
 public class PlayModeController extends Application {
@@ -41,15 +40,23 @@ public class PlayModeController extends Application {
     protected Hero hero;
     protected MonsterManager monsterManager;
     protected HallType hallType;
-    
+    private List<Enchantment> activeEnchantments;
+    private Map<Tile, Integer> runeExtraTimeMap; // Tracks extra time added per rune
+    private boolean luringGemActivated = false;
+
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
+
     public int runeXCoordinate;
     public int runeYCoordinate;
     private boolean mouseClicked = false;
     private double mouseX;
     private double mouseY;
-    
+
     public static double time;
     public static double totalTime;
+    private Inventory inventory;
+    private InventoryView inventoryView;
+    private long lastEnchantmentSpawnTime = 0;
     
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
@@ -87,7 +94,10 @@ public class PlayModeController extends Application {
     public void initializePlayMode() {
         // Create a new empty grid
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
-        
+        activeEnchantments = new ArrayList<>(); // Initialize enchantment list
+        lastEnchantmentSpawnTime = System.nanoTime();
+        inventory = new Inventory();
+        inventoryView = new InventoryView();
         // Populate the grid with the objects stored in the static variables
         if (null == this.hallType) {
             this.hallType = HallType.EARTH;
@@ -208,31 +218,259 @@ public class PlayModeController extends Application {
             save();
         });    
     }
-    
-    
+
+    private Monster findClosestFighterMonster(int heroX, int heroY) {
+        Monster closestFighter = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Monster monster : monsterManager.monsterList) {
+            if (monster.getType() == MonsterType.FIGHTER) { // Only consider Fighter Monsters
+                double distance = calculateManhattanDistance(heroX, heroY, monster.getX(), monster.getY());
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestFighter = monster;
+                }
+            }
+        }
+
+        return closestFighter;
+    }
+
+    private double calculateManhattanDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+    public void useLuringGem(String direction) {
+        if (luringGemActivated) {
+            int heroX = hero.getPosX();
+            int heroY = hero.getPosY();
+
+            // Find the closest Fighter Monster
+            Monster closestFighter = findClosestFighterMonster(heroX, heroY);
+
+            if (closestFighter != null) {
+                // Determine the target position based on direction
+                int targetX = closestFighter.getX();
+                int targetY = closestFighter.getY();
+
+                switch (direction.toUpperCase()) {
+                    case "W" -> targetY--; // Up
+                    case "A" -> targetX--; // Left
+                    case "S" -> targetY++; // Down
+                    case "D" -> targetX++; // Right
+                }
+
+                if (playModeGrid.indexInRange(targetX, targetY)) {
+                    lureSpecificMonster(closestFighter, targetX, targetY);
+                }
+            }
+
+            luringGemActivated = false;
+        }
+    }
+
+
+    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
+        if (monster == null || playModeGrid == null || view == null) {
+            System.err.println("Invalid parameters for luring monster");
+            return;
+        }
+
+        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
+        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
+
+        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
+            // Update the monster's attributes for movement
+            monster.targetX = targetTile.getLeftSide();
+            monster.targetY = targetTile.getTopSide();
+            monster.isMoving = true;
+            monster.setLured(true); // Indicate that the monster was lured
+
+            // Highlight the target tile
+            int highlightWidth = playModeGrid.getTileWidth();
+            int highlightHeight = playModeGrid.getTileHeight();
+
+            view.highlightArea(
+                    targetTile.getLeftSide(),
+                    targetTile.getTopSide(),
+                    highlightWidth,
+                    highlightHeight,
+                    true // Enable highlighting
+            );
+
+            // Schedule removal of the highlight after 2 seconds
+            Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            });
+
+            // Remove the rectangle after a set time
+            // Schedule removal of the highlight after 2 seconds
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.setOnFinished(event -> Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            }));
+            pause.play();
+            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
+            monster.posX = targetX; // Update position
+            monster.posY = targetY;
+            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
+
+        }
+    }
+
+    public void handleMouseClick(double mouseX, double mouseY) {
+        for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
+            Enchantment enchantment = entry.getKey();
+            Rectangle enchantmentView = entry.getValue();
+
+            if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
+                if (!activeEnchantments.contains(enchantment)) {
+                    System.out.println("Enchantment not active: " + enchantment.getType());
+                    return; // Avoid double collection
+                }
+
+                if (enchantment.getType() == Enchantment.Type.EXTRA_LIFE) {
+                    hero.increaseLives(1);
+                    view.updateHeroLife(hero.getLiveCount());
+                    // Remove enchantment after use
+                    activeEnchantments.remove(enchantment);
+                    view.removeEnchantmentView(enchantment);
+                } else {
+                    // Handle other enchantments
+                    view.collectEnchantment(enchantment, inventory);
+                }
+                break; // Exit loop after handling
+            }
+        }
+    }
+    public void addTime(int seconds) {
+        time += seconds; // Update the time
+        view.updateTime(time); // Reflect the change in the view
+        System.out.println("Time updated: " + time); // Debug log
+    }
+
+    public void useCloakOfProtection() {
+        Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
+        if (hero.getEnchantments().containsKey(type)) {
+            hero.consumeEnchantment(type);
+            hero.setProtected(true);
+            Timer protectionTimer = new Timer();
+            protectionTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    hero.setProtected(false);
+                }
+            }, 20000); // Cloak lasts for 20 seconds
+        }
+    }
+
+
+
     private void handleKeyPressed(KeyCode code) {
         if (isCountdownRunning) {
             return;
         }
-        //System.out.println("Key Pressed: " + code); // Debugging statement
+
         switch (code) {
-            case UP, W -> upPressed = true;
-            case DOWN, S -> downPressed = true;
-            case LEFT, A -> leftPressed = true;
-            case RIGHT, D -> rightPressed = true;
+            case W:
+                if (luringGemActivated) {
+                    useLuringGem("W");
+                    luringGemActivated = false; // Reset the activation
+                } else {
+                    upPressed = true;
+                }
+                break;
+            case S:
+                if (luringGemActivated) {
+                    useLuringGem("S");
+                    luringGemActivated = false;
+                } else {
+                    downPressed = true;
+                }
+                break;
+            case A:
+                if (luringGemActivated) {
+                    useLuringGem("A");
+                    luringGemActivated = false;
+                } else {
+                    leftPressed = true;
+                }
+                break;
+            case D:
+                if (luringGemActivated) {
+                    useLuringGem("D");
+                    luringGemActivated = false;
+                } else {
+                    rightPressed = true;
+                }
+                break;
+            case ESCAPE:
+                if (!escPressedFlag) {
+                    togglePause();
+                    escPressedFlag = true;
+                }
+                break;
+            case R:
+                if (inventory.useEnchantment(Enchantment.Type.REVEAL)) {
+                    Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+
+                    if (runeTile != null) {
+                        int tileWidth = playModeGrid.getTileWidth();
+                        int tileHeight = playModeGrid.getTileHeight();
+
+                        int xPoint = Math.max(playModeGrid.topLeftXCoordinate, runeTile.getLeftSide() - tileWidth);
+                        int yPoint = Math.max(playModeGrid.topLeftYCoordinate, runeTile.getTopSide() - tileHeight);
+
+                        Enchantment.highlightArea(xPoint, yPoint, 4 * tileWidth, 4 * tileHeight, view);
+                    }
+
+                    view.updateInventoryUI(inventory.getEnchantments());
+                }
+                break;
+            case P:
+                if (inventory.useEnchantment(Enchantment.Type.CLOAK_OF_PROTECTION)) {
+                    hero.setProtectedFrom(MonsterType.ARCHER); // Protect only from archers
+                    view.updateInventoryUI(inventory.getEnchantments());
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            hero.removeProtectionFrom(MonsterType.ARCHER);
+                        }
+                    }, 20000); // Cloak lasts for 20 seconds
+                }
+                break;
+            case B:
+                if (inventory.useEnchantment(Enchantment.Type.LURING_GEM)) {
+                    luringGemActivated = true; // Enable direction selection
+                    handleKeyPressed(code);
+                    view.updateInventoryUI(inventory.getEnchantments());
+                }
+                break;
             case ESCAPE -> {
                 if (!escPressedFlag) {
                     soundPlayer.playSoundEffectInThread("escButton");
                     togglePause();
-                    escPressedFlag = true; 
-                }   
-            }         
-                default -> {
-                //System.out.println("Unhandled Key Pressed: " + code);
+                    escPressedFlag = true;
+                }
             }
+            default:
+                // Handle unrecognized keys if necessary
+                break;
         }
     }
-    
+
+
     private void handleKeyReleased(KeyCode code) {
         switch (code) {
             case UP, W -> upPressed = false;
@@ -259,8 +497,8 @@ public class PlayModeController extends Application {
                 if (lastFrameTime > 0 && adjustedNow - lastFrameTime < FRAME_DURATION_NANOS) {
                     return;
                 }
-                lastFrameTime = adjustedNow;               
-
+                lastFrameTime = adjustedNow;
+                spawnEnchantment();
                 if (lastMonsterSpawnTime == 0) {
                     lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
                 }
@@ -280,7 +518,10 @@ public class PlayModeController extends Application {
                     stopGameLoop();
                     return;
                 }
-                
+                if (now - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
+                    spawnEnchantment();
+                    lastEnchantmentSpawnTime = now;
+                }
                 if (adjustedNow - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
                     view.updateTime(time); // Update the view
                     time--;
@@ -357,8 +598,54 @@ public class PlayModeController extends Application {
         };
         gameLoop.start();
     }
-    
-    private void stopGameLoop() {
+
+    private void spawnEnchantment() {
+        long currentTime = System.nanoTime();
+
+        // Check if enough time has passed since the last enchantment spawn
+        if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
+            Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
+
+            // Try spawning Extra Time on the rune if available
+            if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
+                Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+
+                if (runeTile != null && checkRune(runeTile)) { // Ensure the rune is still available and valid
+                    activeEnchantments.add(enchantmentToSpawn);
+                    view.addEnchantmentView(enchantmentToSpawn, runeTile.getLeftSide(), runeTile.getTopSide());
+                    final Enchantment finalEnchantment = enchantmentToSpawn; // Effectively final for lambda
+                    enchantmentToSpawn.startExpirationTimer(6000, () -> {
+                        activeEnchantments.remove(finalEnchantment);
+                        view.removeEnchantmentView(finalEnchantment);
+                    });
+
+                    lastEnchantmentSpawnTime = currentTime;
+                    return; // Exit early since the Extra Time enchantment was successfully spawned
+                }
+            }
+            Tile randomTile = getRandomEmptyTile();
+            if (randomTile != null) {
+                Enchantment newEnchantment = enchantmentToSpawn;
+
+                if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
+                    newEnchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
+                }
+
+                final Enchantment finalFallbackEnchantment = newEnchantment; // Effectively final for lambda
+                activeEnchantments.add(finalFallbackEnchantment);
+                view.addEnchantmentView(finalFallbackEnchantment, randomTile.getLeftSide(), randomTile.getTopSide());
+
+                // Schedule expiration
+                finalFallbackEnchantment.startExpirationTimer(6000, () -> {
+                    activeEnchantments.remove(finalFallbackEnchantment);
+                    view.removeEnchantmentView(finalFallbackEnchantment);
+                });
+                lastEnchantmentSpawnTime = currentTime;
+            }
+        }
+    }
+
+            private void stopGameLoop() {
         if (!isRunning) return;
         isRunning = false;
         if (gameLoop != null) {

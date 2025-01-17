@@ -18,7 +18,7 @@ public abstract class Monster {
     public long lastMovedTime = 0;
     public long spawnTime = 0;
     public long lastActTime = 0;
-
+    private boolean lured = false;
     public Rectangle monsterView;
     
     public MonsterType getType(){
@@ -57,7 +57,15 @@ public abstract class Monster {
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
+    public boolean isLured() {
+        return lured;
+    }
 
+    public void setLured(boolean lured) {
+        this.lured = lured;
+    }
+    public int getX() {return posX;}
+    public int getY() {return posY;}
     public long getLastActTime() {
         return lastActTime;
     }

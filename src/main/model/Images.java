@@ -93,7 +93,25 @@ public class Images extends Application {
 	public static final Image IMAGE_SKULL_x4 = new Image("/rokue-like_assets/Skull_x4_64_64.png");
 	public static final Image IMAGE_TILE_x4 = new Image("/rokue-like_assets/Tile_x4_64_64.png");
 	public static final Image IMAGE_WIZARD_x4 = new Image("/rokue-like_assets/Wizard_x4_64_64.png");
-	
+	public static final Image IMAGE_TRANSPARENT = new Image("/rokue-like_assets/Transparent.png");
+
+
+	public static Image convertEnchantmentToImage(Enchantment.Type type) {
+		switch (type) {
+			case EXTRA_TIME:
+				return IMAGE_TRANSPARENT; // Replace with actual image
+			case REVEAL:
+				return IMAGE_REVEAL_x2;
+			case CLOAK_OF_PROTECTION:
+				return IMAGE_CLOAK_x2;
+			case LURING_GEM:
+				return IMAGE_ALLURE_x4;
+			case EXTRA_LIFE:
+				return IMAGE_CHESTHEARTOPEN_x2;
+			default:
+				return null;
+		}
+	}
 	
 	
 	//Takes an Image and finds the char associated with it.

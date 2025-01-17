@@ -2,6 +2,10 @@ package main.model;
 
 import javafx.scene.image.Image;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Hero {
     public static final long INVINCIBILITY_FRAMES = 1_000_000_000L;
 	public final int maxLives = 4;
@@ -12,13 +16,15 @@ public class Hero {
 
     public int targetX, targetY;
     public int currentX, currentY;
-
+	private boolean isProtected;
+	private HashMap<Enchantment.Type, Integer> enchantments;
 	public boolean isMoving;
 	public boolean isTakingDamage;
     public Directions movingDirection;
 	public Directions facingDirection;
-    
-    public long lastDamagedFrame = 0;
+	private Set<MonsterType> protectedFromMonsters = new HashSet<>();
+
+	public long lastDamagedFrame = 0;
 	private boolean isTeleported=false;
 	protected Image sprite;
     private int takingDamageAnimationCounter = 0;
@@ -66,7 +72,44 @@ public class Hero {
 		}
 		
 	}
-	
+	public boolean isProtected() {
+		return isProtected;
+	}
+
+	public void setProtected(boolean isProtected) {
+		this.isProtected = isProtected;
+	}
+
+	public void addEnchantment(Enchantment.Type type) {
+		enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
+	}
+	public void setProtectedFrom(MonsterType monsterType) {
+		protectedFromMonsters.add(monsterType);
+	}
+
+	// Method to remove protection from a specific monster type
+	public void removeProtectionFrom(MonsterType monsterType) {
+		protectedFromMonsters.remove(monsterType);
+	}
+
+	// Method to check if the hero is protected from a specific monster type
+	public boolean isProtectedFrom(MonsterType monsterType) {
+		return protectedFromMonsters.contains(monsterType);
+	}
+	public Enchantment consumeEnchantment(Enchantment.Type type) {
+		if (enchantments.containsKey(type) && enchantments.get(type) > 0) {
+			enchantments.put(type, enchantments.get(type) - 1);
+			if (enchantments.get(type) == 0) {
+				enchantments.remove(type);
+			}
+			return new Enchantment(type, posX, posY, System.currentTimeMillis());
+		}
+		return null;
+	}
+
+	public HashMap<Enchantment.Type, Integer> getEnchantments() {
+		return enchantments;
+	}
 	public int getLiveCount(){
 		return remainingLives;
 	}

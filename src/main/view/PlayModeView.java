@@ -1,6 +1,7 @@
 package main.view;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javafx.animation.KeyFrame;
@@ -32,9 +33,7 @@ import javafx.util.Duration;
 import main.Main;
 import main.controller.MonsterManager;
 import main.controller.PlayModeController;
-import main.model.HallType;
-import main.model.Images;
-import main.model.Monster;
+import main.model.*;
 import main.utils.Grid;
 import main.utils.SoundEffects;
 import main.utils.Tile;
@@ -51,6 +50,8 @@ public class PlayModeView {
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
+	protected Inventory inventory;
+	protected InventoryView inventoryView;
 	public Rectangle walls;
 	private StackPane pauseOverlay;
 	private StackPane exitOverlay;
@@ -62,6 +63,8 @@ public class PlayModeView {
 	public Button saveButton;
 	SoundEffects soundPlayer = SoundEffects.getInstance();
 	private Timeline countdown;
+	private HashMap<Enchantment.Type, Label> bagLabels;
+	private HashMap<Enchantment, Rectangle> enchantmentViews;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
 	
@@ -72,9 +75,52 @@ public class PlayModeView {
 		this.pane = new Pane();
 		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
+		initializeBagUI();
 		initialize();
 	}
-	
+	private void initializeBagUI() {
+		int offsetX = 20;
+		int offsetY = 20;
+
+		for (Enchantment.Type type : Enchantment.Type.values()) {
+			Label label = new Label(type.name() + ": 0");
+			label.setLayoutX(offsetX);
+			label.setLayoutY(offsetY);
+			offsetY += 30;
+
+			bagLabels.put(type, label);
+			pane.getChildren().add(label);
+		}
+	}
+	public void highlightTile(Tile tile, boolean highlight) {
+		Rectangle rect = new Rectangle(40, 40);
+		rect.setLayoutX(tile.getLeftSide());
+		rect.setLayoutY(tile.getTopSide());
+		rect.setFill(highlight ? Color.LIGHTBLUE : Color.TRANSPARENT);
+		rect.setStroke(highlight ? Color.BLUE : null);
+		rect.setId("highlight-" + tile.hashCode());
+
+		if (highlight) {
+			Platform.runLater(() -> pane.getChildren().add(rect)); // Ensure UI modification on the JavaFX thread
+		} else {
+			Platform.runLater(() -> pane.getChildren().removeIf(node ->
+					node.getId() != null && node.getId().equals("highlight-" + tile.hashCode())
+			)); // Remove on the JavaFX thread
+		}
+	}
+	public void removeEnchantment(Enchantment enchantment) {
+		pane.getChildren().removeIf(node -> node.getId() != null &&
+				node.getId().equals("enchantment-" + enchantment.getType()));
+	}
+	public HashMap<Enchantment, Rectangle> getEnchantmentViews() {
+		return enchantmentViews;
+	}
+	public void updateBagUI(HashMap<Enchantment.Type, Integer> enchantments) {
+		for (Enchantment.Type type : bagLabels.keySet()) {
+			int count = enchantments.getOrDefault(type, 0);
+			bagLabels.get(type).setText(type.name() + ": " + count);
+		}
+	}
 	public void refresh(Grid newGrid, double time, HallType hallType) {
 		this.grid = newGrid;
 		this.time = time;
@@ -90,7 +136,7 @@ public class PlayModeView {
 		}
 
         monsterViews = new ArrayList<>();
-		
+		enchantmentViews = new HashMap<Enchantment, Rectangle>();
 		pane.setBackground(new Background(new BackgroundImage(
 			tileImage,
 			BackgroundRepeat.REPEAT,
@@ -176,15 +222,88 @@ public class PlayModeView {
 		heart4.setFill(new ImagePattern(Images.IMAGE_HEART_x4));
 		heartsContainer.getChildren().addAll(heart1,heart2,heart3,heart4);
 
-		Rectangle inventory = new Rectangle(200,400);
-		inventory.setFill(new ImagePattern(Images.IMAGE_INVENTORY));
-		inventory.setTranslateY(100);
+		inventoryView = new InventoryView();
+		inventoryView.setTranslateY(100);
+		uiContainer.getChildren().addAll(buttonContainer, timeLabelContainer, heartsContainer, inventoryView);
 
-		uiContainer.getChildren().addAll(buttonContainer,timeLabelContainer,heartsContainer,inventory);
 		pane.getChildren().add(uiContainer);
 
 		initializePauseOverlay();
 		initializeExitOverlay();
+	}
+	public void addEnchantmentView(Enchantment enchantment, double x, double y) {
+		// Skip rendering for EXTRA_TIME_ENCHANTMENT
+		if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+			enchantmentViews.put(enchantment, null); // Logical presence without rendering
+			return;
+		}
+
+		Rectangle enchantmentView = new Rectangle(tileSize, tileSize);
+		enchantmentView.setFill(new ImagePattern(enchantment.getImage()));
+		enchantmentView.setX(x);
+		enchantmentView.setY(y);
+		enchantmentView.setId("enchantment-" + enchantment.hashCode());
+
+		enchantmentViews.put(enchantment, enchantmentView);
+		pane.getChildren().add(enchantmentView);
+	}
+	public void updateInventoryUI(HashMap<Enchantment.Type, Integer> enchantments) {
+		inventoryView.updateInventory(enchantments);
+	}
+	public void collectEnchantment(Enchantment enchantment, Inventory inventory) {
+		if (!enchantmentViews.containsKey(enchantment)) {
+			System.out.println("Attempted to collect a non-existent enchantment.");
+			return; // Avoid duplicate processing
+		}
+
+		Platform.runLater(() -> {
+			inventory.addEnchantment(enchantment.getType());
+			updateInventoryUI(inventory.getEnchantments());
+
+			// Remove from screen only if it was rendered
+			Rectangle enchantmentView = enchantmentViews.get(enchantment);
+			if (enchantmentView != null) {
+				pane.getChildren().remove(enchantmentView);
+			}
+
+			synchronized (enchantmentViews) {
+				enchantmentViews.remove(enchantment);
+			}
+		});
+	}
+	public void removeEnchantmentView(Enchantment enchantment) {
+		Rectangle enchantmentView = enchantmentViews.remove(enchantment);
+		if (enchantmentView != null) {
+			pane.getChildren().remove(enchantmentView);
+		}
+	}
+
+
+	public void updateEnchantmentPosition(Enchantment enchantment, double x, double y) {
+		Rectangle enchantmentView = enchantmentViews.get(enchantment);
+		if (enchantmentView != null) {
+			enchantmentView.setX(x);
+			enchantmentView.setY(y);
+		}
+	}
+	public void highlightArea(int x, int y, int width, int height, boolean highlight) {
+		String highlightId = "highlight-" + x + "-" + y;
+
+		if (highlight) {
+			Rectangle highlightRectangle = new Rectangle(x, y, width, height);
+			highlightRectangle.setStroke(Color.GOLD); // Border color
+			highlightRectangle.setFill(Color.TRANSPARENT); // Transparent fill
+			highlightRectangle.setId(highlightId);
+
+			// Add the rectangle to the pane if it doesn't already exist
+			Platform.runLater(() -> {
+				pane.getChildren().removeIf(node -> highlightId.equals(node.getId()));
+				pane.getChildren().add(highlightRectangle);
+			});
+		} else {
+			// Remove the rectangle by ID
+			Platform.runLater(() -> pane.getChildren().removeIf(node -> highlightId.equals(node.getId())));
+		}
 	}
 
     private void initializePauseOverlay() {
