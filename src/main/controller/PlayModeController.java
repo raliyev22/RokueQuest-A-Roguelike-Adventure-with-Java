@@ -1,23 +1,22 @@
 package main.controller;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 import javafx.util.Duration;
+import main.Main;
 import main.model.*;
 import main.utils.*;
 import main.view.InventoryView;
@@ -39,35 +38,31 @@ public class PlayModeController extends Application {
     public Grid playModeGrid;
     protected Hero hero;
     protected MonsterManager monsterManager;
-    protected Iterator<Monster> monsterIterator;
     protected HallType hallType;
+
     private List<Enchantment> activeEnchantments;
     private Map<Tile, Integer> runeExtraTimeMap; // Tracks extra time added per rune
-
-
     private boolean luringGemActivated = false;
-    private int runeXCoordinate;
-    private int runeYCoordinate;
+
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
+
+    public int runeXCoordinate;
+    public int runeYCoordinate;
     private boolean mouseClicked = false;
     private double mouseX;
     private double mouseY;
 
     public static double time;
     public static double totalTime;
-
+    private Inventory inventory;
+    private InventoryView inventoryView;
     protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
-    private long lastEnchantmentSpawnTime = 0; // Tracks the last time an enchantment was spawned
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
-    private Inventory inventory;
-    private InventoryView inventoryView;
-
-    private long lastMonsterUpdateTime = 0;
-    private static final long MONSTER_UPDATE_INTERVAL = 300_000_000L; // Monster movement update interval (500ms)
-
+    private long lastEnchantmentSpawnTime = 0;
+    private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
+    private static final long MONSTER_SPAWN_INTERVAL = 5_000_000_000L; // 8 seconds in nanoseconds
 
     private static final int TARGET_FPS = 120;
     private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
@@ -76,13 +71,19 @@ public class PlayModeController extends Application {
     private PlayModeView view;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
 
-    private Random random = new Random();
-
+    private long adjustedNow;
     private AnimationTimer gameLoop;
     private boolean isRunning = false;
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
 
     private boolean escPressedFlag = false;
+    private long pauseStartTime = 0;
+    private long totalPausedTime = 0;
+    private long lastToggleTime = 0;
+    private static final long TOGGLE_DEBOUNCE_DELAY = 300_000_000L;
+    private boolean isCountdownRunning = false;
+
+    private Stage primaryStage;
 
     // public PlayModeController() {
     //     initializePlayMode();
@@ -95,8 +96,6 @@ public class PlayModeController extends Application {
         lastEnchantmentSpawnTime = System.nanoTime();
         inventory = new Inventory();
         inventoryView = new InventoryView();
-
-
         // Populate the grid with the objects stored in the static variables
         if (null == this.hallType) {
             this.hallType = HallType.EARTH;
@@ -134,11 +133,9 @@ public class PlayModeController extends Application {
         int randomYCoordinate = playModeGrid.findYofTile(initialHeroTile);
         Tile heroTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
         hero = initializeHero(randomXCoordinate, randomYCoordinate);
-        runeExtraTimeMap = new HashMap<>();
 
         hero.targetX = heroTile.getLeftSide();
         hero.targetY = heroTile.getTopSide();
-        activeEnchantments = new ArrayList<>(); // Initialize the list
 
         // Create monster manager
 
@@ -149,30 +146,22 @@ public class PlayModeController extends Application {
 
         monsterManager = new MonsterManager(playModeGrid, hero);
 
-        if (view != null) { // Else we have already come from another grid, which means we only need to refresh the view
+        if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
             view.refresh(playModeGrid, time);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-//            view.getPane().getChildren().add(inventoryView.getInventoryBox());
-            view.pauseButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-            });
+            initializeSetOnActions();
             monsterManager.setPlayModeView(view);
         }
     }
 
     public void start(Stage primaryStage) {
         initializePlayMode();
-        initializeSoundEffects();
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         // If view is null (which means we are in the first hall), create a new one
-        if (view == null) {
+        if (view == null){
             view = new PlayModeView(playModeGrid, time, primaryStage);
             view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            view.pauseButton.setOnAction(e -> {
-                togglePause();
-                soundPlayer.playSoundEffectInThread("blueButtons");
-            });
+            initializeSetOnActions();
             monsterManager.setPlayModeView(view);
         }
 
@@ -184,23 +173,9 @@ public class PlayModeController extends Application {
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
+        this.primaryStage = primaryStage;
 
         startGameLoop();
-    }
-
-    private void initializeSoundEffects() {
-        soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
-        soundPlayer.setVolume("step", -10);
-        soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
-        soundPlayer.setVolume("door", -10);
-        soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
-        soundPlayer.setVolume("gameWinner", -15);
-        soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
-        soundPlayer.setVolume("gameLoser", -15);
-        soundPlayer.addSoundEffect("archer", "src/main/sounds/archer.wav");
-        soundPlayer.addSoundEffect("fighter", "src/main/sounds/fighter.wav");
-        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
-        soundPlayer.setVolume("wizard", -10);
     }
 
     public void initialize(Scene scene) {
@@ -216,107 +191,143 @@ public class PlayModeController extends Application {
         scene.getRoot().requestFocus();
     }
 
-    private void scheduleEnchantmentSpawns() {
-        Timer enchantmentTimer = new Timer(true);
-        enchantmentTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                spawnEnchantment();
-            }
-        }, 0, 12000); // Spawn every 12 seconds
+    public void initializeSetOnActions(){
+        view.pauseButton.setOnAction(e -> {
+            soundPlayer.playSoundEffect("blueButtons");
+            togglePause();
+        });
+
+        view.exitButton.setOnAction(e -> {
+            stopGameLoop();
+            Main mainPage = new Main();
+            javafx.geometry.Rectangle2D screenBounds1 = javafx.stage.Screen.getPrimary().getVisualBounds();
+
+            // Set up the main stage in the center of the screen
+            primaryStage.setX((screenBounds1.getWidth() - 600) / 2);
+            primaryStage.setY((screenBounds1.getHeight() - 400) / 2);
+
+            mainPage.start(primaryStage);
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });
+
+        view.saveButton.setOnAction(e -> {
+            save();
+        });
     }
 
-    private void spawnEnchantment() {
-        long currentTime = System.nanoTime();
+    private Monster findClosestFighterMonster(int heroX, int heroY) {
+        Monster closestFighter = null;
+        double minDistance = Double.MAX_VALUE;
 
-        if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
-            Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
-
-            // Ensure the runeTile is valid
-            if (runeTile != null) {
-                Enchantment enchantment = new Enchantment(Enchantment.Type.EXTRA_TIME,
-                        runeTile.getLeftSide(),
-                        runeTile.getTopSide(),
-                        currentTime);
-                activeEnchantments.add(enchantment); // Add to active enchantments
-                view.addEnchantmentView(enchantment, runeTile.getLeftSide(), runeTile.getTopSide());
-
-                // Log the spawn for debugging
-                System.out.println("Extra Time Enchantment spawned at Rune!");
-
-                // Schedule expiration
-                enchantment.startExpirationTimer(6000, () -> {
-                    activeEnchantments.remove(enchantment);
-                    view.removeEnchantmentView(enchantment);
-                });
-
-                lastEnchantmentSpawnTime = currentTime; // Update spawn time
-            } else {
-                System.err.println("Rune tile is null. Cannot spawn Extra Time Enchantment.");
+        for (Monster monster : monsterManager.monsterList) {
+            if (monster.getType() == MonsterType.FIGHTER) { // Only consider Fighter Monsters
+                double distance = calculateManhattanDistance(heroX, heroY, monster.getX(), monster.getY());
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestFighter = monster;
+                }
             }
+        }
+
+        return closestFighter;
+    }
+    private double calculateManhattanDistance(int x1, int y1, int x2, int y2) {
+        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+    }
+
+
+    public void useLuringGem(String direction) {
+        if (luringGemActivated) {
+            int heroX = hero.getPosX();
+            int heroY = hero.getPosY();
+
+            // Find the closest Fighter Monster
+            Monster closestFighter = findClosestFighterMonster(heroX, heroY);
+
+            if (closestFighter != null) {
+                // Determine the target position based on direction
+                int targetX = closestFighter.getX();
+                int targetY = closestFighter.getY();
+
+                switch (direction.toUpperCase()) {
+                    case "W" -> targetY--; // Up
+                    case "A" -> targetX--; // Left
+                    case "S" -> targetY++; // Down
+                    case "D" -> targetX++; // Right
+                }
+
+                if (playModeGrid.indexInRange(targetX, targetY)) {
+                    lureSpecificMonster(closestFighter, targetX, targetY);
+                }
+            }
+
+            luringGemActivated = false;
         }
     }
 
+    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
+        if (monster == null || playModeGrid == null || view == null) {
+            System.err.println("Invalid parameters for luring monster");
+            return;
+        }
 
-    public void handleMouseClick(double mouseX, double mouseY) {
-        for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
-            Enchantment enchantment = entry.getKey();
-            Rectangle enchantmentView = entry.getValue();
+        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
+        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
 
-            if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
-                if (!activeEnchantments.contains(enchantment)) {
-                    System.out.println("Enchantment not active: " + enchantment.getType());
-                    return; // Avoid double collection
-                }
+        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
+            // Update the monster's attributes for movement
+            monster.targetX = targetTile.getLeftSide();
+            monster.targetY = targetTile.getTopSide();
+            monster.isMoving = true;
+            monster.setLured(true); // Indicate that the monster was lured
 
-                if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
-                    // Increment time
-                    addTime(1); // Add 1 second
+            // Highlight the target tile
+            int highlightWidth = playModeGrid.getTileWidth();
+            int highlightHeight = playModeGrid.getTileHeight();
 
-                    // Remove enchantment after use
-                    activeEnchantments.remove(enchantment);
-                    view.removeEnchantmentView(enchantment);
-                    System.out.println("Extra Time enchantment clicked. Current time: " + time);
-                } else {
-                    // Handle other enchantments
-                    view.collectEnchantment(enchantment, inventory);
-                }
-                break; // Exit loop after handling
-            }
+            view.highlightArea(
+                    targetTile.getLeftSide(),
+                    targetTile.getTopSide(),
+                    highlightWidth,
+                    highlightHeight,
+                    true // Enable highlighting
+            );
+
+            // Schedule removal of the highlight after 2 seconds
+            Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            });
+
+            // Remove the rectangle after a set time
+            // Schedule removal of the highlight after 2 seconds
+            PauseTransition pause = new PauseTransition(Duration.seconds(2));
+            pause.setOnFinished(event -> Platform.runLater(() -> {
+                view.highlightArea(
+                        targetTile.getLeftSide(),
+                        targetTile.getTopSide(),
+                        highlightWidth,
+                        highlightHeight,
+                        false // Disable highlighting
+                );
+            }));
+            pause.play();
+
+
+            // Move monster logically in the grid
+            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
+            monster.posX = targetX; // Update position
+            monster.posY = targetY;
+            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
+
         }
     }
 
-
-    public void addTime(int seconds) {
-        time += seconds; // Update the time
-        view.updateTime(time); // Reflect the change in the view
-        System.out.println("Time updated: " + time); // Debug log
-    }
-
-
-//    public void useRevealEnchantment() {
-//        Enchantment.Type type = Enchantment.Type.REVEAL;
-//        if (hero.getEnchantments().containsKey(type)) {
-//            Tile runeTile = playModeGrid.findTileWithIndex(view.getRuneXCoordinate(), view.getRuneYCoordinate());
-//            Enchantment.highlightArea(playModeGrid, runeTile, view);
-//            hero.consumeEnchantment(type);
-//        }
-//    }
-
-    public void useCloakOfProtection() {
-        Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
-        if (hero.getEnchantments().containsKey(type)) {
-            hero.consumeEnchantment(type);
-            hero.setProtected(true);
-            Timer protectionTimer = new Timer();
-            protectionTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    hero.setProtected(false);
-                }
-            }, 20000); // Cloak lasts for 20 seconds
-        }
-    }
 
     private void handleKeyPressed(KeyEvent event) {
         String keyText = event.getText().toLowerCase(); // Get the key text in lowercase
@@ -414,122 +425,6 @@ public class PlayModeController extends Application {
                 break;
         }
     }
-
-    public void useLuringGem(String direction) {
-        if (luringGemActivated) {
-            int heroX = hero.getPosX();
-            int heroY = hero.getPosY();
-
-            // Find the closest Fighter Monster
-            Monster closestFighter = findClosestFighterMonster(heroX, heroY);
-
-            if (closestFighter != null) {
-                // Determine the target position based on direction
-                int targetX = closestFighter.getX();
-                int targetY = closestFighter.getY();
-
-                switch (direction.toUpperCase()) {
-                    case "W" -> targetY--; // Up
-                    case "A" -> targetX--; // Left
-                    case "S" -> targetY++; // Down
-                    case "D" -> targetX++; // Right
-                }
-
-                if (playModeGrid.indexInRange(targetX, targetY)) {
-                    lureSpecificMonster(closestFighter, targetX, targetY);
-                }
-            }
-
-            luringGemActivated = false;
-        }
-    }
-
-    private Monster findClosestFighterMonster(int heroX, int heroY) {
-        Monster closestFighter = null;
-        double minDistance = Double.MAX_VALUE;
-
-        for (Monster monster : monsterManager.monsterList) {
-            if (monster.getType() == MonsterType.FIGHTER) { // Only consider Fighter Monsters
-                double distance = calculateManhattanDistance(heroX, heroY, monster.getX(), monster.getY());
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestFighter = monster;
-                }
-            }
-        }
-
-        return closestFighter;
-    }
-    public void lureSpecificMonster(Monster monster, int targetX, int targetY) {
-        if (monster == null || playModeGrid == null || view == null) {
-            System.err.println("Invalid parameters for luring monster");
-            return;
-        }
-
-        Tile currentTile = playModeGrid.findTileWithIndex(monster.posX, monster.posY);
-        Tile targetTile = playModeGrid.findTileWithIndex(targetX, targetY);
-
-        if (currentTile != null && targetTile != null && Grid.isWalkableTile(targetTile)) {
-            // Update the monster's attributes for movement
-            monster.targetX = targetTile.getLeftSide();
-            monster.targetY = targetTile.getTopSide();
-            monster.isMoving = true;
-            monster.setLured(true); // Indicate that the monster was lured
-
-            // Highlight the target tile
-            int highlightWidth = playModeGrid.getTileWidth();
-            int highlightHeight = playModeGrid.getTileHeight();
-
-            view.highlightArea(
-                    targetTile.getLeftSide(),
-                    targetTile.getTopSide(),
-                    highlightWidth,
-                    highlightHeight,
-                    true // Enable highlighting
-            );
-
-            // Schedule removal of the highlight after 2 seconds
-            Platform.runLater(() -> {
-                view.highlightArea(
-                        targetTile.getLeftSide(),
-                        targetTile.getTopSide(),
-                        highlightWidth,
-                        highlightHeight,
-                        false // Disable highlighting
-                );
-            });
-
-            // Remove the rectangle after a set time
-            // Schedule removal of the highlight after 2 seconds
-            PauseTransition pause = new PauseTransition(Duration.seconds(2));
-            pause.setOnFinished(event -> Platform.runLater(() -> {
-                view.highlightArea(
-                        targetTile.getLeftSide(),
-                        targetTile.getTopSide(),
-                        highlightWidth,
-                        highlightHeight,
-                        false // Disable highlighting
-                );
-            }));
-            pause.play();
-
-
-            // Move monster logically in the grid
-            playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // Clear old position
-            monster.posX = targetX; // Update position
-            monster.posY = targetY;
-            playModeGrid.changeTileWithIndex(targetX, targetY, monster.getCharType()); // Update grid
-
-        }
-    }
-
-
-
-    private double calculateManhattanDistance(int x1, int y1, int x2, int y2) {
-        return Math.abs(x1 - x2) + Math.abs(y1 - y2);
-    }
-
-
     private void handleKeyReleased(KeyEvent event) {
         String keyText = event.getText().toLowerCase(); // Get the key text in lowercase
 
@@ -563,32 +458,22 @@ public class PlayModeController extends Application {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                if (lastFrameTime > 0 && now - lastFrameTime < FRAME_DURATION_NANOS) {
+                adjustedNow = now - totalPausedTime;
+
+                if (lastFrameTime > 0 && adjustedNow - lastFrameTime < FRAME_DURATION_NANOS) {
                     return;
                 }
+                lastFrameTime = adjustedNow;
 
-                lastFrameTime = now;
-
-                // Time updates
-                if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
-                    view.updateTime(time);
-                    time--;
-                    lastUpdateTime = now;
-                }
-
-                // Enchantment spawn logic
                 spawnEnchantment();
 
-                // Handle mouse click
                 if (mouseClicked) {
                     handleMouseClick(mouseX, mouseY);
                     mouseClicked = false;
                 }
 
-                lastFrameTime = now;
-
                 if (lastMonsterSpawnTime == 0) {
-                    lastMonsterSpawnTime = now-1;
+                    lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
                 }
 
                 if (time < 0) {
@@ -599,43 +484,58 @@ public class PlayModeController extends Application {
                 }
 
                 if (hero.getLiveCount() <= 0) {
+                    changeHeroSpriteToDamaged();
+                    view.changeHeroSprite(hero.getSprite());
                     view.showGameOverPopup(false);
                     soundPlayer.playSoundEffectInThread("gameLoser");
                     stopGameLoop();
                     return;
                 }
-
-                if (now - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
-                    view.updateTime(time); // Update the view
-                    time--;
-                    lastUpdateTime = now;
-                }
-
-                if(!hero.getIsTeleported()){
-                    moveHero();
-                }
-                view.changeHeroSprite(getHeroImage());
                 if (now - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
                     spawnEnchantment();
                     lastEnchantmentSpawnTime = now;
                 }
+                if (adjustedNow - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
+                    view.updateTime(time); // Update the view
+                    time--;
+                    lastUpdateTime = adjustedNow;
+                }
+
+                if (!hero.getIsTeleported()){
+                    moveHero();
+                }
+
+                // If hero is taking damage, change blip animations
+                if (hero.isTakingDamage) {
+                    if (hero.getTakingDamageAnimationCounter() == 0) {
+                        blinkHeroSprite();
+                    }
+
+                    hero.increaseTakingDamageAnimationCounter();
+
+                    if (adjustedNow - hero.lastDamagedFrame >= Hero.INVINCIBILITY_FRAMES) {
+                        hero.isTakingDamage = false;
+                        changeHeroSpriteToNormal();
+                    }
+                }
+
+                view.changeHeroSprite(hero.getSprite());
 
                 //monster spawn logic
-                if (now - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
+                if (adjustedNow - lastMonsterSpawnTime >= MONSTER_SPAWN_INTERVAL) {
                     Tile initialMonsterTile = getRandomEmptyTile();
 
                     int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
                     int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
 
-                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, now);
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, adjustedNow);
 
-                    lastMonsterSpawnTime = now;
-
-
+                    lastMonsterSpawnTime = adjustedNow;
                 }
-                monsterManager.actAllMonsters(now, PlayModeController.this);
 
-                monsterManager.moveAllMonsters(now);
+                monsterManager.actAllMonsters(adjustedNow, PlayModeController.this);
+
+                monsterManager.moveAllMonsters(adjustedNow);
 
                 if (mouseClicked) {
                     if (playModeGrid.coordinatesAreInGrid(mouseX, mouseY)) {
@@ -672,46 +572,85 @@ public class PlayModeController extends Application {
         gameLoop.start();
     }
 
+    private void spawnEnchantment() {
+        long currentTime = System.nanoTime();
+
+        // Check if enough time has passed since the last enchantment spawn
+        if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
+            Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
+
+            // Try spawning Extra Time on the rune if available
+            if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
+                Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
+
+                if (runeTile != null && checkRune(runeTile)) { // Ensure the rune is still available and valid
+                    activeEnchantments.add(enchantmentToSpawn);
+                    view.addEnchantmentView(enchantmentToSpawn, runeTile.getLeftSide(), runeTile.getTopSide());
+
+                    // Schedule expiration
+                    final Enchantment finalEnchantment = enchantmentToSpawn; // Effectively final for lambda
+                    enchantmentToSpawn.startExpirationTimer(6000, () -> {
+                        activeEnchantments.remove(finalEnchantment);
+                        view.removeEnchantmentView(finalEnchantment);
+                    });
+
+                    lastEnchantmentSpawnTime = currentTime;
+                    return; // Exit early since the Extra Time enchantment was successfully spawned
+                }
+            }
+
+            // If Extra Time could not be spawned, generate a new random enchantment
+            Tile randomTile = getRandomEmptyTile();
+            if (randomTile != null) {
+                Enchantment newEnchantment = enchantmentToSpawn;
+
+                if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
+                    newEnchantment = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
+                }
+
+                final Enchantment finalFallbackEnchantment = newEnchantment; // Effectively final for lambda
+                activeEnchantments.add(finalFallbackEnchantment);
+                view.addEnchantmentView(finalFallbackEnchantment, randomTile.getLeftSide(), randomTile.getTopSide());
+
+                // Schedule expiration
+                finalFallbackEnchantment.startExpirationTimer(6000, () -> {
+                    activeEnchantments.remove(finalFallbackEnchantment);
+                    view.removeEnchantmentView(finalFallbackEnchantment);
+                });
+
+                lastEnchantmentSpawnTime = currentTime;
+            }
+        }
+    }
+
+
     private void stopGameLoop() {
         if (!isRunning) return;
         isRunning = false;
         if (gameLoop != null) {
             gameLoop.stop();
         }
-
+        System.out.println("Game loop stopped.");
     }
-    public Grid resolveAllMovingCharacters() {
-        Grid resolvedGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
-        resolvedGrid.copyTileMap(playModeGrid);
 
-        if (hero.isMoving) {
-            Tile heroTile = resolvedGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
-            Tile destinationTile = resolvedGrid.findTileUsingDirection(heroTile, hero.movingDirection);
-
-            heroTile.changeTileType(hero.getCharType());
-            destinationTile.changeTileType('E');
-        }
-
-        for (Monster monster: monsterManager.monsterList) {
-            if (monster.isMoving) {
-                Tile monsterTile = resolvedGrid.findTileWithIndex(monster.posX, monster.posY);
-                Tile destinationTile = resolvedGrid.findTileUsingDirection(monsterTile, monster.movingDirection);
-
-                monsterTile.changeTileType('E');
-                destinationTile.changeTileType(monster.getCharType());
-            }
-        }
-
-        return resolvedGrid;
-    }
     private void togglePause() {
+        long now = System.nanoTime();
+        if (now - lastToggleTime < TOGGLE_DEBOUNCE_DELAY) {
+            return;
+        }
+        lastToggleTime = now;
+
         if (isRunning){
             stopGameLoop();
             view.showPauseGame();
+//            soundPlayer.pauseSoundEffect("background");
+            pauseStartTime = System.nanoTime();
         }
         else {
+            totalPausedTime += now - pauseStartTime;
             startGameLoop();
             view.hidePauseGame();
+//            soundPlayer.resumeSoundEffect("background");
         }
     }
 
@@ -720,7 +659,52 @@ public class PlayModeController extends Application {
         playModeGrid.changeTileWithIndex(hero.getPosX(), hero.getPosY(), hero.getCharType());
         return hero;
     }
+    public void handleMouseClick(double mouseX, double mouseY) {
+        for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
+            Enchantment enchantment = entry.getKey();
+            Rectangle enchantmentView = entry.getValue();
 
+            if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
+                if (!activeEnchantments.contains(enchantment)) {
+                    System.out.println("Enchantment not active: " + enchantment.getType());
+                    return; // Avoid double collection
+                }
+
+                if (enchantment.getType() == Enchantment.Type.EXTRA_LIFE) {
+                    // Increment time
+                    hero.increaseLives(1);
+                    view.updateHeroLife(hero.getLiveCount());
+                    // Remove enchantment after use
+                    activeEnchantments.remove(enchantment);
+                    view.removeEnchantmentView(enchantment);
+                } else {
+                    // Handle other enchantments
+                    view.collectEnchantment(enchantment, inventory);
+                }
+                break; // Exit loop after handling
+            }
+        }
+    }
+    public void addTime(int seconds) {
+        time += seconds; // Update the time
+        view.updateTime(time); // Reflect the change in the view
+        System.out.println("Time updated: " + time); // Debug log
+    }
+
+    public void useCloakOfProtection() {
+        Enchantment.Type type = Enchantment.Type.CLOAK_OF_PROTECTION;
+        if (hero.getEnchantments().containsKey(type)) {
+            hero.consumeEnchantment(type);
+            hero.setProtected(true);
+            Timer protectionTimer = new Timer();
+            protectionTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    hero.setProtected(false);
+                }
+            }, 20000); // Cloak lasts for 20 seconds
+        }
+    }
     public void moveHero() {
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         int heroViewLeftSide = heroTile.getLeftSide();
@@ -764,6 +748,7 @@ public class PlayModeController extends Application {
                 hero.isMoving = true;
                 hero.facingDirection = Directions.WEST;
                 hero.movingDirection = Directions.WEST;
+                hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
 
                 soundPlayer.playSoundEffectInThread("step");
             } else if (rightPressed && isWalkableTile(playModeGrid.findEastTile(heroTile))) {
@@ -776,6 +761,7 @@ public class PlayModeController extends Application {
                 hero.isMoving = true;
                 hero.facingDirection = Directions.EAST;
                 hero.movingDirection = Directions.EAST;
+                hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
 
                 soundPlayer.playSoundEffectInThread("step");
             }
@@ -819,13 +805,32 @@ public class PlayModeController extends Application {
         //System.out.println(playModeGrid);
     }
 
-    public Image getHeroImage() {
-        if (hero.getCharType() == 'R') {
-            return Images.IMAGE_PLAYERRIGHT_x4;
-        } else if (hero.getCharType() == 'L') {
-            return Images.IMAGE_PLAYERLEFT_x4;
-        }else {
-            return null;
+    public void blinkHeroSprite() {
+        // Change hero sprite to red if normal, normal if red.
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
+        }
+    }
+
+    public void changeHeroSpriteToNormal() {
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFT_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHT_x4);
+        }
+    }
+
+    public void changeHeroSpriteToDamaged() {
+        if (hero.getSprite().equals(Images.IMAGE_PLAYERLEFT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERLEFTTAKINGDAMAGE_x4);
+        } else if (hero.getSprite().equals(Images.IMAGE_PLAYERRIGHT_x4)) {
+            hero.setSprite(Images.IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4);
         }
     }
 
@@ -833,10 +838,23 @@ public class PlayModeController extends Application {
     //     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     // }
 
-    public void  teleportRune() {
+    /**
+     * Requires:
+     * - `playModeGrid` must be properly initialized.
+     * - The list returned by `getHallObjectTiles()` must not be empty (hallObjects.size() > 0).
+     *
+     * Modifies:
+     * - `runeXCoordinate`
+     * - `runeYCoordinate`
+     *
+     * Effects:
+     * - Randomly selects a hall object from the available hall objects and updates the rune's coordinates.
+     * - If only one hall object exists, the rune may remain in the same location.
+     * - Updates `runeXCoordinate` and `runeYCoordinate` to the position of the selected hall object.
+     */
+    public void teleportRune() {
         SecureRandom rng = new SecureRandom();
         ArrayList<Tile> hallObjects = getHallObjectTiles();
-
 
         int luckyHallObjectIndex = rng.nextInt(hallObjects.size());
         Tile luckyHallObjectTile = hallObjects.get(luckyHallObjectIndex);
@@ -874,9 +892,9 @@ public class PlayModeController extends Application {
 
     public boolean checkRune(Tile tile) {
         if ((playModeGrid.findXofTile(tile) == runeXCoordinate)
-        && (playModeGrid.findYofTile(tile) == runeYCoordinate)) {
+                && (playModeGrid.findYofTile(tile) == runeYCoordinate)) {
             if ((Math.abs(runeXCoordinate - hero.getPosX()) <= 1)
-            && (Math.abs(runeYCoordinate - hero.getPosY()) <= 1)) {
+                    && (Math.abs(runeYCoordinate - hero.getPosY()) <= 1)) {
                 return true;
             }
         }
@@ -944,22 +962,321 @@ public class PlayModeController extends Application {
     }
 
     public void removeMonster(Monster monster) {
-        // Remove monster from the grid
-        playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E'); // 'E' for empty tile
+        monsterManager.monsterList.remove(monster);
+        // monsterIterator.remove();
+        playModeGrid.changeTileWithIndex(monster.posX, monster.posY, 'E');
+        view.removeFromPane(monster.monsterView);
+    }
 
-        // Remove monster from the list of active monsters
-        Iterator<Monster> iterator = monsterIterator;
-        while (iterator.hasNext()) {
-            Monster m = iterator.next();
-            if (m.equals(monster)) {
-                iterator.remove();
-                break;
+    public Grid resolveAllMovingCharacters() {
+        Grid resolvedGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
+        resolvedGrid.copyTileMap(playModeGrid);
+
+        if (hero.isMoving) {
+            Tile heroTile = resolvedGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+            Tile destinationTile = resolvedGrid.findTileUsingDirection(heroTile, hero.movingDirection);
+
+            heroTile.changeTileType(hero.getCharType());
+            destinationTile.changeTileType('E');
+        }
+
+        for (Monster monster: monsterManager.monsterList) {
+            if (monster.isMoving) {
+                Tile monsterTile = resolvedGrid.findTileWithIndex(monster.posX, monster.posY);
+                Tile destinationTile = resolvedGrid.findTileUsingDirection(monsterTile, monster.movingDirection);
+
+                monsterTile.changeTileType('E');
+                destinationTile.changeTileType(monster.getCharType());
             }
         }
 
-        // Remove the monster's visual representation from the view
-        view.removeMonsterView(monster);
+        return resolvedGrid;
     }
-}
 
+    public void save(){
+        System.out.println("Game Saved!");
+        String filePath = "src/saveFiles/allSaveFiles.txt";
+        File file = new File(filePath);
+        ArrayList<String> saves = new ArrayList<String>();
+        try (Scanner scanner = new Scanner(file)){
+            while (scanner.hasNextLine()){
+                String line = scanner.nextLine();
+                if(!line.isEmpty()){
+                    saves.add(line);
+                }
+            }
+        }catch (IOException e){
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+        StringBuilder str = new StringBuilder(saves.get(saves.size()-1));
+        str.delete(0,4);
+        str.delete(str.length()-4,str.length());
+        int num = Integer.valueOf(str.toString()) + 1;
+        try (FileWriter writer = new FileWriter(file, true)){
+            writer.write("\nsave" + String.valueOf(num) + ".txt");
+        }catch(IOException e){
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+        createSaveFile("save" + String.valueOf(num));
+    }
+
+
+    public void createSaveFile(String name){
+        String filePath = "src/saveFiles/" + name + ".txt";
+        File file = new File(filePath);
+        String earthallString = earthHall.toString();
+        String airhallString = airHall.toString();
+        String waterhalString = waterHall.toString();
+        String firehallString = fireHall.toString();
+        String playModeGridString = resolveAllMovingCharacters().toString(); // Change '?' before saving
+        String currentHall = hallType.toString();
+
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write("EarthHall:");
+            writer.write(earthallString);
+            writer.write("\n");
+            writer.write("AirHall:");
+            writer.write(airhallString);
+            writer.write("\n");
+            writer.write("WaterHall:");
+            writer.write(waterhalString);
+            writer.write("\n");
+            writer.write("FireHall:");
+            writer.write(firehallString);
+            writer.write("\n");
+            writer.write("PlayModeGrid:");
+            writer.write(playModeGridString);
+            writer.write("\n");
+            writer.write("CurrentHall:\n");
+            writer.write(currentHall);
+            writer.write("\n");
+            writer.write("TimeLeft:\n");
+            writer.write(Double.toString(time));
+            writer.write("\nHeroPosx:\n");
+            writer.write(Integer.toString(hero.getPosX()));
+            writer.write("\nHeroPosy:\n");
+            writer.write(Integer.toString(hero.getPosY()));
+            writer.write("\nHeroRemainingLives:\n");
+            writer.write(Integer.toString(hero.getLiveCount()));
+            writer.write("\nRuneXCoordinate:\n");
+            writer.write(Integer.toString(runeXCoordinate));
+            writer.write("\nRuneYCoordinate:\n");
+            writer.write(Integer.toString(runeYCoordinate));
+            writer.write("\nRemainingMonsterSpawnTime:\n");
+            remainingMonsterSpawnTime = adjustedNow - lastMonsterSpawnTime;
+            writer.write(Long.toString(remainingMonsterSpawnTime));
+
+            System.out.println("File written successfully!");
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+        }
+    }
+
+    public void load(Stage primaryStage, String fileName) {
+
+        String filePath = "src/saveFiles/" + fileName;
+        System.out.println("Loading game...");
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                System.out.println("No saved game file found.");
+                return;
+            }
+
+            ArrayList<String> lines = new ArrayList<>();
+            try (Scanner scanner = new Scanner(file)) {
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine().trim();
+                    if (!line.isEmpty()) { // Skip empty lines
+                        lines.add(line);
+                    }
+                }
+            }
+
+            int index = 0;
+
+            // Load Earth Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("EarthHall:TileMap:")) {
+                index++;
+                earthHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(earthHall, lines, index);
+            } else {
+                throw new RuntimeException("Earth Hall data missing or corrupted.");
+            }
+
+            // Load Air Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("AirHall:TileMap:")) {
+                index++;
+                airHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(airHall, lines, index);
+            } else {
+                throw new RuntimeException("Air Hall data missing or corrupted.");
+            }
+
+            // Load Water Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("WaterHall:TileMap:")) {
+                index++;
+                waterHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(waterHall, lines, index);
+            } else {
+                throw new RuntimeException("Water Hall data missing or corrupted.");
+            }
+
+            // Load Fire Hall grid
+            if (index < lines.size() && lines.get(index).startsWith("FireHall:TileMap:")) {
+                index++;
+                fireHall = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(fireHall, lines, index);
+            } else {
+                throw new RuntimeException("Fire Hall data missing or corrupted.");
+            }
+
+            // Load Current Play Mode grid
+            if (index < lines.size() && lines.get(index).startsWith("PlayModeGrid:TileMap:")) {
+                index++;
+                playModeGrid = new Grid(10, 9, 64, 64, 100, 150);
+                index = parseTileMap(playModeGrid, lines, index);
+            } else {
+                throw new RuntimeException("Play Mode Grid data missing or corrupted.");
+            }
+
+            // Load current hall type
+            if (index < lines.size() && lines.get(index).equals("CurrentHall:")) {
+                index++;
+                hallType = HallType.valueOf(lines.get(index++));
+            } else {
+                throw new RuntimeException("Current Hall data missing or corrupted.");
+            }
+
+            // Load remaining time
+            if (index < lines.size() && lines.get(index).equals("TimeLeft:")) {
+                index++;
+                time = Double.parseDouble(lines.get(index++));
+            } else {
+                throw new RuntimeException("TimeLeft data missing or corrupted.");
+            }
+
+            // Load hero's position and lives
+            if (index < lines.size() && lines.get(index).equals("HeroPosx:")) {
+                index++;
+                int heroPosX = Integer.parseInt(lines.get(index++));
+
+                if (index < lines.size() && lines.get(index).equals("HeroPosy:")) {
+                    index++;
+                    int heroPosY = Integer.parseInt(lines.get(index++));
+
+                    if (index < lines.size() && lines.get(index).equals("HeroRemainingLives:")) {
+                        index++;
+                        int heroLives = Integer.parseInt(lines.get(index++));
+
+                        hero = initializeHero(heroPosX, heroPosY);
+                        hero.setRemaningLives(heroLives);
+                    }
+                }
+            } else {
+                throw new RuntimeException("Hero data missing or corrupted.");
+            }
+
+            // Load rune's position
+            if (index < lines.size() && lines.get(index).equals("RuneXCoordinate:")) {
+                index++;
+                runeXCoordinate = Integer.parseInt(lines.get(index++));
+
+                if (index < lines.size() && lines.get(index).equals("RuneYCoordinate:")) {
+                    index++;
+                    runeYCoordinate = Integer.parseInt(lines.get(index++));
+                }
+            } else {
+                throw new RuntimeException("Rune data missing or corrupted.");
+            }
+
+            // Load last monster spawn time
+            if (index < lines.size() && lines.get(index).equals("RemainingMonsterSpawnTime:")) {
+                index++;
+                remainingMonsterSpawnTime = Long.parseLong(lines.get(index++));
+            } else {
+                throw new RuntimeException("RemainingMonsterSpawnTime data missing or corrupted.");
+            }
+
+            view = new PlayModeView(playModeGrid, time, primaryStage);
+
+            monsterManager = new MonsterManager(playModeGrid, hero);
+
+            // Refresh the view
+            Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
+            hero.targetX = heroTile.getLeftSide();
+            hero.targetY = heroTile.getTopSide();
+            hero.isMoving = false;
+            view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
+            view.updateHeroLife(hero.getRemainingLives());
+            initializeSetOnActions();
+            monsterManager.setPlayModeView(view);
+
+            for (int y = 0; y < playModeGrid.getColumnLength(); y++) {
+                for (int x = 0; x < playModeGrid.getRowLength(); x++) {
+                    Tile tile = playModeGrid.findTileWithIndex(x, y);
+                    char tileType = tile.getTileType();
+
+                    MonsterType monsterType = null;
+
+                    switch (tileType) {
+                        case 'F' -> monsterType = MonsterType.FIGHTER;
+                        case 'A' -> monsterType = MonsterType.ARCHER;
+                        case 'W' -> monsterType = MonsterType.WIZARD;
+                    }
+
+                    if (monsterType != null) {
+                        // Canavarı oluştur ve ekrana çiz
+                        monsterManager.createMonster(x, y, monsterType, System.nanoTime());
+                    }
+                }
+            }
+
+            Scene scene = view.getScene();
+            initialize(scene);
+
+            primaryStage.setTitle("Play Mode");
+            primaryStage.setScene(scene);
+            primaryStage.setY(0);
+            // primaryStage.setFullScreen(true);
+            // primaryStage.setFullScreenExitHint("");
+            primaryStage.show();
+            this.primaryStage = primaryStage;
+            view.showCountdownAndStart(() -> {
+                isCountdownRunning= false;
+                startGameLoop();
+            });
+            isCountdownRunning = true;
+
+            System.out.println("Game loaded successfully!");
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading the game: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("An unexpected error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private int parseTileMap(Grid grid, ArrayList<String> lines, int index) {
+        int tileCount = 0; // Keep track of processed tiles
+        int totalTiles = grid.getRowLength()* grid.getColumnLength(); // Total tiles expected in the grid
+
+        for (int i = 0; i < grid.getColumnLength(); i++) {
+            String[] tiles = lines.get(index++).split(", ");
+            for (int j = 0; j < tiles.length; j++) {
+                String[] tileData = tiles[j].split(" ");
+                char tileType = tileData[1].charAt(0); // Extract tile type
+                grid.changeTileWithIndex(j, i, tileType);
+                tileCount++;
+            }
+        }
+
+        if (tileCount != totalTiles) {
+            System.err.println("Warning: Parsed tile count does not match expected grid size.");
+        }
+
+        return index;
+    }
+
+}
 

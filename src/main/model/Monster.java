@@ -1,6 +1,7 @@
 package main.model;
 
 import javafx.scene.image.Image;
+import javafx.scene.shape.Rectangle;
 
 public abstract class Monster {
     public final int speed = 5;
@@ -8,7 +9,7 @@ public abstract class Monster {
     public long spawnTime = 0;
     public long lastActTime = 0;
     public int posX, posY; // position on grid
-
+    public Rectangle monsterView;
     public int targetX, targetY; // location of where the monsterView will go to
     public int currentX, currentY; // location of where the monsterView is currently drawn
 

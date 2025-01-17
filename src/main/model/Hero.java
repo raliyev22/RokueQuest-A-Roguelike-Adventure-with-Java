@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import java.util.HashMap;
 
 public class Hero {
+	public static final long INVINCIBILITY_FRAMES = 1_000_000_000L;
 	public final int maxLives = 4;
 	public final int speed = 4;
 
@@ -13,19 +14,18 @@ public class Hero {
 
 	public int targetX, targetY;
 	public int currentX, currentY;
-
+	private boolean isProtected;
+	private HashMap<Enchantment.Type, Integer> enchantments;
 	public boolean isMoving;
 	public boolean isTakingDamage;
 	public Directions movingDirection;
 	public Directions facingDirection;
-	private boolean isProtected;
+
 	public long lastDamagedFrame = 0;
 	private boolean isTeleported=false;
-	private Image sprite;
+	protected Image sprite;
 	private int takingDamageAnimationCounter = 0;
 	private final int TAKING_DAMAGE_ANIMATION_LOOP = 3;
-	private HashMap<Enchantment.Type, Integer> enchantments;
-
 
 	public Hero(int posX, int posY) {
 		this.posX = posX;
@@ -33,37 +33,29 @@ public class Hero {
 		this.remainingLives = 4;
 		this.isMoving = false;
 		this.isTakingDamage = false;
-		this.isProtected = false;
-		this.facingDirection = Directions.EAST;
 		this.enchantments = new HashMap<>();
-		sprite = Images.IMAGE_PLAYERRIGHT_x4;
-	}
-	public Image getSprite() {
-		return this.sprite;
-	}
+		this.facingDirection = Directions.EAST;
 
-	public void setSprite(Image newSprite) {
-		this.sprite = newSprite;
+		 sprite = Images.IMAGE_PLAYERRIGHT_x4;
 	}
 
 	public void move(Directions direction) {
 		switch (direction) {
-			case NORTH -> posY--;
-			case SOUTH -> posY++;
-			case EAST -> posX++;
-			case WEST -> posX--;
+			case NORTH -> {
+				posY--;
+			}
+			case SOUTH -> {
+				posY++;
+			}
+			case EAST -> {
+				posX++;
+			}
+			case WEST -> {
+				posX--;
+			}
 			default -> throw new IllegalArgumentException("Invalid direction");
 		}
 	}
-
-	public void increaseTakingDamageAnimationCounter() {
-		if (this.takingDamageAnimationCounter <= this.TAKING_DAMAGE_ANIMATION_LOOP) {
-			this.takingDamageAnimationCounter += 1;
-		} else {
-			this.takingDamageAnimationCounter = 0;
-		}
-	}
-
 	public boolean isProtected() {
 		return isProtected;
 	}
@@ -90,7 +82,6 @@ public class Hero {
 	public HashMap<Enchantment.Type, Integer> getEnchantments() {
 		return enchantments;
 	}
-
 	public void increaseLives(int num) {
 		remainingLives += num;
 		if (remainingLives > maxLives) {
@@ -104,10 +95,7 @@ public class Hero {
 		}
 	}
 
-	public int getTakingDamageAnimationCounter() {
-		return this.takingDamageAnimationCounter;
-	}
-	public int getLiveCount() {
+	public int getLiveCount(){
 		return remainingLives;
 	}
 
@@ -119,23 +107,53 @@ public class Hero {
 		return posY;
 	}
 
-	public void setPosY(int pos) {
-		this.posY = pos;
+	public int getRemainingLives(){
+		return remainingLives;
 	}
-
-	public void setPosX(int pos) {
+	public void setPosY(int pos){
+		this.posY= pos;
+	}
+	public void setPosX(int pos){
 		this.posX = pos;
+	}
+	public void setRemaningLives(int lives){
+		this.remainingLives = lives;
 	}
 
 	public char getCharType() {
-		return this.facingDirection == Directions.WEST ? 'L' : 'R';
+		if (this.facingDirection == Directions.WEST) {
+			return 'L';
+		}
+		else {
+			return 'R';
+		}
 	}
 
-	public Boolean getIsTeleported() {
+	public Image getSprite() {
+		return this.sprite;
+	}
+
+	public void setSprite(Image newSprite) {
+		this.sprite = newSprite;
+	}
+
+	public int getTakingDamageAnimationCounter() {
+		return this.takingDamageAnimationCounter;
+	}
+
+	public void increaseTakingDamageAnimationCounter() {
+		if (this.takingDamageAnimationCounter <= this.TAKING_DAMAGE_ANIMATION_LOOP) {
+			this.takingDamageAnimationCounter += 1;
+		} else {
+			this.takingDamageAnimationCounter = 0;
+		}
+	}
+
+	public Boolean getIsTeleported(){
 		return this.isTeleported;
 	}
 
-	public void setIsTeleported(Boolean bool) {
+	public void setIsTeleported(Boolean bool){
 		this.isTeleported = bool;
 	}
 }

@@ -8,14 +8,14 @@ public class Images extends Application {
 	// Images that are usually used only once, these do not have a char associated with them.
 	public static final Image IMAGE_UI_CHEST = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
 	public static final Image IMAGE_INVENTORY = new Image("/rokue-like_assets/Inventory.png");
-	
+
 	public static final Image IMAGE_DOORSOPEN = new Image("/rokue-like_assets/DoorOpenWithoutWalls_32_32.png");
 	public static final Image IMAGE_DOORSOPEN_x2 = new Image("/rokue-like_assets/DoorOpenWithoutWalls_x2_64_64.png");
 	public static final Image IMAGE_DOORSCLOSED = new Image("/rokue-like_assets/DoorWithoutWalls_32_32.png");
 	public static final Image IMAGE_DOORSCLOSED_x2 = new Image("/rokue-like_assets/DoorWithoutWalls_x2_64_64.png");
 	public static final Image IMAGE_DOORSCLOSEDWALLS = new Image("/rokue-like_assets/DoorWithWalls_64_32.png");
 	public static final Image IMAGE_DOORSCLOSEDWALLS_x2 = new Image("/rokue-like_assets/DoorWithWalls_x2_128_64.png");
-	
+
 	public static final Image IMAGE_EXITBUTTON_x2 = new Image("/rokue-like_assets/ExitButton_x2_32_32.png");
 	public static final Image IMAGE_EXITBUTTON_x4 = new Image("/rokue-like_assets/ExitButton_x4_64_64.png");
 	public static final Image IMAGE_PAUSEBUTTON_x2 = new Image("/rokue-like_assets/PauseButton_x2_32_32.png");
@@ -24,10 +24,10 @@ public class Images extends Application {
 	public static final Image IMAGE_SAVEBUTTON_x4 = new Image("/rokue-like_assets/SaveButton_x4_64_64.png");
 	public static final Image IMAGE_PLAYBUTTON_x2 = new Image("/rokue-like_assets/PlayButton_x2_32_32.png");
 	public static final Image IMAGE_PLAYBUTTON_x4 = new Image("/rokue-like_assets/PlayButton_x4_64_64.png");
-	
+
 	public static final Image IMAGE_HEART_x2 = new Image("/rokue-like_assets/Heart_x2_32_32.png");
 	public static final Image IMAGE_HEART_x4 = new Image("/rokue-like_assets/Heart_x4_64_64.png");
-	
+
 	public static final Image IMAGE_SMEARED = new Image("/rokue-like_assets/SmearedTile_32_32.png");
 	public static final Image IMAGE_SMEARED_x2 = new Image("/rokue-like_assets/SmearedTile_x2_64_64.png");
 
@@ -35,9 +35,12 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
-	
-	
-	
+
+	public static final Image IMAGE_PLAYERLEFTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerLeftTakingDamage_x4_64_64.png");
+	public static final Image IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerRightTakingDamage_x4_64_64.png");
+
+
+
 	// Images that are used more than once, associated with a char.
 	// In alphabetical order.
 	public final static Image IMAGE_ALLURE_X2 = new Image("/rokue-like_assets/Allure_x2_32_32.png");
@@ -60,7 +63,7 @@ public class Images extends Application {
 	public static final Image IMAGE_TILE_x2 = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 	public static final Image IMAGE_LADDER_x2 = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
 	public static final Image IMAGE_WIZARD_x2 = new Image("/rokue-like_assets/Wizard_x2_32_32.png");
-	
+
 	// All of the assets above, in times two pixels.
 	public static final Image IMAGE_ALLURE_x4 = new Image("/rokue-like_assets/Allure_x4_64_64.png");
 	public static final Image IMAGE_ARCHER_x4 = new Image("/rokue-like_assets/Archer_x4_64_64.png");
@@ -83,8 +86,24 @@ public class Images extends Application {
 	public static final Image IMAGE_TILE_x4 = new Image("/rokue-like_assets/Tile_x4_64_64.png");
 	public static final Image IMAGE_WIZARD_x4 = new Image("/rokue-like_assets/Wizard_x4_64_64.png");
 	public static final Image IMAGE_TRANSPARENT = new Image("/rokue-like_assets/Transparent.png");
-	
-	
+
+
+	public static Image convertEnchantmentToImage(Enchantment.Type type) {
+		switch (type) {
+			case EXTRA_TIME:
+				return IMAGE_TRANSPARENT; // Replace with actual image
+			case REVEAL:
+				return IMAGE_REVEAL_x2;
+			case CLOAK_OF_PROTECTION:
+				return IMAGE_CLOAK_x2;
+			case LURING_GEM:
+				return IMAGE_ALLURE_x4;
+			case EXTRA_LIFE:
+				return IMAGE_CHESTHEARTOPEN_x2;
+			default:
+				return null;
+		}
+	}
 	//Takes an Image and finds the char associated with it.
 	public static char convertImageToChar(Image img) {
 		// Cannot use switch statements (image is not a primitive type) so idk what to do.
@@ -92,7 +111,7 @@ public class Images extends Application {
 		// Other option is to use the toString method.
 		// Never mind, found a workaround:
 		int hashCode = img.hashCode();
-		
+
 		for (char c = 'a'; c <= 'z'; c++) {
 			if (convertCharToImage(c) != null) {
 				if (convertCharToImage(c).hashCode() == hashCode) {
@@ -112,7 +131,7 @@ public class Images extends Application {
 
 		return '%'; // just an error character.
 	}
-	
+
 	// Takes a char and finds the image associated with it. Upper case means x2, lower case means x4.
 	public static Image convertCharToImage(char c) {
 		// Unless someone wants to change chars to TileType that I conveniently created just for this purpose, it returns a char.
@@ -138,7 +157,7 @@ public class Images extends Application {
 				return IMAGE_FIGHTER_x2;
 			}
 			// Why is G = CUBE? Idk I don't see any better alternatives then randomly assigning chars
-			case 'G' -> { 
+			case 'G' -> {
 				return IMAGE_CUBE_x2;
 			}
 			case 'H' -> {
@@ -181,7 +200,7 @@ public class Images extends Application {
 				return IMAGE_WIZARD_x2;
 			}
 			// As of writing this, I U V X Y Z are unused. Also Turkish characters, in case we need more.
-			
+
 			// Here are the same chars, but lower case. These return x4 images.
 			case 'a' -> {
 				return IMAGE_ARCHER_x4;
@@ -201,7 +220,7 @@ public class Images extends Application {
 			case 'f' -> {
 				return IMAGE_FIGHTER_x4;
 			}
-			case 'g' -> { 
+			case 'g' -> {
 				return IMAGE_CUBE_x4;
 			}
 			case 'h' -> {
@@ -244,24 +263,8 @@ public class Images extends Application {
 				return IMAGE_WIZARD_x4;
 			}
 		}
-		
+
 		return null;
-	}
-	public static Image convertEnchantmentToImage(Enchantment.Type type) {
-		switch (type) {
-			case EXTRA_TIME:
-				return IMAGE_TRANSPARENT; // Replace with actual image
-			case REVEAL:
-				return IMAGE_REVEAL_x2;
-			case CLOAK_OF_PROTECTION:
-				return IMAGE_CLOAK_x2;
-			case LURING_GEM:
-				return IMAGE_ALLURE_x4;
-			case EXTRA_LIFE:
-				return IMAGE_CHESTHEARTOPEN_x2;
-			default:
-				return null;
-		}
 	}
 
 	public static void main(String[] args) {
@@ -274,7 +277,7 @@ public class Images extends Application {
 			System.out.println(convertImageToChar(convertCharToImage(c)));
 			System.out.println("------------------------------------------");
 		}
-		
+
 		for (char c = 'a'; c <= 'w'; c++) {
 			if (c == 'i' || c == 'u' || c == 'v') {
 				continue;
