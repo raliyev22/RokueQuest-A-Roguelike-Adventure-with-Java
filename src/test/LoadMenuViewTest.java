@@ -175,15 +175,4 @@ public class LoadMenuViewTest {
         assertTrue("Existing files should remain in the list", savedFiles.contains("save2.txt"));
         assertTrue("Existing files should remain in the list", savedFiles.contains("save3.txt"));
     }
-
-
-
-    @After
-    public void tearDown() {
-        // Cleanup after the tests
-        File saveFileList = new File("src/saveFiles/allSaveFiles.txt");
-        if (saveFileList.exists()) {
-            saveFileList.delete();
-        }
-    }
 }
