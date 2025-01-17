@@ -9,10 +9,14 @@ import java.util.Scanner;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.Main;
@@ -331,14 +335,13 @@ public class PlayModeController extends Application {
 
                             view.showWalls(playModeGrid, false);
                             view.walls.toFront();
+                            soundPlayer.playSoundEffectInThread("door");
                             
                             if(hallType == HallType.FIRE){
                                 soundPlayer.playSoundEffectInThread("gameWinner");
                                 view.showGameOverPopup(true);
                             }
                             else{
-                                soundPlayer.playSoundEffectInThread("door");
-
                                 new Timeline(new KeyFrame(Duration.seconds(1.75), e -> {
                                     startGameLoop();
                                     initializePlayMode();
@@ -583,6 +586,7 @@ public class PlayModeController extends Application {
         && (playModeGrid.findYofTile(tile) == runeYCoordinate)) {
             if ((Math.abs(runeXCoordinate - hero.getPosX()) <= 1) 
             && (Math.abs(runeYCoordinate - hero.getPosY()) <= 1)) {
+                showRuneParticleEffect(tile);
                 return true;
             }
         }
@@ -970,6 +974,48 @@ public class PlayModeController extends Application {
         
         return index;
     }
+
+    private void showRuneParticleEffect(Tile runeTile) {
+        soundPlayer.playSoundEffectInThread("sparkle");
+
+        double centerX = runeTile.getLeftSide() + tileWidth / 2.0;
+        double centerY = runeTile.getTopSide() + tileHeight / 2.0;
+    
+        Group particleGroup = new Group();
+        view.getPane().getChildren().add(particleGroup);
+    
+        Timeline timeline = new Timeline();
+    
+        for (int i = 0; i < 100; i++) {
+            Circle particle = new Circle(3, Color.GOLD);
+            particle.setCenterX(centerX);
+            particle.setCenterY(centerY);
+    
+            double angle = Math.random() * 360;
+            double distance = Math.random() * 100;
+            double targetX = centerX + Math.cos(Math.toRadians(angle)) * distance;
+            double targetY = centerY + Math.sin(Math.toRadians(angle)) * distance;
+    
+            particleGroup.getChildren().add(particle);
+    
+            timeline.getKeyFrames().addAll(
+                new KeyFrame(Duration.millis(0),
+                    new KeyValue(particle.opacityProperty(), 1),
+                    new KeyValue(particle.centerXProperty(), centerX),
+                    new KeyValue(particle.centerYProperty(), centerY)
+                ),
+                new KeyFrame(Duration.millis(800),
+                    new KeyValue(particle.opacityProperty(), 0),
+                    new KeyValue(particle.centerXProperty(), targetX),
+                    new KeyValue(particle.centerYProperty(), targetY)
+                )
+            );
+        }
+    
+        timeline.setOnFinished(e -> view.getPane().getChildren().remove(particleGroup));
+        timeline.play();
+    }
+    
 
 }
 

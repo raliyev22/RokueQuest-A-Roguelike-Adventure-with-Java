@@ -207,7 +207,6 @@ public class MainMenuView extends Application {
         soundPlayer.addSoundEffect("step", "src/main/sounds/step.wav");
         soundPlayer.setVolume("step", -10);
         soundPlayer.addSoundEffect("door", "src/main/sounds/door.wav");
-        soundPlayer.setVolume("door", -10);
         soundPlayer.addSoundEffect("gameWinner", "src/main/sounds/gameWinner.wav");
         soundPlayer.setVolume("gameWinner", -15);
         soundPlayer.addSoundEffect("gameLoser", "src/main/sounds/gameLoser.wav");
@@ -217,6 +216,7 @@ public class MainMenuView extends Application {
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
         soundPlayer.setVolume("wizard", -10);
         soundPlayer.addSoundEffect("escButton","src/main/sounds/escButton.wav");
+        soundPlayer.addSoundEffect("sparkle","src/main/sounds/sparkle.wav");
     }
     
     private void showExitConfirmation(Stage primaryStage) {
