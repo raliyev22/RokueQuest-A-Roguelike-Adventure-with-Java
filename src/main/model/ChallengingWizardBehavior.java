@@ -8,7 +8,6 @@ public class ChallengingWizardBehavior implements WizardBehavior {
 
     public ChallengingWizardBehavior() {
         soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
-        soundPlayer.setVolume("wizard", -10);
     }
 
     @Override
