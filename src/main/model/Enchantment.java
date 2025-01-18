@@ -129,6 +129,14 @@ public class Enchantment {
         pause.play();
     }
 
+    public static Enchantment getEnchantmentFromType(Type type) {
+        // Use default or placeholder values
+        int defaultPosX = 0;
+        int defaultPosY = 0;
+        long defaultSpawnTime = System.currentTimeMillis();
+
+        return new Enchantment(type, defaultPosX, defaultPosY, defaultSpawnTime);
+    }
 
     @Override
     public String toString() {

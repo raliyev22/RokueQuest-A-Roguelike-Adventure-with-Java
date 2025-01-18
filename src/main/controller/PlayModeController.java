@@ -1102,7 +1102,11 @@ public class PlayModeController extends Application {
 			writer.write("\nRemainingMonsterSpawnTime:\n");
             remainingMonsterSpawnTime = adjustedNow - lastMonsterSpawnTime;
             writer.write(Long.toString(remainingMonsterSpawnTime));
-
+            writer.write("\nInventoryEnchantments:\n");
+            // Save inventory enchantments
+            for (var entry : inventory.getEnchantments().entrySet()) {
+                writer.write(entry.getKey() + "," + entry.getValue() + "\n");
+            }
             System.out.println("File written successfully!");
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());
@@ -1235,7 +1239,38 @@ public class PlayModeController extends Application {
                 throw new RuntimeException("RemainingMonsterSpawnTime data missing or corrupted.");
 }
 
-            view = new PlayModeView(playModeGrid, time, primaryStage,hallType);
+            view = new PlayModeView(playModeGrid, time, primaryStage, hallType);
+
+            if (inventory == null) {inventory = new Inventory();}
+            if (activeEnchantments == null) {activeEnchantments = new ArrayList<>();}
+            if (index < lines.size() && lines.get(index).equals("InventoryEnchantments:")) {
+                index++;
+                if (inventory == null) {
+                    inventory = new Inventory();
+                }
+                if (activeEnchantments == null) {
+                    activeEnchantments = new ArrayList<>();
+                }
+                while (index < lines.size() && !lines.get(index).isEmpty()) {
+                    String[] enchantmentData = lines.get(index++).split(",");
+                    Enchantment.Type type = Enchantment.Type.valueOf(enchantmentData[0]);
+                    int count = Integer.parseInt(enchantmentData[1]);
+                    for (int i = 0; i < count; i++) {
+                        // Create the Enchantment object
+                        Enchantment enchantment = Enchantment.getEnchantmentFromType(type);
+
+                        // Add to the enchantment views map
+                        Rectangle fakeEnchantmentView = new Rectangle(0, 0, 0, 0); // Placeholder view
+                        view.getEnchantmentViews().put(enchantment, fakeEnchantmentView);
+
+                        // Collect the enchantment
+                        view.collectEnchantment(enchantment, inventory);
+                    }
+                }
+            } else {
+                throw new RuntimeException("Inventory data missing or corrupted.");
+            }
+
 
             monsterManager = new MonsterManager(playModeGrid, hero);
 
