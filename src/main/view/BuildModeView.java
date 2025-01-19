@@ -439,7 +439,7 @@ public class BuildModeView extends Application {
         Random random = new Random();
         for (int j = 0; j < neededObj; j++){
             //First pick which object is going to be putted
-            int objRand = random.nextInt(6);
+            int objRand = random.nextInt(7);
             if (objRand == 0) {
                 img = Pillar_IMAGE;
                 w = 32;
