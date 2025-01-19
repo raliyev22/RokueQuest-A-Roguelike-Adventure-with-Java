@@ -504,23 +504,22 @@ public class BuildModeView extends Application {
         object.setFill(new ImagePattern(image));
         
         object.setOnMouseClicked(event -> {
-            Rectangle clone = new Rectangle(width * 2, height * 2);
-            Image img = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64_2.png");
-            clone.setFill(new ImagePattern(img));
+            Rectangle clone = new Rectangle(width, height);
+            clone.setFill(new ImagePattern(image));
             root.getChildren().add(clone);
-            clone.setX(event.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
-            clone.setY(event.getSceneY() - (height * 2) / 2);
+            clone.setX(event.getSceneX() - width  / 2); // Center the clone around the mouse
+            clone.setY(event.getSceneY() - height / 2);
 
             
             clone.setOnMouseMoved(dragEvent -> {
                 clone.setVisible(true);
-                clone.setX(dragEvent.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
-                clone.setY(dragEvent.getSceneY() - (height * 2) / 2);
+                clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
+                clone.setY(dragEvent.getSceneY() - height / 2);
             });
             clone.setOnMouseExited(exitEvent -> {
                 clone.setVisible(true);
-                clone.setX(exitEvent.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
-                clone.setY(exitEvent.getSceneY() - (height * 2) / 2);
+                clone.setX(exitEvent.getSceneX() - width / 2); // Center the clone around the mouse
+                clone.setY(exitEvent.getSceneY() - height / 2);
             });
             clone.setOnMouseClicked(e -> {
                 boolean snappedToTile = false;
