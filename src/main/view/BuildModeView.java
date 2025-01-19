@@ -190,6 +190,36 @@ public class BuildModeView extends Application {
         Button exitButton = new Button();
 		exitButton.setStyle("-fx-background-color: transparent;"); 
 
+        Button randomButton = new Button();
+        randomButton.setStyle("-fx-background-color: transparent;");
+
+        ImageView randomButtonView = new ImageView(new Image("/rokue-like_assets/RandomButton_x4_64_64.png"));
+        randomButtonView.setFitWidth(35);
+        randomButtonView.setFitHeight(35);
+
+        randomButton.setGraphic(randomButtonView);
+        randomButton.setPrefWidth(35);
+        randomButton.setPrefHeight(35);
+
+        randomButton.setLayoutX(toolboxX+48);
+        randomButton.setLayoutY(toolboxHeight-75);
+        
+        randomButton.setOnMouseEntered(event -> {
+            randomButton.setCursor(Cursor.HAND);
+        });
+        
+        randomButton.setOnMouseExited(event -> {
+            randomButton.setCursor(Cursor.DEFAULT);
+        });
+
+        randomButton.setOnMouseClicked(event -> {
+            soundPlayer.playSoundEffectInThread("blueButtons");
+            randomCreateObjects(pane);
+        });
+
+
+        pane.getChildren().add(randomButton);
+
 		ImageView exitButtonView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
 		exitButtonView.setFitWidth(35);
 		exitButtonView.setFitHeight(35);
@@ -228,7 +258,7 @@ public class BuildModeView extends Application {
 
 		playButton.setGraphic(playButtonView);
 		playButton.setPrefWidth(35);
-		playButton.setPrefHeight(35);      
+		playButton.setPrefHeight(35);     
 
         playButton.setOnMouseEntered(event -> {
             playButton.setCursor(Cursor.HAND);
@@ -375,110 +405,129 @@ public class BuildModeView extends Application {
         // createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');
     }
 
+    private void randomCreateObjects(Pane root){
+        int i = 0;
+        int neededObj;
+        for (TiledHall hall : halls){
+            if (i == 0 && tileMap.get(hall).size() < 6){
+                neededObj = 6 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            }
+            else if (i == 1 && tileMap.get(hall).size()<9){
+                neededObj = 9 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            }
+            else if (i == 2 && tileMap.get(hall).size()<13){
+                neededObj = 13 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            }
+            else if (i == 3 && tileMap.get(hall).size()<17){
+                neededObj = 17 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+            }
+        }
+    }
+
+    private void randomCreateObjectHelper(TiledHall hall, int neededObj, Pane root){
+        Image img;
+        int w;
+        int h;
+        char tileType;
+        Random random = new Random();
+        for (int j = 0; j < neededObj; j++){
+            //First pick which object is going to be putted
+            int objRand = random.nextInt(6);
+            if (objRand == 0) {
+                img = Pillar_IMAGE;
+                w = 32;
+                h = 64;
+                tileType = 'P';
+            }
+            else if (objRand == 1){
+                img = Ladder_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'T';
+            }
+            else if (objRand == 2){
+                img = BOX_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'B';
+            }
+            else if (objRand == 3){
+                img = BoxOnBox_IMAGE;
+                w = 32;
+                h = 64;
+                tileType = 'D';
+            }
+            else if (objRand == 4){
+                img = Cube_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'G';
+            }
+            else if (objRand == 5){
+                img = Skull_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'S';
+            }
+            else {
+                img = CHEST;
+                w = 32;
+                h = 32;
+                tileType = 'H';
+            }
+            Grid grid = hall.getGrid();
+            Tile chosenTile = grid.getRandomEmptyTile();
+            chosenTile.changeTileType(tileType);
+            tileMap.get(hall).add(chosenTile);
+
+            
+
+            Rectangle targetRect = new Rectangle(w, h);
+            targetRect.setFill(new ImagePattern(img));
+            targetRect.setX(chosenTile.getLeftSide());
+            targetRect.setY(chosenTile.getTopSide()); 
+            hall.getChildren().add(targetRect);
+        }
+    }
+    
+
+    
     private void createDraggableObject(double x, double y, Image image, Pane root, double width, double height, List<TiledHall> halls, char tileType) {
         Rectangle object = new Rectangle(x, y, width, height);
         object.setFill(new ImagePattern(image));
         
-        // object.setOnMouseClicked(event -> {
-        //     Rectangle clone = new Rectangle(width, height);
-        //     clone.setFill(new ImagePattern(image));
-        //     root.getChildren().add(clone);
-        //     clone.setX(event.getSceneX() - width / 2); // Center the clone around the mouse
-        //     clone.setY(event.getSceneY() - height / 2);
+        object.setOnMouseClicked(event -> {
+            Rectangle clone = new Rectangle(width * 2, height * 2);
+            Image img = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64_2.png");
+            clone.setFill(new ImagePattern(img));
+            root.getChildren().add(clone);
+            clone.setX(event.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
+            clone.setY(event.getSceneY() - (height * 2) / 2);
 
             
-        //     clone.setOnMouseMoved(dragEvent -> {
-        //         clone.setVisible(true);
-        //         clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
-        //         clone.setY(dragEvent.getSceneY() - height / 2);
-        //     });
-        //     clone.setOnMouseClicked(e -> {
-        //         boolean snappedToTile = false;
-    
-        //         // Get the scene coordinates where the object was released
-        //         double sceneX = e.getSceneX();
-        //         double sceneY = e.getSceneY();
-
-        //         int adjustmentForBigObjects=0;
-        //         boolean flag=false;
-    
-        //         // Adjust the Y-coordinate for tall objects (32x64)
-        //         if (height == 64) {
-        //             flag=true;
-        //             adjustmentForBigObjects=32;
-        //             sceneY += adjustmentForBigObjects; // Align the bottom part with the grid
-        //         }
-    
-        //         for (TiledHall hall : halls) {
-        //             Grid grid = hall.getGrid();
-    
-        //             // Check if the adjusted position is within the grid
-        //             if (grid.coordinatesAreInGrid(sceneX, sceneY)) {
-        //                 Tile targetTile = grid.findTileUsingCoordinates(sceneX, sceneY);
-    
-        //                 if (targetTile != null && targetTile.getTileType() == 'E') {
-        //                     // Update the tile's type to match the dragged object
-        //                     targetTile.changeTileType(tileType);
-
-
-        //                     //add the target tile to the tileList
-        //                     if(!tileMap.get(hall).contains(targetTile)){tileMap.get(hall).add(targetTile);}
-
-
-        //                     if (flag){
-        //                     Tile flagTile=grid.findTileUsingCoordinates(sceneX, sceneY-32);
-        //                     if(flagTile!=null){
-        //                         flagTile.changeTileType('!');
-        //                     }
-        //                     }
-    
-        //                     // Snap the clone to the target tile
-        //                     Rectangle targetRect = new Rectangle(width, height);
-        //                     targetRect.setFill(new ImagePattern(image));
-        //                     // root.getChildren().add(targetRect);
-        //                     targetRect.setX(targetTile.getLeftSide());
-        //                     targetRect.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
-        //                     hall.getChildren().add(targetRect);
-    
-        //                     snappedToTile = true;
-
-        //                     soundPlayer.playSoundEffectInThread("putting");
-                            
-        //                     break;
-        //                 }
-        //             }
-        //         }
-    
-        //         // If not snapped to a grid, remove the clone
-        //         if (!snappedToTile) {
-        //             root.getChildren().remove(clone);
-        //         }
-        //     });
-        // });
-
-
-        object.setOnMousePressed(event -> {
-            // Create a new copy when dragging starts
-            Rectangle clone = new Rectangle(width, height);
-            clone.setFill(new ImagePattern(image));
-            root.getChildren().add(clone);
-            clone.setVisible(false);
-    
-            // Update the position of the clone in real time
-            object.setOnMouseDragged(dragEvent -> {
+            clone.setOnMouseMoved(dragEvent -> {
                 clone.setVisible(true);
-                // Position the clone to follow the mouse cursor
-                clone.setX(dragEvent.getSceneX() - width / 2); // Center the clone around the mouse
-                clone.setY(dragEvent.getSceneY() - height / 2);
+                clone.setX(dragEvent.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
+                clone.setY(dragEvent.getSceneY() - (height * 2) / 2);
             });
-    
-            // Handle release for snapping or discarding
-            object.setOnMouseReleased(releaseEvent -> {
+            clone.setOnMouseExited(exitEvent -> {
+                clone.setVisible(true);
+                clone.setX(exitEvent.getSceneX() - (width * 2) / 2); // Center the clone around the mouse
+                clone.setY(exitEvent.getSceneY() - (height * 2) / 2);
+            });
+            clone.setOnMouseClicked(e -> {
                 boolean snappedToTile = false;
     
                 // Get the scene coordinates where the object was released
-                double sceneX = releaseEvent.getSceneX();
-                double sceneY = releaseEvent.getSceneY();
+                double sceneX = e.getSceneX();
+                double sceneY = e.getSceneY();
 
                 int adjustmentForBigObjects=0;
                 boolean flag=false;
@@ -514,9 +563,12 @@ public class BuildModeView extends Application {
                             }
     
                             // Snap the clone to the target tile
-                            clone.setX(targetTile.getLeftSide());
-                            clone.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
-                            hall.getChildren().add(clone);
+                            Rectangle targetRect = new Rectangle(width, height);
+                            targetRect.setFill(new ImagePattern(image));
+                            // root.getChildren().add(targetRect);
+                            targetRect.setX(targetTile.getLeftSide());
+                            targetRect.setY(targetTile.getTopSide()-adjustmentForBigObjects);    
+                            hall.getChildren().add(targetRect);
     
                             snappedToTile = true;
 
