@@ -387,7 +387,7 @@ public class BuildModeView extends Application {
         double[] positionsY = {
             toolboxY + 100,  toolboxY + 100+64+20, toolboxY + 184+32+20,
             toolboxY + 236+42+20, toolboxY + 362+20, toolboxY + 410+20,
-            toolboxY + 462+20
+            toolboxY + 462+20,toolboxY + 514+20
         };
 
         // Create draggable objects (absolute positioning)
@@ -402,7 +402,7 @@ public class BuildModeView extends Application {
         createDraggableObject(objectStartX, positionsY[6], CHEST, root, 32, 32, halls, 'H');
 
 
-        // createDraggableObject(objectStartX, positionsY[6], Chest_IMAGE, root, 32, 32, halls, 'C');
+        createDraggableObject(objectStartX, positionsY[7], Images.IMAGE_BLUEELIXIR_x2, root, 32, 32, halls, 'V');
     }
 
     private void randomCreateObjects(Pane root){

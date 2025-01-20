@@ -71,6 +71,7 @@ public class Images extends Application {
 	public static final Image IMAGE_TILE_x2 = new Image("/rokue-like_assets/Tile_x2_32_32.png");
 	public static final Image IMAGE_LADDER_x2 = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
 	public static final Image IMAGE_WIZARD_x2 = new Image("/rokue-like_assets/Wizard_x2_32_32.png");
+	public static final Image IMAGE_BLUEELIXIR_x2= new Image("/rokue-like_assets/Blue_Elixir_x2_32_32.png");
 	
 	// All of the assets above, in times two pixels.
 	public static final Image IMAGE_ALLURE_x4 = new Image("/rokue-like_assets/Allure_x4_64_64.png");
