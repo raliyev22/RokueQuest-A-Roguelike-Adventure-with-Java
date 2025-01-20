@@ -29,6 +29,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import main.utils.DialogDesignUtils;
 import main.utils.Grid;
 import main.utils.SoundEffects;
 import main.utils.Tile;
@@ -36,6 +37,7 @@ import main.utils.TiledHall;
 
 import java.util.Random;
 
+import main.controller.BuildModeController;
 import main.controller.PlayModeController;
 
 public class BuildModeView extends Application {
@@ -64,6 +66,8 @@ public class BuildModeView extends Application {
 
     private List<TiledHall> halls;
     Pane pane;
+    BuildModeController controller = new BuildModeController();
+
 
     SoundEffects soundPlayer = SoundEffects.getInstance();
 
@@ -126,52 +130,6 @@ public class BuildModeView extends Application {
         primaryStage.setX((screenBounds.getWidth() - 1200) / 2); // Width of the scene
         primaryStage.setY((screenBounds.getHeight() - 800) / 2); // Height of the scene
         primaryStage.show();
-
-        // this.primaryStage = primaryStage;
-
-        //Create a button to click when the build mode is finished
-        Button button = new Button("Finish");
-        button.setStyle(
-        "-fx-background-color: #303843; " +
-        "-fx-text-fill: white; " +
-        "-fx-font-size: 18px; " +
-        "-fx-padding: 10px 27px; " +
-        "-fx-background-radius: 10; " +
-        "-fx-border-color: #FFFFFF; " +
-        "-fx-border-width: 1px; " +
-        "-fx-border-radius: 10; " +
-        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
-    );
-
-    button.setOnMouseEntered(e -> {
-        button.setStyle(
-            "-fx-background-color: rgb(78, 90, 107); " + // Change background on hover
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 18px; " +
-            "-fx-padding: 10px 27px; " +
-            "-fx-background-radius: 10; " +
-            "-fx-border-color: #FFFFFF; " +
-            "-fx-border-width: 1px; " +
-            "-fx-border-radius: 10; " +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
-        );
-        button.setCursor(Cursor.HAND); 
-    });
-
-    button.setOnMouseExited(e -> {
-        button.setStyle(
-            "-fx-background-color: #303843; " + // Revert to original color
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 18px; " +
-            "-fx-padding: 10px 27px; " +
-            "-fx-background-radius: 10; " +
-            "-fx-border-color: #FFFFFF; " +
-            "-fx-border-width: 1px; " +
-            "-fx-border-radius: 10; " +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 1);"
-        );
-        button.setCursor(Cursor.DEFAULT);
-    });
 
         // Place the button below the toolbox
         double toolboxX = 950; // Toolbox X coordinate
@@ -315,38 +273,9 @@ public class BuildModeView extends Application {
             }
         
         alert.setContentText(message.toString());
+        DialogDesignUtils.styleDialog(alert);
 
-        // Custom styling for the dialog
-        // Custom styling for the dialog
-        DialogPane dialogPane = alert.getDialogPane();
-        dialogPane.setStyle(
-            "-fx-background-color: #352645; " + // Match BuildModeView purple
-            "-fx-border-color: #FFFFFF; " +     // Optional border for definition
-            "-fx-border-width: 2px;"
-        );
-
-        dialogPane.lookup(".header-panel").setStyle(
-            "-fx-background-color: #5A3E77; " + // Match a secondary color (or same as main)
-            "-fx-font-size: 18px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-text-fill: white; " +
-            "-fx-padding: 10px;"
-        );
-
-        dialogPane.lookup(".content").setStyle(
-            "-fx-font-size: 14px; " +
-            "-fx-text-fill: #FFD700; " + // Gold for better visibility
-            "-fx-padding: 10px;"
-        );
-
-        dialogPane.lookupButton(ButtonType.OK).setStyle(
-            "-fx-background-color: #5A3E77; " + // Match BuildModeView button color
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 14px; " +
-            "-fx-padding: 5px 10px; " +
-            "-fx-background-radius: 5px;"
-        );
-            alert.showAndWait();
+        alert.showAndWait();
         });
 
     buttonContainer.getChildren().addAll(exitButton, playButton);
@@ -476,6 +405,12 @@ public class BuildModeView extends Application {
                 h = 32;
                 tileType = 'S';
             }
+            else if (objRand == 6) {
+                img = Images.IMAGE_BLUEELIXIR_x2;
+                w = 32;
+                h = 32;
+                tileType = 'V';
+            } 
             else {
                 img = CHEST;
                 w = 32;

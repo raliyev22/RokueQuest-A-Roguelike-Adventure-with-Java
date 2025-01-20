@@ -1,10 +1,15 @@
 package main.controller;
 
 import main.model.HallType;
+import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
 import main.utils.TiledHall;
-
+import main.view.BuildModeView;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -14,6 +19,19 @@ public class BuildModeController {
     private HashMap<TiledHall, List<Tile>> tileMap;
     private HashMap<TiledHall, HallType> hallTypeMap;
     private List<Pair<Integer, Integer>> runeLocationList;
+    static final Image tileImage = new Image("/rokue-like_assets/Tile_x2_32_32.png");
+
+    static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
+    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
+    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
+    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
+    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
+    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
+
+    static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png");
+    
+    static final Image CHEST = new Image("/rokue-like_assets/ChestHeart_x2_32_28.png");
+    static final Image Exit_Button = new Image("/rokue-like_assets/ExitButton_x2_32_32.png");
 
     public BuildModeController() {
         tileMap = new HashMap<>();
@@ -129,4 +147,93 @@ public class BuildModeController {
     public List<Pair<Integer, Integer>> getRuneLocationList() {
         return runeLocationList;
     }
+    public void randomCreateObjects(List<TiledHall> halls, Pane root) {
+        int i = 0;
+        int neededObj;
+        for (TiledHall hall : halls) {
+            if (i == 0 && tileMap.get(hall).size() < 6) {
+                neededObj = 6 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            } else if (i == 1 && tileMap.get(hall).size() < 9) {
+                neededObj = 9 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            } else if (i == 2 && tileMap.get(hall).size() < 13) {
+                neededObj = 13 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+                i += 1;
+            } else if (i == 3 && tileMap.get(hall).size() < 17) {
+                neededObj = 17 - tileMap.get(hall).size();
+                randomCreateObjectHelper(hall, neededObj, root);
+            }
+        }
+    }
+
+    private void randomCreateObjectHelper(TiledHall hall, int neededObj, Pane root) {
+        Image img;
+        int w;
+        int h;
+        char tileType;
+        Random random = new Random();
+        for (int j = 0; j < neededObj; j++) {
+            // First pick which object is going to be put
+            int objRand = random.nextInt(7);
+            if (objRand == 0) {
+                img = Pillar_IMAGE;
+                w = 32;
+                h = 64;
+                tileType = 'P';
+            } else if (objRand == 1) {
+                img = Ladder_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'T';
+            } else if (objRand == 2) {
+                img = BOX_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'B';
+            } else if (objRand == 3) {
+                img = BoxOnBox_IMAGE;
+                w = 32;
+                h = 64;
+                tileType = 'D';
+            } else if (objRand == 4) {
+                img = Cube_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'G';
+            } else if (objRand == 5) {
+                img = Skull_IMAGE;
+                w = 32;
+                h = 32;
+                tileType = 'S';
+            } 
+            else if (objRand == 6) {
+                img = Images.IMAGE_BLUEELIXIR_x2;
+                w = 32;
+                h = 32;
+                tileType = 'V';
+            } 
+            
+            else {
+                img = CHEST;
+                w = 32;
+                h = 32;
+                tileType = 'H';
+            }
+            Grid grid = hall.getGrid();
+            Tile chosenTile = grid.getRandomEmptyTile();
+            chosenTile.changeTileType(tileType);
+            tileMap.get(hall).add(chosenTile);
+
+            Rectangle targetRect = new Rectangle(w, h);
+            targetRect.setFill(new ImagePattern(img));
+            targetRect.setX(chosenTile.getLeftSide());
+            targetRect.setY(chosenTile.getTopSide());
+            hall.getChildren().add(targetRect);
+        }
+    }
+
 }
