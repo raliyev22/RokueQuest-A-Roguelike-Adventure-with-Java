@@ -643,19 +643,21 @@ public class PlayModeController extends Application {
     
             // Spawn a new enchantment
             Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, adjustedNow);
-            Tile randomTile = getRandomEmptyTile();
+            Tile enchantmentTile = playModeGrid.findTileWithIndex(enchantmentToSpawn.getPosX(), enchantmentToSpawn.getPosY());
     
             // Spawn other enchantments if the above logic didn't apply
-            if (randomTile != null) {
+            if (enchantmentTile != null) {
                 Enchantment newEnchantment = enchantmentToSpawn;
     
                 final Enchantment finalFallbackEnchantment = newEnchantment;
                 activeEnchantments.add(finalFallbackEnchantment);
-                view.addEnchantmentView(finalFallbackEnchantment, randomTile.getLeftSide(), randomTile.getTopSide());
+                view.addEnchantmentView(finalFallbackEnchantment, enchantmentTile.getLeftSide(), enchantmentTile.getTopSide());
                 view.redrawTallItems();
 
                 // Schedule expiration
                 finalFallbackEnchantment.startExpirationTimer(6000, () -> {
+                    playModeGrid.changeTileWithIndex(finalFallbackEnchantment.getPosX(), 
+                    finalFallbackEnchantment.getPosY(), 'E');
                     activeEnchantments.remove(finalFallbackEnchantment);
                     if (finalFallbackEnchantment.getType() == Enchantment.Type.EXTRA_TIME) {
                         activeExtraTimeEnchantments--; // Decrement the counter if it's an Extra Time enchantment

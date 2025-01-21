@@ -568,8 +568,8 @@ public class Grid {
     }
     
     public static boolean isHallObjectTileType(char c) {
-        if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H'
-        || c == 'J' || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T'){
+        if (c == 'B' || c == 'C' || c == 'D' || c == 'G' || c == 'H' || c == 'J' 
+        || c == 'K' || c == 'M' || c == 'P' || c == 'S' || c == 'T' || c == 'V'){
             return true;
         }
         return false;

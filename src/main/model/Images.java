@@ -35,16 +35,16 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
-	public static final Image IMAGE_EARTHHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_399_Top.png");
+	public static final Image IMAGE_EARTHHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_399_Top_new.png");
 	public static final Image IMAGE_EARTHHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Close_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_EARTHHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Open_Door_x4_680_400_Bottom.png");
-	public static final Image IMAGE_AIRHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_399_Top.png");
+	public static final Image IMAGE_AIRHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_399_Top_new.png");
 	public static final Image IMAGE_AIRHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Air_Close_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_AIRHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Air_Open_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_WATERHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_399_Top.png");
 	public static final Image IMAGE_WATERHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Water_Close_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_WATERHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Water_Open_Door_x4_680_400_Bottom.png");
-	public static final Image IMAGE_FIREHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Fire_x4_680_399_Top.png");
+	public static final Image IMAGE_FIREHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Fire_x4_680_399_Top_new.png");
 	public static final Image IMAGE_FIREHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Fire_Close_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_FIREHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Fire_Open_Door_x4_680_400_Bottom.png");
     
@@ -65,6 +65,7 @@ public class Images extends Application {
 	public static final Image IMAGE_CHESTHEARTCLOSED_x2 = new Image("/rokue-like_assets/ChestHeart_x2_32_32.png");
 	public static final Image IMAGE_CHESTHEARTOPEN_x2 = new Image("/rokue-like_assets/ChestOpenWithHeart_x2_32_54.png");
 	public static final Image IMAGE_CLOAK_x2 = new Image("/rokue-like_assets/Cloak_x2_32_32.png");
+    public static final Image IMAGE_CLOCK_x2 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
 	public static final Image IMAGE_CUBE_x2 = new Image("/rokue-like_assets/Cube_x2_32_32.png");
 	public static final Image IMAGE_FIGHTER_x2 = new Image("/rokue-like_assets/Fighter_x2_32_40.png");
 	public static final Image IMAGE_PILLAR_x2 = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
@@ -88,7 +89,7 @@ public class Images extends Application {
 	public static final Image IMAGE_CHESTHEARTCLOSED_x4 = new Image("/rokue-like_assets/ChestHeart_x4_64_64.png");
 	public static final Image IMAGE_CHESTHEARTOPEN_x4 = new Image("/rokue-like_assets/ChestOpenWithHeart_x4_64_108.png");
 	public static final Image IMAGE_CLOAK_x4 = new Image("/rokue-like_assets/Cloak_x4_64_64.png");
-	public static final Image IMAGE_CLOCK_x2 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
+    public static final Image IMAGE_CLOCK_x4 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
 	public static final Image IMAGE_CUBE_x4 = new Image("/rokue-like_assets/Cube_x4_64_64.png");
 	public static final Image IMAGE_FIGHTER_x4 = new Image("/rokue-like_assets/Fighter_x4_64_80.png");
 	public static final Image IMAGE_LADDER_x4 = new Image("/rokue-like_assets/TileWithLadder_x4_64_64.png");
@@ -99,6 +100,8 @@ public class Images extends Application {
 	public static final Image IMAGE_SKULL_x4 = new Image("/rokue-like_assets/Skull_x4_64_64.png");
 	public static final Image IMAGE_TILE_x4 = new Image("/rokue-like_assets/Tile_x4_64_64.png");
 	public static final Image IMAGE_WIZARD_x4 = new Image("/rokue-like_assets/Wizard_x4_64_64.png");
+    public static final Image IMAGE_BLUEELIXIR_x4= new Image("/rokue-like_assets/Blue_Elixir_x4_64_64.png");
+
 	public static final Image IMAGE_TRANSPARENT = new Image("/rokue-like_assets/Transparent.png");
 
 
@@ -172,7 +175,6 @@ public class Images extends Application {
 			case 'F' -> {
 				return IMAGE_FIGHTER_x2;
 			}
-			// Why is G = CUBE? Idk I don't see any better alternatives then randomly assigning chars
 			case 'G' -> { 
 				return IMAGE_CUBE_x2;
 			}
@@ -214,6 +216,12 @@ public class Images extends Application {
 			}
 			case 'W' -> {
 				return IMAGE_WIZARD_x2;
+			}
+            case 'V' -> {
+				return IMAGE_BLUEELIXIR_x2;
+			}
+            case 'X' -> {
+				return IMAGE_CLOCK_x2;
 			}
 			// As of writing this, I U V X Y Z are unused. Also Turkish characters, in case we need more.
 			
@@ -277,6 +285,12 @@ public class Images extends Application {
 			}
 			case 'w' -> {
 				return IMAGE_WIZARD_x4;
+			}
+            case 'v' -> {
+				return IMAGE_BLUEELIXIR_x4;
+			}
+            case 'x' -> {
+				return IMAGE_CLOCK_x4;
 			}
 		}
 		

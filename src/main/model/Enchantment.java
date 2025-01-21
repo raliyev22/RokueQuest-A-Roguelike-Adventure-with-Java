@@ -78,6 +78,20 @@ public class Enchantment {
         };
     }
 
+    public static char getChar (Type type) {
+        return switch (type) {
+            case EXTRA_TIME ->  'X';
+            case EXTRA_LIFE -> 'M';
+            case CLOAK_OF_PROTECTION -> 'O';
+            case LURING_GEM -> 'N';
+            case REVEAL -> 'Q';
+        };
+    }
+
+    public char getChar () {
+        return getChar(this.type);
+    }
+
     // Start expiration timer and trigger the provided callback upon expiration
     // Enchantment.java
     public void startExpirationTimer(long durationInMillis, Runnable onExpire) {
@@ -101,6 +115,8 @@ public class Enchantment {
         int posX = grid.findXofTile(randomTile);
         int posY = grid.findYofTile(randomTile);
         Type type = Type.values()[random.nextInt(Type.values().length)];
+        char c = Enchantment.getChar(type);
+        grid.changeTileWithIndex(posX, posY, c);
 
         return new Enchantment(type, posX, posY, spawnTime);
     }
