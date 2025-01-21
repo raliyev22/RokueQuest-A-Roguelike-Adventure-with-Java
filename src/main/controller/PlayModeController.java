@@ -652,7 +652,8 @@ public class PlayModeController extends Application {
                 final Enchantment finalFallbackEnchantment = newEnchantment;
                 activeEnchantments.add(finalFallbackEnchantment);
                 view.addEnchantmentView(finalFallbackEnchantment, randomTile.getLeftSide(), randomTile.getTopSide());
-    
+                view.redrawTallItems();
+
                 // Schedule expiration
                 finalFallbackEnchantment.startExpirationTimer(6000, () -> {
                     activeEnchantments.remove(finalFallbackEnchantment);

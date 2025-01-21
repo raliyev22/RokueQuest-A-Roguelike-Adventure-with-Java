@@ -6,10 +6,6 @@ import main.utils.SoundEffects;
 public class ChallengingWizardBehavior implements WizardBehavior {
     private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
 
-    public ChallengingWizardBehavior() {
-        soundPlayer.addSoundEffect("wizard", "src/main/sounds/wizard.wav");
-    }
-
     @Override
     public void execute(WizardMonster wizard, PlayModeController controller) {
         controller.teleportRune();

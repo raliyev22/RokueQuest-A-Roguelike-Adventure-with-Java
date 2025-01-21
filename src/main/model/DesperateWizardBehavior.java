@@ -2,9 +2,12 @@ package main.model;
 
 import main.controller.PlayModeController;
 import main.utils.Grid;
+import main.utils.SoundEffects;
 import main.utils.Tile;
 
 public class DesperateWizardBehavior implements WizardBehavior {
+        private SoundEffects soundPlayer = SoundEffects.getInstance(); // Singleton instance
+
     @Override
     public void execute(WizardMonster wizard, PlayModeController controller) {
 
@@ -37,6 +40,7 @@ public class DesperateWizardBehavior implements WizardBehavior {
         hero.setIsTeleported(false);
         controller.removeMonster(wizard); // Wizard disappears after this action
         System.out.println(grid);
+        soundPlayer.playSoundEffect("wizard");
     }
 
 }
