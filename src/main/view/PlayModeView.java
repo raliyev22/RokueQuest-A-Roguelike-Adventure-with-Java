@@ -3,6 +3,7 @@ package main.view;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -50,8 +51,8 @@ public class PlayModeView {
 	protected Label timeLabel;
 	private HBox heartsContainer;
 	private Stage primaryStage;
-	protected Inventory inventory;
-	protected InventoryView inventoryView;
+	public Inventory inventory;
+	public InventoryView inventoryView;
 	public Rectangle topWalls;
 	public Rectangle bottomWalls;
 	private StackPane pauseOverlay;
@@ -68,18 +69,25 @@ public class PlayModeView {
 	private HashMap<Enchantment, Rectangle> enchantmentViews;
 
 	protected final Image tileImage = Images.IMAGE_TILE_x4;
-	
+
 	public PlayModeView(Grid grid, double time, Stage primaryStage, HallType hallType) {
 		this.grid = grid;
 		this.time = time;
 		this.hallType = hallType;
 		this.pane = new Pane();
-		heroView = new Rectangle(64,64);
 		this.primaryStage = primaryStage;
+
+		// Reuse or create InventoryView
+		if (inventoryView == null) {
+			inventoryView = new InventoryView();
+		}
+
+		heroView = new Rectangle(64, 64);
 		bagLabels = new HashMap<>();
 		initializeBagUI();
 		initialize();
 	}
+
 	private void initializeBagUI() {
 		int offsetX = 20;
 		int offsetY = 20;
@@ -248,27 +256,34 @@ public class PlayModeView {
 		enchantmentViews.put(enchantment, enchantmentView);
 		pane.getChildren().add(enchantmentView);
 	}
-	public void updateInventoryUI(HashMap<Enchantment.Type, Integer> enchantments) {
-		inventoryView.updateInventory(enchantments);
-	}
+
 	public void collectEnchantment(Enchantment enchantment, Inventory inventory) {
 		if (!enchantmentViews.containsKey(enchantment)) {
 			System.out.println("Attempted to collect a non-existent enchantment.");
 			return; // Avoid duplicate processing
 		}
+
 		Platform.runLater(() -> {
-			inventory.addEnchantment(enchantment.getType());
-			updateInventoryUI(inventory.getEnchantments());
-			// Remove from screen only if it was rendered
+			inventory.addEnchantment(enchantment.getType()); // Add the enchantment (only once)
+			updateInventoryUI(inventory.getEnchantments()); // Update the inventory UI
+
+			// Remove the enchantment view if it was rendered
 			Rectangle enchantmentView = enchantmentViews.get(enchantment);
 			if (enchantmentView != null) {
 				pane.getChildren().remove(enchantmentView);
 			}
+
 			synchronized (enchantmentViews) {
-				enchantmentViews.remove(enchantment);
+				enchantmentViews.remove(enchantment); // Remove from the internal tracking
 			}
 		});
 	}
+	public void updateInventoryUI(Set<Enchantment.Type> enchantments) {
+		if (inventoryView != null) {
+			inventoryView.updateInventory(enchantments); // Update the InventoryView with the set of enchantments
+		}
+	}
+
 	public void removeEnchantmentView(Enchantment enchantment) {
 		Rectangle enchantmentView = enchantmentViews.remove(enchantment);
 		if (enchantmentView != null) {

@@ -1,35 +1,37 @@
 package main.model;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Inventory {
-    private final HashMap<Enchantment.Type, Integer> enchantments;
+    private final Set<Enchantment.Type> enchantments; // Store collected enchantments as a set
 
     public Inventory() {
-        enchantments = new HashMap<>();
+        enchantments = new HashSet<>();
     }
 
     // Add an enchantment to the inventory
     public void addEnchantment(Enchantment.Type type) {
-        enchantments.put(type, enchantments.getOrDefault(type, 0) + 1);
+        enchantments.add(type); // Add the enchantment type
     }
 
-    // Use an enchantment (reduces count by 1, removes if count becomes 0)
+    // Use an enchantment (remove it from the set if it exists)
     public boolean useEnchantment(Enchantment.Type type) {
-        if (enchantments.containsKey(type) && enchantments.get(type) > 0) {
-            enchantments.put(type, enchantments.get(type) - 1);
-            if (enchantments.get(type) == 0) {
-                enchantments.remove(type);
-            }
+        if (enchantments.contains(type)) {
+            enchantments.remove(type); // Remove the enchantment after use
             return true; // Successfully used the enchantment
         }
         return false; // Enchantment not available
     }
 
+    // Check if the inventory contains a specific enchantment
+    public boolean hasEnchantment(Enchantment.Type type) {
+        return enchantments.contains(type);
+    }
 
-    // Get all enchantments in the inventory
-    public HashMap<Enchantment.Type, Integer> getEnchantments() {
-        return new HashMap<>(enchantments); // Return a copy to ensure immutability
+    // Get all enchantments in the inventory (for UI updates)
+    public Set<Enchantment.Type> getEnchantments() {
+        return new HashSet<>(enchantments); // Return a copy to ensure immutability
     }
 
     // Clear the inventory (optional utility method)

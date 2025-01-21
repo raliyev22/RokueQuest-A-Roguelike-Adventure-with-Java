@@ -68,7 +68,7 @@ public class PlayModeController extends Application {
     public static double time;
     public static double totalTime;
 
-    protected int hallTimeMultiplier = 5;
+    protected int hallTimeMultiplier = 500;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
 
@@ -102,69 +102,83 @@ public class PlayModeController extends Application {
     // }
 
     public void initializePlayMode() {
-        // Create a new empty grid
+        // Initialize hallType if it's null
+        if (hallType == null) {
+            hallType = HallType.EARTH; // Default to EARTH if no hall type is set
+        }
+
+        if (inventory == null) {
+            inventory = new Inventory(); // Ensure inventory persists
+        }
+
+        if (view != null && view.inventoryView != null) {
+            inventoryView = view.inventoryView; // Reuse existing InventoryView
+        } else {
+            inventoryView = new InventoryView(); // Create a new one if not present
+        }
+
         playModeGrid = new Grid(ROW, COLUMN, tileWidth, tileHeight, topLeftXCoordinate, topLeftYCoordinate);
-        activeEnchantments = new ArrayList<>(); // Initialize enchantment list
+        activeEnchantments = new ArrayList<>();
         lastEnchantmentSpawnTime = System.nanoTime();
-        inventory = new Inventory();
-        inventoryView = new InventoryView();
-        // Populate the grid with the objects stored in the static variables
-        if (null == this.hallType) {
-            this.hallType = HallType.EARTH;
-            playModeGrid.copyTileMap(earthHall);
-            this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
-        } else switch (this.hallType) {
+
+        // Populate the grid for the current hall
+        switch (hallType) {
             case EARTH -> {
-                this.hallType = HallType.AIR;
+                hallType = HallType.AIR;
                 playModeGrid.copyTileMap(airHall);
-                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
+                time = getHallObjectTiles().size() * hallTimeMultiplier;
             }
             case AIR -> {
-                this.hallType = HallType.WATER;
+                hallType = HallType.WATER;
                 playModeGrid.copyTileMap(waterHall);
-                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
+                time = getHallObjectTiles().size() * hallTimeMultiplier;
             }
             case WATER -> {
-                this.hallType = HallType.FIRE;
+                hallType = HallType.FIRE;
                 playModeGrid.copyTileMap(fireHall);
-                this.time = (getHallObjectTiles().size()) * hallTimeMultiplier;
+                time = getHallObjectTiles().size() * hallTimeMultiplier;
             }
             case FIRE -> {
                 stopGameLoop();
                 view.showGameOverPopup(true);
-                System.err.println("playmodecontroller line 103 fire hall bug");
                 return;
             }
         }
-        this.totalTime = time;
+        totalTime = time;
 
-        //playModeGrid.copyTileMap(earthHall);
-        // Find the first random tile that the hero will spawn on
+        // Initialize hero at a random empty tile
         Tile initialHeroTile = getRandomEmptyTile();
-        int randomXCoordinate = playModeGrid.findXofTile(initialHeroTile);
-        int randomYCoordinate = playModeGrid.findYofTile(initialHeroTile);
-        Tile heroTile = playModeGrid.findTileWithIndex(randomXCoordinate, randomYCoordinate);
-        hero = initializeHero(randomXCoordinate, randomYCoordinate);
+        hero = initializeHero(
+                playModeGrid.findXofTile(initialHeroTile),
+                playModeGrid.findYofTile(initialHeroTile)
+        );
 
-        hero.targetX = heroTile.getLeftSide();
-        hero.targetY = heroTile.getTopSide();
+        // Set hero's target to the initial tile position
+        hero.targetX = initialHeroTile.getLeftSide();
+        hero.targetY = initialHeroTile.getTopSide();
 
         // Create monster manager
-
-        // Find the random object that the rune will spawn in
         Tile runeTile = getRandomHallObjectTile();
         runeXCoordinate = playModeGrid.findXofTile(runeTile);
         runeYCoordinate = playModeGrid.findYofTile(runeTile);
-      
+
         monsterManager = new MonsterManager(playModeGrid, hero);
 
-        if(view  != null){ // Else we have already come from another grid, which means we only need to refresh the view
+        // Update or create view
+        if (view != null) {
             view.refresh(playModeGrid, time, hallType);
-            view.updateHeroPosition(heroTile.getLeftSide(), heroTile.getTopSide());
-            initializeSetOnActions();
-            monsterManager.setPlayModeView(view);
+            view.updateHeroPosition(hero.targetX, hero.targetY);
+        } else {
+            view = new PlayModeView(playModeGrid, time, primaryStage, hallType);
+            view.updateHeroPosition(hero.targetX, hero.targetY);
         }
+
+        // Update inventory UI to reflect current state
+        view.updateInventoryUI(inventory.getEnchantments());
+        initializeSetOnActions();
+        monsterManager.setPlayModeView(view);
     }
+
 
     public void start(Stage primaryStage) {
         initializePlayMode();
@@ -1079,10 +1093,12 @@ public class PlayModeController extends Application {
             remainingMonsterSpawnTime = adjustedNow - lastMonsterSpawnTime;
             writer.write(Long.toString(remainingMonsterSpawnTime));
             writer.write("\nInventoryEnchantments:\n");
+
             // Save inventory enchantments
-            for (var entry : inventory.getEnchantments().entrySet()) {
-                writer.write(entry.getKey() + "," + entry.getValue() + "\n");
+            for (Enchantment.Type enchantmentType : inventory.getEnchantments()) {
+                writer.write(enchantmentType.name() + "\n");
             }
+
             System.out.println("File written successfully!");
         } catch (IOException e) {
             System.out.println("An error occurred: " + e.getMessage());
@@ -1228,9 +1244,15 @@ public class PlayModeController extends Application {
                     activeEnchantments = new ArrayList<>();
                 }
                 while (index < lines.size() && !lines.get(index).isEmpty()) {
-                    String[] enchantmentData = lines.get(index++).split(",");
+                    String line = lines.get(index++);
+                    String[] enchantmentData = line.split(",");
+                    if (enchantmentData.length < 1) {
+                        System.err.println("Invalid enchantment data: " + line);
+                        continue; // Skip invalid lines
+                    }
+
                     Enchantment.Type type = Enchantment.Type.valueOf(enchantmentData[0]);
-                    int count = Integer.parseInt(enchantmentData[1]);
+                    int count = enchantmentData.length > 1 ? Integer.parseInt(enchantmentData[1]) : 1; // Default count to 1
                     for (int i = 0; i < count; i++) {
                         // Create the Enchantment object
                         Enchantment enchantment = Enchantment.getEnchantmentFromType(type);
@@ -1246,8 +1268,6 @@ public class PlayModeController extends Application {
             } else {
                 throw new RuntimeException("Inventory data missing or corrupted.");
             }
-
-
             monsterManager = new MonsterManager(playModeGrid, hero);
 
             // Refresh the view
