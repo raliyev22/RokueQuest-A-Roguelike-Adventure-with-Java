@@ -68,13 +68,13 @@ public class PlayModeController extends Application {
     public static double time;
     public static double totalTime;
 
-    protected int hallTimeMultiplier = 500;
+    protected int hallTimeMultiplier = 5;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
 
     private long remainingMonsterSpawnTime;
     private long lastMonsterSpawnTime = 0;
-    private static final long MONSTER_SPAWN_INTERVAL = 5_000_000_000L; // 8 seconds in nanoseconds
+    private static final long MONSTER_SPAWN_INTERVAL = 8_000_000_000L; // 8 seconds in nanoseconds
 
 	private static final int TARGET_FPS = 120;
 	private static final long FRAME_DURATION_NANOS = 1_000_000_000 / TARGET_FPS;
@@ -503,15 +503,11 @@ public class PlayModeController extends Application {
                     return;
                 }
                 lastFrameTime = adjustedNow;               
-                spawnEnchantment();
                 
                 // if (mouseClicked) {
                 //     handleMouseClick(mouseX, mouseY);
                 //     mouseClicked = false;
                 // }
-                if (lastMonsterSpawnTime == 0) {
-                    lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
-                }
 
                 if (time < 0) {
                     view.showGameOverPopup(false);
@@ -528,9 +524,9 @@ public class PlayModeController extends Application {
                     stopGameLoop();
                     return;
                 }
-                if (now - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
+                if (adjustedNow - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
                     spawnEnchantment();
-                    lastEnchantmentSpawnTime = now;
+                    lastEnchantmentSpawnTime = adjustedNow;
                 }
                 if (adjustedNow - lastUpdateTime >= ONE_SECOND_IN_NANOS) {
                     view.updateTime(time); // Update the view
@@ -606,8 +602,8 @@ public class PlayModeController extends Application {
                             lastMonsterSpawnTime = 0;
                             lastUpdateTime = 0;
 
-                            view.showWalls(playModeGrid, false);
-                            view.walls.toFront();
+                            view.showBottomWalls(playModeGrid, false);
+                            view.bottomWalls.toFront();
                             soundPlayer.playSoundEffectInThread("door");
 
                             if(hallType == HallType.FIRE){
@@ -626,17 +622,16 @@ public class PlayModeController extends Application {
 
                     mouseClicked = false;
                 }
-                view.walls.toFront();
+                view.bottomWalls.toFront();
             }
         };
         gameLoop.start();
     }
      
     public void spawnEnchantment() {
-        long currentTime = System.nanoTime();
+        // long currentTime = System.nanoTime();
     
         // Check if enough time has passed since the last enchantment spawn
-        if (currentTime - lastEnchantmentSpawnTime >= ENCHANTMENT_SPAWN_INTERVAL) {
             // Get the maximum allowed "Extra Time" enchantments
             int maxExtraTimeEnchantments = getHallObjectTiles().size();
     
@@ -647,33 +642,10 @@ public class PlayModeController extends Application {
             }
     
             // Spawn a new enchantment
-            Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, currentTime);
-    
-            // Handle "Extra Time" enchantment specifically
-            if (enchantmentToSpawn.getType() == Enchantment.Type.EXTRA_TIME) {
-                Tile runeTile = playModeGrid.findTileWithIndex(runeXCoordinate, runeYCoordinate);
-    
-                if (runeTile != null && checkRune(runeTile)) {
-                    // Ensure the rune is valid and available
-                    activeEnchantments.add(enchantmentToSpawn);
-                    view.addEnchantmentView(enchantmentToSpawn, runeTile.getLeftSide(), runeTile.getTopSide());
-                    activeExtraTimeEnchantments++; // Increment the counter
-    
-                    // Schedule expiration
-                    final Enchantment finalEnchantment = enchantmentToSpawn;
-                    enchantmentToSpawn.startExpirationTimer(6000, () -> {
-                        activeEnchantments.remove(finalEnchantment);
-                        activeExtraTimeEnchantments--; // Decrement the counter
-                        view.removeEnchantmentView(finalEnchantment);
-                    });
-    
-                    lastEnchantmentSpawnTime = currentTime;
-                    return; // Exit early since "Extra Time" enchantment was spawned
-                }
-            }
+            Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, adjustedNow);
+            Tile randomTile = getRandomEmptyTile();
     
             // Spawn other enchantments if the above logic didn't apply
-            Tile randomTile = getRandomEmptyTile();
             if (randomTile != null) {
                 Enchantment newEnchantment = enchantmentToSpawn;
     
@@ -690,10 +662,10 @@ public class PlayModeController extends Application {
                     view.removeEnchantmentView(finalFallbackEnchantment);
                 });
     
-                lastEnchantmentSpawnTime = currentTime;
+                lastEnchantmentSpawnTime = adjustedNow;
             }
         }
-    }
+    
     
 
     

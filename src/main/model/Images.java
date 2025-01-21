@@ -35,14 +35,18 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
-	public static final Image IMAGE_EARTHHALL_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_799.png");
-	public static final Image IMAGE_EARTHHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Earth_Open_Door_x4_680_799.png");
-	public static final Image IMAGE_AIRHALL_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_799.png");
-	public static final Image IMAGE_AIRHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Air_Open_Door_x4_680_799.png");
-	public static final Image IMAGE_WATERHALL_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_799.png");
-	public static final Image IMAGE_WATERHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Water_Open_Door_x4_680_799.png");
-	public static final Image IMAGE_FIREHALL_X4 = new Image("/rokue-like_assets/Walls_Fire_x4_680_799.png");
-	public static final Image IMAGE_FIREHALL_OPENDOOR_X4 = new Image("/rokue-like_assets/Walls_Fire_Open_Door_x4_680_799.png");
+	public static final Image IMAGE_EARTHHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_399_Top.png");
+	public static final Image IMAGE_EARTHHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Close_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_EARTHHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Open_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_AIRHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_399_Top.png");
+	public static final Image IMAGE_AIRHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Air_Close_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_AIRHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Air_Open_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_WATERHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Water_x4_680_399_Top.png");
+	public static final Image IMAGE_WATERHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Water_Close_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_WATERHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Water_Open_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_FIREHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Fire_x4_680_399_Top.png");
+	public static final Image IMAGE_FIREHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Fire_Close_Door_x4_680_400_Bottom.png");
+	public static final Image IMAGE_FIREHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Fire_Open_Door_x4_680_400_Bottom.png");
     
     public static final Image IMAGE_PLAYERLEFTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerLeftTakingDamage_x4_64_64.png");
     public static final Image IMAGE_PLAYERRIGHTTAKINGDAMAGE_x4 = new Image("/rokue-like_assets/PlayerRightTakingDamage_x4_64_64.png");
@@ -84,6 +88,7 @@ public class Images extends Application {
 	public static final Image IMAGE_CHESTHEARTCLOSED_x4 = new Image("/rokue-like_assets/ChestHeart_x4_64_64.png");
 	public static final Image IMAGE_CHESTHEARTOPEN_x4 = new Image("/rokue-like_assets/ChestOpenWithHeart_x4_64_108.png");
 	public static final Image IMAGE_CLOAK_x4 = new Image("/rokue-like_assets/Cloak_x4_64_64.png");
+	public static final Image IMAGE_CLOCK_x2 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
 	public static final Image IMAGE_CUBE_x4 = new Image("/rokue-like_assets/Cube_x4_64_64.png");
 	public static final Image IMAGE_FIGHTER_x4 = new Image("/rokue-like_assets/Fighter_x4_64_80.png");
 	public static final Image IMAGE_LADDER_x4 = new Image("/rokue-like_assets/TileWithLadder_x4_64_64.png");

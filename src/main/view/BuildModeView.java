@@ -84,6 +84,8 @@ public class BuildModeView extends Application {
                 pane.getChildren().add(tideRectangle);
             }
         }
+        
+        showTopWalls();
 
         // Create 4 TiledHall instances with specific sizes
         TiledHall hall1 = new TiledHall(10, 7, new Grid(10, 9, 32, 32, 10, 40),1);
@@ -108,7 +110,7 @@ public class BuildModeView extends Application {
         // Add TiledHalls to the pane
         pane.getChildren().addAll(hall1, hall2, hall3, hall4);
         //pane.getChildren().add(hall1);
-        showWalls();
+        showBottomWalls();
 
         // Add toolbox UI directly in Run
         addToolbox(pane, halls);
@@ -507,9 +509,9 @@ public class BuildModeView extends Application {
                             snappedToTile = true;
 
                             soundPlayer.playSoundEffectInThread("putting");
-                            
                             break;
                         }
+                        showBottomWalls();
                     }
                 }
     
@@ -634,16 +636,38 @@ public class BuildModeView extends Application {
     }
 
 
-	public void showWalls() {
-		ImagePattern earthHallImage = new ImagePattern(Images.IMAGE_EARTHHALL_X4);
-		ImagePattern airHallImage = new ImagePattern(Images.IMAGE_AIRHALL_X4);
-		ImagePattern waterHallImage = new ImagePattern(Images.IMAGE_WATERHALL_X4);
-		ImagePattern fireHallImage = new ImagePattern(Images.IMAGE_FIREHALL_X4);
+	public void showTopWalls() {
+		ImagePattern earthHallImage = new ImagePattern(Images.IMAGE_EARTHHALL_TOP_X4);
+		ImagePattern airHallImage = new ImagePattern(Images.IMAGE_AIRHALL_TOP_X4);
+		ImagePattern waterHallImage = new ImagePattern(Images.IMAGE_WATERHALL_TOP_X4);
+		ImagePattern fireHallImage = new ImagePattern(Images.IMAGE_FIREHALL_TOP_X4);
 
-		Rectangle earthWalls = new Rectangle(151, 12, 340, 400);
-		Rectangle airWalls = new Rectangle(551, 12, 340, 400);
-		Rectangle waterWalls = new Rectangle(151, 410, 340, 400);
-		Rectangle fireWalls = new Rectangle(551, 410, 340, 400);
+		Rectangle earthWalls = new Rectangle(151, 12, 340, 200);
+		Rectangle airWalls = new Rectangle(551, 12, 340, 200);
+		Rectangle waterWalls = new Rectangle(151, 410, 340, 200);
+		Rectangle fireWalls = new Rectangle(551, 410, 340, 200);
+
+		earthWalls.setFill(earthHallImage);
+		airWalls.setFill(airHallImage);
+		waterWalls.setFill(waterHallImage);
+		fireWalls.setFill(fireHallImage);
+
+		pane.getChildren().add(earthWalls);
+		pane.getChildren().add(airWalls);
+		pane.getChildren().add(waterWalls);
+		pane.getChildren().add(fireWalls);
+	}
+
+    public void showBottomWalls() {
+		ImagePattern earthHallImage = new ImagePattern(Images.IMAGE_EARTHHALL_CLOSEDOOR_BOTTOM_X4);
+		ImagePattern airHallImage = new ImagePattern(Images.IMAGE_AIRHALL_CLOSEDOOR_BOTTOM_X4);
+		ImagePattern waterHallImage = new ImagePattern(Images.IMAGE_WATERHALL_CLOSEDOOR_BOTTOM_X4);
+		ImagePattern fireHallImage = new ImagePattern(Images.IMAGE_FIREHALL_CLOSEDOOR_BOTTOM_X4);
+
+		Rectangle earthWalls = new Rectangle(151, 212, 340, 200);
+		Rectangle airWalls = new Rectangle(551, 212, 340, 200);
+		Rectangle waterWalls = new Rectangle(151, 610, 340, 200);
+		Rectangle fireWalls = new Rectangle(551, 610, 340, 200);
 
 		earthWalls.setFill(earthHallImage);
 		airWalls.setFill(airHallImage);

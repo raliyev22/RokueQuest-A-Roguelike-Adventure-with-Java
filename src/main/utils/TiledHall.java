@@ -63,16 +63,13 @@ public class TiledHall extends Pane {
         this.grid=givenGrid;
 
         if(scale==1){
-            drawHall();
+            // drawHall();
             showGrid(grid,scale);
         }
         else if(scale==2){
-            drawHall2X();
+            // drawHall2X();
             showGrid(grid,scale);
-
         }
-        
-        
     }
 
     private void drawHall() {

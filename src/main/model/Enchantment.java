@@ -70,7 +70,7 @@ public class Enchantment {
     // Get the image representation for this enchantment
     public Image getImage() {
         return switch (type) {
-            case EXTRA_TIME ->  Images.IMAGE_TRANSPARENT;
+            case EXTRA_TIME ->  Images.IMAGE_CLOCK_x2;
             case EXTRA_LIFE -> Images.IMAGE_CHESTHEARTOPEN_x4;
             case CLOAK_OF_PROTECTION -> Images.IMAGE_CLOAK_x4;
             case LURING_GEM -> Images.IMAGE_ALLURE_x4;

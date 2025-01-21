@@ -52,7 +52,8 @@ public class PlayModeView {
 	private Stage primaryStage;
 	protected Inventory inventory;
 	protected InventoryView inventoryView;
-	public Rectangle walls;
+	public Rectangle topWalls;
+	public Rectangle bottomWalls;
 	private StackPane pauseOverlay;
 	private StackPane exitOverlay;
 	public Button pauseButton;
@@ -146,7 +147,7 @@ public class PlayModeView {
 			BackgroundSize.DEFAULT
 		)));
 
-        showWalls(grid,true);
+        showTopWalls(grid);
         heroView.setFill(new ImagePattern(Images.IMAGE_PLAYERRIGHT_x4));
         pane.getChildren().add(heroView);
         showGrid(grid);
@@ -229,6 +230,7 @@ public class PlayModeView {
 
 		initializePauseOverlay();
 		initializeExitOverlay();
+		showBottomWalls(grid, true);
 	}
 	public void addEnchantmentView(Enchantment enchantment, double x, double y) {
 		// Skip rendering for EXTRA_TIME_ENCHANTMENT
@@ -427,40 +429,68 @@ public class PlayModeView {
 		pauseButton.setPrefWidth(40);
 		pauseButton.setPrefHeight(40);
     }
-	
-	public void showWalls(Grid grid, Boolean doorClosed) {
+
+	public void showTopWalls(Grid grid) {
 		int wallX = grid.topLeftXCoordinate - 20;
 		int wallY = grid.topLeftYCoordinate - 109;
 
 		int wallLengthX = 680;
-		int wallLengthY = 799;
+		int wallLengthY = 399;
 
-		ImagePattern wallImage = getWallImage(hallType, doorClosed);
+		ImagePattern wallImage = getTopWallImage(hallType);
 
-		if (walls != null) {
-			pane.getChildren().remove(walls);
+		if (topWalls != null) {
+			pane.getChildren().remove(topWalls);
 		}
 
-		walls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
-		walls.setFill(wallImage);
-		walls.toFront();
-		pane.getChildren().add(walls);
+		topWalls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
+		topWalls.setFill(wallImage);
+		pane.getChildren().add(topWalls);
 	}
 	
-	private ImagePattern getWallImage(HallType hallType, boolean doorClosed) {
+	public void showBottomWalls(Grid grid, Boolean doorClosed) {
+		int wallX = grid.topLeftXCoordinate - 20;
+		int wallY = grid.topLeftYCoordinate + 290;
+
+		int wallLengthX = 680;
+		int wallLengthY = 400;
+
+		ImagePattern wallImage = getBottomWallImage(hallType, doorClosed);
+
+		if (bottomWalls != null) {
+			pane.getChildren().remove(bottomWalls);
+		}
+
+		bottomWalls = new Rectangle(wallX, wallY, wallLengthX, wallLengthY);
+		bottomWalls.setFill(wallImage);
+		bottomWalls.toFront();
+		pane.getChildren().add(bottomWalls);
+	}
+	
+	private ImagePattern getTopWallImage(HallType hallType) {
+		return switch (hallType) {
+			case EARTH -> new ImagePattern(Images.IMAGE_EARTHHALL_TOP_X4);
+			case AIR -> new ImagePattern(Images.IMAGE_AIRHALL_TOP_X4);
+			case WATER -> new ImagePattern(Images.IMAGE_WATERHALL_TOP_X4);
+			case FIRE -> new ImagePattern(Images.IMAGE_FIREHALL_TOP_X4);
+			default -> null;
+		};
+	}
+
+	private ImagePattern getBottomWallImage(HallType hallType, boolean doorClosed) {
 		return switch (hallType) {
 			case EARTH -> doorClosed ? 
-				new ImagePattern(Images.IMAGE_EARTHHALL_X4) : 
-				new ImagePattern(Images.IMAGE_EARTHHALL_OPENDOOR_X4);
+				new ImagePattern(Images.IMAGE_EARTHHALL_CLOSEDOOR_BOTTOM_X4) : 
+				new ImagePattern(Images.IMAGE_EARTHHALL_OPENDOOR_BOTTOM_X4);
 			case AIR -> doorClosed ? 
-				new ImagePattern(Images.IMAGE_AIRHALL_X4) : 
-				new ImagePattern(Images.IMAGE_AIRHALL_OPENDOOR_X4);
+				new ImagePattern(Images.IMAGE_AIRHALL_CLOSEDOOR_BOTTOM_X4) : 
+				new ImagePattern(Images.IMAGE_AIRHALL_OPENDOOR_BOTTOM_X4);
 			case WATER -> doorClosed ? 
-				new ImagePattern(Images.IMAGE_WATERHALL_X4) : 
-				new ImagePattern(Images.IMAGE_WATERHALL_OPENDOOR_X4);
+				new ImagePattern(Images.IMAGE_WATERHALL_CLOSEDOOR_BOTTOM_X4) : 
+				new ImagePattern(Images.IMAGE_WATERHALL_OPENDOOR_BOTTOM_X4);
 			case FIRE -> doorClosed ? 
-				new ImagePattern(Images.IMAGE_FIREHALL_X4) : 
-				new ImagePattern(Images.IMAGE_FIREHALL_OPENDOOR_X4);
+				new ImagePattern(Images.IMAGE_FIREHALL_CLOSEDOOR_BOTTOM_X4) : 
+				new ImagePattern(Images.IMAGE_FIREHALL_OPENDOOR_BOTTOM_X4);
 			default -> null;
 		};
 	}
