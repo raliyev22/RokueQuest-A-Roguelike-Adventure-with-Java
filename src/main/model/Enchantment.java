@@ -71,7 +71,7 @@ public class Enchantment {
     public Image getImage() {
         return switch (type) {
             case EXTRA_TIME ->  Images.IMAGE_CLOCK_x2;
-            case EXTRA_LIFE -> Images.IMAGE_CHESTHEARTOPEN_x4;
+            case EXTRA_LIFE -> Images.IMAGE_HEART_ENCH_X4;
             case CLOAK_OF_PROTECTION -> Images.IMAGE_CLOAK_x4;
             case LURING_GEM -> Images.IMAGE_ALLURE_x4;
             case REVEAL -> Images.IMAGE_REVEAL_x4;

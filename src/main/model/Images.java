@@ -63,8 +63,9 @@ public class Images extends Application {
 	public static final Image IMAGE_CHESTCLOSED_x2 = new Image("/rokue-like_assets/Chest_Closed_x2_32_32.png");
 	public static final Image IMAGE_CHESTOPEN_x2 = new Image("/rokue-like_assets/Chest_Open_x2_32_32.png");
 	public static final Image IMAGE_CHESTHEARTCLOSED_x2 = new Image("/rokue-like_assets/ChestHeart_x2_32_32.png");
-	public static final Image IMAGE_CHESTHEARTOPEN_x2 = new Image("/rokue-like_assets/ChestOpenWithHeart_x2_32_54.png");
-	public static final Image IMAGE_CLOAK_x2 = new Image("/rokue-like_assets/Cloak_x2_32_32.png");
+	// public static final Image IMAGE_CHESTHEARTOPEN_x2 = new Image("/rokue-like_assets/ChestOpenWithHeart_x2_32_54.png");
+	public static final Image IMAGE_HEART_ENCH_X2 = new Image("/rokue-like_assets/Heart_Enchantment_x2_32_32.png");
+    public static final Image IMAGE_CLOAK_x2 = new Image("/rokue-like_assets/Cloak_x2_32_32.png");
     public static final Image IMAGE_CLOCK_x2 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
 	public static final Image IMAGE_CUBE_x2 = new Image("/rokue-like_assets/Cube_x2_32_32.png");
 	public static final Image IMAGE_FIGHTER_x2 = new Image("/rokue-like_assets/Fighter_x2_32_40.png");
@@ -87,8 +88,9 @@ public class Images extends Application {
 	public static final Image IMAGE_CHESTCLOSED_x4 = new Image("/rokue-like_assets/Chest_Closed_x4_64_64.png");
 	public static final Image IMAGE_CHESTOPEN_x4 = new Image("/rokue-like_assets/Chest_Open_x4_64_64.png");
 	public static final Image IMAGE_CHESTHEARTCLOSED_x4 = new Image("/rokue-like_assets/ChestHeart_x4_64_64.png");
-	public static final Image IMAGE_CHESTHEARTOPEN_x4 = new Image("/rokue-like_assets/ChestOpenWithHeart_x4_64_108.png");
-	public static final Image IMAGE_CLOAK_x4 = new Image("/rokue-like_assets/Cloak_x4_64_64.png");
+	// public static final Image IMAGE_CHESTHEARTOPEN_x4 = new Image("/rokue-like_assets/ChestOpenWithHeart_x4_64_108.png");
+	public static final Image IMAGE_HEART_ENCH_X4 = new Image("/rokue-like_assets/Heart_Enchantment_x4_64_64.png");
+    public static final Image IMAGE_CLOAK_x4 = new Image("/rokue-like_assets/Cloak_x4_64_64.png");
     public static final Image IMAGE_CLOCK_x4 = new Image("/rokue-like_assets/Clock_x2_60_60.png");
 	public static final Image IMAGE_CUBE_x4 = new Image("/rokue-like_assets/Cube_x4_64_64.png");
 	public static final Image IMAGE_FIGHTER_x4 = new Image("/rokue-like_assets/Fighter_x4_64_80.png");
@@ -110,13 +112,13 @@ public class Images extends Application {
 			case EXTRA_TIME:
 				return IMAGE_TRANSPARENT; // Replace with actual image
 			case REVEAL:
-				return IMAGE_REVEAL_x2;
+				return IMAGE_REVEAL_x4;
 			case CLOAK_OF_PROTECTION:
-				return IMAGE_CLOAK_x2;
+				return IMAGE_CLOAK_x4;
 			case LURING_GEM:
 				return IMAGE_ALLURE_x4;
 			case EXTRA_LIFE:
-				return IMAGE_CHESTHEARTOPEN_x2;
+				return IMAGE_HEART_ENCH_X4;
 			default:
 				return null;
 		}
@@ -191,7 +193,7 @@ public class Images extends Application {
 				return IMAGE_PLAYERLEFT_x2;
 			}
 			case 'M' -> {
-				return IMAGE_CHESTHEARTOPEN_x2;
+				return IMAGE_HEART_ENCH_X2;
 			}
 			case 'N' -> {
 				return IMAGE_ALLURE_X2;
@@ -260,7 +262,7 @@ public class Images extends Application {
 				return IMAGE_PLAYERLEFT_x4;
 			}
 			case 'm' -> {
-				return IMAGE_CHESTHEARTOPEN_x4;
+				return IMAGE_HEART_ENCH_X4;
 			}
 			case 'n' -> {
 				return IMAGE_ALLURE_x4;
