@@ -582,6 +582,7 @@ public class PlayModeController extends Application {
                                     System.out.println("Enchantment not active: " + enchantment.getType());
                                     return; // Avoid double collection
                                 }
+                                playModeGrid.changeTileWithIndex(enchantment.getPosX(), enchantment.getPosY(), 'E');
                 
                                 if (enchantment.getType() == Enchantment.Type.EXTRA_LIFE) {
                                     hero.increaseLives(1);
