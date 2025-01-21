@@ -4,12 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.TimerTask;
-import java.util.Timer;
+import java.util.*;
 
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
@@ -44,6 +39,7 @@ public class PlayModeController extends Application {
     public static Grid airHall;
     public static Grid waterHall;
     public static Grid fireHall;
+    private Map<Enchantment, Long> enchantmentExpirationMap = new HashMap<>();
 
     public Grid playModeGrid;
     protected Hero hero;
@@ -642,51 +638,60 @@ public class PlayModeController extends Application {
         };
         gameLoop.start();
     }
-     
+
     public void spawnEnchantment() {
-        // long currentTime = System.nanoTime();
-    
-        // Check if enough time has passed since the last enchantment spawn
-            // Get the maximum allowed "Extra Time" enchantments
-            int maxExtraTimeEnchantments = getHallObjectTiles().size();
-    
-            // If the limit is reached, skip spawning "Extra Time" enchantments
-            if (activeExtraTimeEnchantments >= maxExtraTimeEnchantments) {
-                System.out.println("Maximum Extra Time enchantments reached. Skipping spawn.");
-                return;
-            }
-    
-            // Spawn a new enchantment
-            Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, adjustedNow);
-            Tile enchantmentTile = playModeGrid.findTileWithIndex(enchantmentToSpawn.getPosX(), enchantmentToSpawn.getPosY());
-    
-            // Spawn other enchantments if the above logic didn't apply
-            if (enchantmentTile != null) {
-                Enchantment newEnchantment = enchantmentToSpawn;
-    
-                final Enchantment finalFallbackEnchantment = newEnchantment;
-                activeEnchantments.add(finalFallbackEnchantment);
-                view.addEnchantmentView(finalFallbackEnchantment, enchantmentTile.getLeftSide(), enchantmentTile.getTopSide());
-                view.redrawTallItems();
-
-                // Schedule expiration
-                finalFallbackEnchantment.startExpirationTimer(6000, () -> {
-                    playModeGrid.changeTileWithIndex(finalFallbackEnchantment.getPosX(), 
-                    finalFallbackEnchantment.getPosY(), 'E');
-                    activeEnchantments.remove(finalFallbackEnchantment);
-                    if (finalFallbackEnchantment.getType() == Enchantment.Type.EXTRA_TIME) {
-                        activeExtraTimeEnchantments--; // Decrement the counter if it's an Extra Time enchantment
-                    }
-                    view.removeEnchantmentView(finalFallbackEnchantment);
-                });
-    
-                lastEnchantmentSpawnTime = adjustedNow;
-            }
+        if (activeExtraTimeEnchantments >= getHallObjectTiles().size()) {
+            System.out.println("Maximum Extra Time enchantments reached. Skipping spawn.");
+            return;
         }
-    
-    
 
-    
+        Enchantment enchantmentToSpawn = Enchantment.spawnRandomEnchantment(playModeGrid, adjustedNow);
+        Tile enchantmentTile = playModeGrid.findTileWithIndex(enchantmentToSpawn.getPosX(), enchantmentToSpawn.getPosY());
+
+        if (enchantmentTile != null) {
+            activeEnchantments.add(enchantmentToSpawn);
+            view.addEnchantmentView(enchantmentToSpawn, enchantmentTile.getLeftSide(), enchantmentTile.getTopSide());
+            view.redrawTallItems();
+
+            long expirationDuration = 6000; // Expiration in milliseconds
+            enchantmentExpirationMap.put(enchantmentToSpawn, expirationDuration);
+
+            // Start expiration logic
+            scheduleEnchantmentExpiration(enchantmentToSpawn);
+        }
+    }
+    private void scheduleEnchantmentExpiration(Enchantment enchantment) {
+        if (!enchantmentExpirationMap.containsKey(enchantment)) return;
+
+        long remainingTime = enchantmentExpirationMap.get(enchantment);
+
+        // Use a Timeline for precise control
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.millis(remainingTime), event -> {
+                    activeEnchantments.remove(enchantment);
+                    playModeGrid.changeTileWithIndex(enchantment.getPosX(), enchantment.getPosY(), 'E');
+                    view.removeEnchantmentView(enchantment);
+
+                    if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+                        activeExtraTimeEnchantments--;
+                    }
+
+                    enchantmentExpirationMap.remove(enchantment);
+                })
+        );
+
+        timeline.setOnFinished(event -> enchantmentExpirationMap.remove(enchantment));
+        timeline.setCycleCount(1);
+
+        if (!isRunning) {
+            timeline.pause();
+        }
+
+        enchantment.setExpirationTimeline(timeline); // Store timeline for pause/resume control
+        timeline.play();
+    }
+
+
 
     private void stopGameLoop() {
         if (!isRunning) return;
@@ -704,17 +709,32 @@ public class PlayModeController extends Application {
         }
         lastToggleTime = now;
 
-        if (isRunning){
+        if (isRunning) {
             stopGameLoop();
             view.showPauseGame();
             soundPlayer.pauseSoundEffect("background");
             pauseStartTime = System.nanoTime();
-        }
-        else {
+
+            // Pause all enchantment expiration timelines
+            for (Enchantment enchantment : enchantmentExpirationMap.keySet()) {
+                Timeline timeline = enchantment.getExpirationTimeline();
+                if (timeline != null) {
+                    timeline.pause();
+                }
+            }
+        } else {
             totalPausedTime += now - pauseStartTime;
             startGameLoop();
             view.hidePauseGame();
             soundPlayer.resumeSoundEffect("background");
+
+            // Resume all enchantment expiration timelines
+            for (Enchantment enchantment : enchantmentExpirationMap.keySet()) {
+                Timeline timeline = enchantment.getExpirationTimeline();
+                if (timeline != null) {
+                    timeline.play();
+                }
+            }
             initialize(view.getScene());
         }
     }

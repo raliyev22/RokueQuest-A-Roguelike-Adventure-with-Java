@@ -32,6 +32,7 @@ public class Enchantment {
     private Set<Tile> extraTimeRunes = new HashSet<>();
     private static final int MAX_EXTRA_TIME_SECONDS = 5;
     private int totalExtraTimeGained = 0;
+    private Timeline expirationTimeline;
 
     public Enchantment(Type type, int posX, int posY, long spawnTime) {
         this.type = type;
@@ -40,7 +41,13 @@ public class Enchantment {
         this.spawnTime = spawnTime;
         this.isActive = true;
     }
+    public void setExpirationTimeline(Timeline timeline) {
+        this.expirationTimeline = timeline;
+    }
 
+    public Timeline getExpirationTimeline() {
+        return this.expirationTimeline;
+    }
     // Getters
     public Type getType() {
         return type;
