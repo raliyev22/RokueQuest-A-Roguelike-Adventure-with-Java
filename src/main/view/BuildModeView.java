@@ -174,7 +174,7 @@ public class BuildModeView extends Application {
 
         randomButton.setOnMouseClicked(event -> {
             soundPlayer.playSoundEffectInThread("blueButtons");
-            randomCreateObjects(pane);
+            randomCreateObjects();
         });
 
 
@@ -336,33 +336,38 @@ public class BuildModeView extends Application {
         createDraggableObject(objectStartX, positionsY[7], Images.IMAGE_BLUEELIXIR_x2, root, 32, 32, halls, 'V');
     }
 
-    private void randomCreateObjects(Pane root){
+    private void randomCreateObjects(){
         int i = 0;
         int neededObj;
         for (TiledHall hall : halls){
-            if (i == 0 && tileMap.get(hall).size() < 6){
-                neededObj = 6 - tileMap.get(hall).size();
-                randomCreateObjectHelper(hall, neededObj, root);
-                i += 1;
+            List<Tile> tiles = new ArrayList<Tile>();
+            tiles = tileMap.get(hall);
+            for (Tile tile : tiles){
+                tile.changeTileType('E');
             }
-            else if (i == 1 && tileMap.get(hall).size()<9){
-                neededObj = 9 - tileMap.get(hall).size();
-                randomCreateObjectHelper(hall, neededObj, root);
-                i += 1;
+            tiles.clear();
+            hall.getChildren().clear();
+
+            if (i==0) {
+                randomCreateObjectHelper(hall, 6);
+                i+=1;
             }
-            else if (i == 2 && tileMap.get(hall).size()<13){
-                neededObj = 13 - tileMap.get(hall).size();
-                randomCreateObjectHelper(hall, neededObj, root);
-                i += 1;
+            else if (i==1) {
+                randomCreateObjectHelper(hall, 9);
+                i+=1;
             }
-            else if (i == 3 && tileMap.get(hall).size()<17){
-                neededObj = 17 - tileMap.get(hall).size();
-                randomCreateObjectHelper(hall, neededObj, root);
+            else if (i==2) {
+                randomCreateObjectHelper(hall, 13);
+                i+=1;
+            }
+            else if (i==3) {
+                randomCreateObjectHelper(hall, 17);
+                i+=1;
             }
         }
     }
 
-    private void randomCreateObjectHelper(TiledHall hall, int neededObj, Pane root){
+    private void randomCreateObjectHelper(TiledHall hall, int neededObj){
         Image img;
         int w;
         int h;
@@ -370,7 +375,7 @@ public class BuildModeView extends Application {
         Random random = new Random();
         for (int j = 0; j < neededObj; j++){
             //First pick which object is going to be putted
-            int objRand = random.nextInt(7);
+            int objRand = random.nextInt(8);
             if (objRand == 0) {
                 img = Pillar_IMAGE;
                 w = 32;

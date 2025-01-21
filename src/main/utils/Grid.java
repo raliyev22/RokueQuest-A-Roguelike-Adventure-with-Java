@@ -69,6 +69,11 @@ public class Grid {
         
         return tileM;
     }
+
+    public Grid clearGrid(){
+        Grid grid = new Grid(this.rowLength, this.columnLength, this.tileWidth, this.tileHeight, this.topLeftXCoordinate, this.topLeftYCoordinate);
+        return grid;
+    }
     
     
     /** 
