@@ -369,7 +369,7 @@ public class PlayModeController extends Application {
         }
 
         switch (code) {
-            case W,UP:
+            case UP,W:
                 if (luringGemActivated) {
                     useLuringGem("W");
                     luringGemActivated = false; // Reset the activation
@@ -377,7 +377,7 @@ public class PlayModeController extends Application {
                     upPressed = true;
                 }
                 break;
-            case S,DOWN:
+            case DOWN,S:
                 if (luringGemActivated) {
                     useLuringGem("S");
                     luringGemActivated = false;
@@ -385,7 +385,7 @@ public class PlayModeController extends Application {
                     downPressed = true;
                 }
                 break;
-            case A,LEFT:
+            case LEFT,A:
                 if (luringGemActivated) {
                     useLuringGem("A");
                     luringGemActivated = false;
@@ -393,7 +393,7 @@ public class PlayModeController extends Application {
                     leftPressed = true;
                 }
                 break;
-            case D,RIGHT:
+            case RIGHT,D:
                 if (luringGemActivated) {
                     useLuringGem("D");
                     luringGemActivated = false;
@@ -764,6 +764,11 @@ public class PlayModeController extends Application {
             soundPlayer.pauseSoundEffect("background");
             pauseStartTime = System.nanoTime();
 
+            upPressed = false;
+            downPressed = false;
+            leftPressed = false;
+            rightPressed = false;
+
             // Pause the reveal timer
             if (revealActive && !revealTimerPaused) {
                 revealPausedTime += System.currentTimeMillis() - revealStartTime;
@@ -775,6 +780,8 @@ public class PlayModeController extends Application {
             startGameLoop();
             view.hidePauseGame();
             soundPlayer.resumeSoundEffect("background");
+
+            view.getScene().getRoot().requestFocus();
 
             // Resume the reveal timer
             if (revealActive && revealTimerPaused) {
