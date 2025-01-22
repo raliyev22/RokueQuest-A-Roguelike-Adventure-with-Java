@@ -150,6 +150,30 @@ public class BuildModeView extends Application {
         Button exitButton = new Button();
 		exitButton.setStyle("-fx-background-color: transparent;"); 
 
+        Button minusButton = new Button();
+        minusButton.setStyle("-fx-background-color: transparent;");
+
+        ImageView minusButtonView = new ImageView(new Image("/rokue-like_assets/MinusButton_x4_64_64.png"));
+        minusButtonView.setFitWidth(35);
+        minusButtonView.setFitHeight(35);
+
+        minusButton.setGraphic(minusButtonView);
+        minusButton.setPrefWidth(35);
+        minusButton.setPrefHeight(35);
+
+        minusButton.setOnMouseEntered(event -> {
+            minusButton.setCursor(Cursor.HAND);
+        });
+
+        minusButton.setOnMouseExited(event -> {
+            minusButton.setCursor(Cursor.DEFAULT);
+        });
+
+        minusButton.setOnMouseClicked(event -> {
+            clearHalls();
+            soundPlayer.playSoundEffectInThread("blueButtons");
+        });
+
         Button randomButton = new Button();
         randomButton.setStyle("-fx-background-color: transparent;");
 
@@ -161,8 +185,8 @@ public class BuildModeView extends Application {
         randomButton.setPrefWidth(35);
         randomButton.setPrefHeight(35);
 
-        randomButton.setLayoutX(toolboxX+48);
-        randomButton.setLayoutY(toolboxHeight-75);
+        // randomButton.setLayoutX(toolboxX+48);
+        // randomButton.setLayoutY(toolboxHeight-75);
         
         randomButton.setOnMouseEntered(event -> {
             randomButton.setCursor(Cursor.HAND);
@@ -177,8 +201,12 @@ public class BuildModeView extends Application {
             randomCreateObjects();
         });
 
-
-        pane.getChildren().add(randomButton);
+        HBox buttonContainer2 = new HBox(10);
+        buttonContainer2.setAlignment(javafx.geometry.Pos.CENTER);
+        buttonContainer2.setLayoutX(toolboxX+18);
+        buttonContainer2.setLayoutY(toolboxHeight-75);
+        buttonContainer2.getChildren().addAll(randomButton, minusButton);
+        pane.getChildren().add(buttonContainer2);
 
 		ImageView exitButtonView = new javafx.scene.image.ImageView(Images.IMAGE_EXITBUTTON_x4);
 		exitButtonView.setFitWidth(35);
@@ -336,18 +364,20 @@ public class BuildModeView extends Application {
         createDraggableObject(objectStartX, positionsY[7], Images.IMAGE_BLUEELIXIR_x2, root, 32, 32, halls, 'V');
     }
 
+    private void clearHalls() {
+        for (TiledHall hall : halls) {
+            for (Tile tile : tileMap.get(hall)){
+                tile.changeTileType('E');
+            }
+            hall.getChildren().clear();
+        }
+    }
+
     private void randomCreateObjects(){
         int i = 0;
         int neededObj;
+        clearHalls();
         for (TiledHall hall : halls){
-            List<Tile> tiles = new ArrayList<Tile>();
-            tiles = tileMap.get(hall);
-            for (Tile tile : tiles){
-                tile.changeTileType('E');
-            }
-            tiles.clear();
-            hall.getChildren().clear();
-
             if (i==0) {
                 randomCreateObjectHelper(hall, 6);
                 i+=1;
@@ -364,6 +394,8 @@ public class BuildModeView extends Application {
                 randomCreateObjectHelper(hall, 17);
                 i+=1;
             }
+
+            System.out.println(hall.getGrid().toString());
         }
     }
 
@@ -426,16 +458,37 @@ public class BuildModeView extends Application {
             }
             Grid grid = hall.getGrid();
             Tile chosenTile = grid.getRandomEmptyTile();
-            chosenTile.changeTileType(tileType);
-            tileMap.get(hall).add(chosenTile);
+            int x = chosenTile.getLeftSide();
+            int y = chosenTile.getTopSide();
+            Boolean flag = false;
+            if (h==64) {
+                y -= 32;
+                flag = true;
+            }
 
-            
 
-            Rectangle targetRect = new Rectangle(w, h);
-            targetRect.setFill(new ImagePattern(img));
-            targetRect.setX(chosenTile.getLeftSide());
-            targetRect.setY(chosenTile.getTopSide()); 
-            hall.getChildren().add(targetRect);
+
+            if (chosenTile.getTileType() == 'E'){
+                chosenTile.changeTileType(tileType);
+                tileMap.get(hall).add(chosenTile);
+                
+                if (flag) {
+                    Tile flagTile = grid.findTileUsingCoordinates(x + 16, y-16);
+                    if (flagTile!=null) {
+                        flagTile.changeTileType('!');
+                    }
+                }
+
+
+                Rectangle targetRect = new Rectangle(w, h);
+                targetRect.setFill(new ImagePattern(img));
+                targetRect.setX(x);
+                targetRect.setY(y); 
+                hall.getChildren().add(targetRect);
+            }
+            else {
+                j-=1;
+            }
         }
     }
     

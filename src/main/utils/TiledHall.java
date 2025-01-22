@@ -72,135 +72,6 @@ public class TiledHall extends Pane {
         }
     }
 
-    private void drawHall() {
-        // Add borders and walls
-
-        // Top-left corner border
-        Rectangle upBorder1 = new Rectangle(0, 0, (upBorderWidth + 1), upBorderHeight);
-        upBorder1.setFill(new ImagePattern(UP_BORDER));
-        getChildren().add(upBorder1);
-
-        // Bottom-left corner border
-        Rectangle downBorder1 = new Rectangle(0, upBorderHeight + sideBorderCount * sideBorderHeight + sideBorder1Height, bottomBorderWidth + 1, bottomBorderHeight);
-        downBorder1.setFill(new ImagePattern(BOTTOM_BORDER));
-        getChildren().add(downBorder1);
-
-        // Top-right corner border
-        Rectangle upBorder2 = new Rectangle(upBorderWidth + blockCount * blockWidth, 0, upBorderWidth + 1, upBorderHeight);
-        upBorder2.setFill(new ImagePattern(UP_BORDER));
-        getChildren().add(upBorder2);
-
-        // Bottom-right corner border
-        Rectangle downBorder2 = new Rectangle(bottomBorderWidth + blockCount * blockWidth, upBorderHeight + sideBorderCount * sideBorderHeight + sideBorder1Height, bottomBorderWidth + 1, bottomBorderHeight);
-        downBorder2.setFill(new ImagePattern(BOTTOM_BORDER));
-        getChildren().add(downBorder2);
-
-        // Top wall
-        for (int i = 0; i < blockCount; i++) {
-            Rectangle topWall = new Rectangle(upBorderWidth + i * blockWidth, 0, blockWidth + 1, blockHeight);
-            topWall.setFill(new ImagePattern(BLOCK_IMAGE));
-            getChildren().add(topWall);
-        }
-
-        // Bottom wall
-        for (int i = 0; i < blockCount; i++) {
-            Rectangle bottomWall = new Rectangle(bottomBorderWidth + i * blockWidth, 6 + upBorderHeight + sideBorderCount * sideBorderHeight + sideBorder1Height, blockWidth + 1, blockHeight);
-            bottomWall.setFill(new ImagePattern(BLOCK_IMAGE));
-            getChildren().add(bottomWall);
-        }
-
-        // Left wall
-        for (int i = 0; i < sideBorderCount; i++) {
-            Rectangle leftWall = new Rectangle(0, upBorderHeight + i * sideBorderHeight, sideBorderWidth + 1, sideBorderHeight);
-            leftWall.setFill(new ImagePattern(SIDE_BORDER));
-            getChildren().add(leftWall);
-        }
-
-        // Right wall
-        for (int i = 0; i < sideBorderCount; i++) {
-            Rectangle rightWall = new Rectangle(sideBorderWidth + blockWidth * blockCount, upBorderHeight + i * sideBorderHeight, sideBorderWidth + 1, sideBorderHeight);
-            rightWall.setFill(new ImagePattern(SIDE_BORDER));
-            getChildren().add(rightWall);
-        }
-
-        // Additional bottom side borders
-        Rectangle sideBorder1 = new Rectangle(sideBorderWidth + blockWidth * blockCount, upBorderHeight + sideBorderCount * sideBorderHeight, sideBorderWidth + 1, sideBorder1Height);
-        sideBorder1.setFill(new ImagePattern(SIDE_BORDER1));
-        getChildren().add(sideBorder1);
-
-        Rectangle sideBorder2 = new Rectangle(0, upBorderHeight + sideBorderCount * sideBorderHeight, sideBorderWidth + 1, sideBorder1Height);
-        sideBorder2.setFill(new ImagePattern(SIDE_BORDER1));
-        getChildren().add(sideBorder2);
-
-        // Set preferred size for the pane
-        setPrefSize(upBorderWidth * 2 + blockCount * blockWidth, upBorderHeight + bottomBorderHeight + sideBorderCount * sideBorderHeight + sideBorder1Height);
-    }
-
-
-    private void drawHall2X() {
-        // Add borders and walls
-
-        // Top-left corner border
-        Rectangle upBorder1 = new Rectangle(0, 0, (upBorderWidth )*2+1, upBorderHeight*2);
-        upBorder1.setFill(new ImagePattern(UP_BORDER_2X));
-        getChildren().add(upBorder1);
-
-        // Bottom-left corner border
-        Rectangle downBorder1 = new Rectangle(0, upBorderHeight*2 + sideBorderCount * sideBorderHeight*2 + sideBorder1Height*2, (bottomBorderWidth)*2+1, bottomBorderHeight*2);
-        downBorder1.setFill(new ImagePattern(BOTTOM_BORDER_2X));
-        getChildren().add(downBorder1);
-
-        // Top-right corner border
-        Rectangle upBorder2 = new Rectangle(upBorderWidth*2 + blockCount * blockWidth*2, 0, (upBorderWidth)*2+1, upBorderHeight*2);
-        upBorder2.setFill(new ImagePattern(UP_BORDER_2X));
-        getChildren().add(upBorder2);
-
-        // Bottom-right corner border
-        Rectangle downBorder2 = new Rectangle(bottomBorderWidth*2 + blockCount * blockWidth*2, upBorderHeight*2 + sideBorderCount * sideBorderHeight*2 + sideBorder1Height*2, (bottomBorderWidth)*2+1, bottomBorderHeight*2);
-        downBorder2.setFill(new ImagePattern(BOTTOM_BORDER_2X));
-        getChildren().add(downBorder2);
-
-        // Top wall
-        for (int i = 0; i < blockCount; i++) {
-            Rectangle topWall = new Rectangle(upBorderWidth*2 + i * blockWidth*2, 0, (blockWidth)*2+1, blockHeight*2);
-            topWall.setFill(new ImagePattern(BLOCK_IMAGE_2X));
-            getChildren().add(topWall);
-        }
-
-        // Bottom wall
-        for (int i = 0; i < blockCount; i++) {
-            Rectangle bottomWall = new Rectangle(bottomBorderWidth*2 + i * blockWidth*2,  12+ upBorderHeight*2 + sideBorderCount * sideBorderHeight*2 + sideBorder1Height*2, (blockWidth)*2+1, blockHeight*2);
-            bottomWall.setFill(new ImagePattern(BLOCK_IMAGE_2X));
-            getChildren().add(bottomWall);
-        }
-
-        // Left wall
-        for (int i = 0; i < sideBorderCount; i++) {
-            Rectangle leftWall = new Rectangle(0, upBorderHeight*2 + i * sideBorderHeight*2, (sideBorderWidth)*2+1, sideBorderHeight*2);
-            leftWall.setFill(new ImagePattern(SIDE_BORDER_2X));
-            getChildren().add(leftWall);
-        }
-
-        // Right wall
-        for (int i = 0; i < sideBorderCount; i++) {
-            Rectangle rightWall = new Rectangle(sideBorderWidth*2 + blockWidth * blockCount*2, upBorderHeight*2 + i * sideBorderHeight*2, (sideBorderWidth )*2+1, sideBorderHeight*2);
-            rightWall.setFill(new ImagePattern(SIDE_BORDER_2X));
-            getChildren().add(rightWall);
-        }
-
-        // Additional bottom side borders
-        Rectangle sideBorder1 = new Rectangle(sideBorderWidth*2 + blockWidth * blockCount*2, upBorderHeight*2 + sideBorderCount * sideBorderHeight*2, (sideBorderWidth)*2+1, sideBorder1Height*2);
-        sideBorder1.setFill(new ImagePattern(SIDE_BORDER1_2X));
-        getChildren().add(sideBorder1);
-
-        Rectangle sideBorder2 = new Rectangle(0, upBorderHeight*2 + sideBorderCount * sideBorderHeight*2, (sideBorderWidth)*2+1, sideBorder1Height*2);
-        sideBorder2.setFill(new ImagePattern(SIDE_BORDER1_2X));
-        getChildren().add(sideBorder2);
-
-        // Set preferred size for the pane
-        setPrefSize(upBorderWidth * 2*2 + blockCount * blockWidth*2, upBorderHeight*2 + bottomBorderHeight*2 + sideBorderCount * sideBorderHeight*2 + sideBorder1Height*2);
-    }
-
     private void showGrid(Grid grid,int scale) {
         // Calculate grid parameters
         Image image;
@@ -220,5 +91,9 @@ public class TiledHall extends Pane {
 
     public Grid getGrid() {
         return grid;
+    }
+
+    public void setGrid(Grid grid) {
+        this.grid = grid;
     }
 }
