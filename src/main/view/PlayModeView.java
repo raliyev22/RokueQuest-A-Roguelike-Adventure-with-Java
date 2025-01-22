@@ -278,9 +278,9 @@ public class PlayModeView {
 			}
 		});
 	}
-	public void updateInventoryUI(Set<Enchantment.Type> enchantments) {
+	public void updateInventoryUI(List<Enchantment.Type> enchantments) {
 		if (inventoryView != null) {
-			inventoryView.updateInventory(enchantments); // Update the InventoryView with the set of enchantments
+			inventoryView.updateInventory(enchantments);
 		}
 	}
 

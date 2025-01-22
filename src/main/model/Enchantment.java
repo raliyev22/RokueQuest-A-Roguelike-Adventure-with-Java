@@ -33,7 +33,6 @@ public class Enchantment {
     private static final int MAX_EXTRA_TIME_SECONDS = 5;
     private int totalExtraTimeGained = 0;
     private Timeline expirationTimeline;
-
     public Enchantment(Type type, int posX, int posY, long spawnTime) {
         this.type = type;
         this.posX = posX;
@@ -44,7 +43,6 @@ public class Enchantment {
     public void setExpirationTimeline(Timeline timeline) {
         this.expirationTimeline = timeline;
     }
-
     public Timeline getExpirationTimeline() {
         return this.expirationTimeline;
     }
