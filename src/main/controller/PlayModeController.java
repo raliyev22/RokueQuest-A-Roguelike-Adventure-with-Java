@@ -56,7 +56,7 @@ public class PlayModeController extends Application {
     private long revealPausedTime = 0; // Cumulative paused duration
     private boolean revealTimerPaused = false; // Is the reveal timer paused?
 
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 1_000_000_000L; // 12 seconds in nanoseconds
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
     private Inventory inventory;
     private InventoryView inventoryView;
     private long lastEnchantmentSpawnTime = 0;
