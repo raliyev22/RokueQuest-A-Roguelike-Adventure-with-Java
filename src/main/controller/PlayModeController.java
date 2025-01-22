@@ -194,6 +194,7 @@ public class PlayModeController extends Application {
 
 
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         initializePlayMode();
         Tile heroTile = playModeGrid.findTileWithIndex(hero.getPosX(), hero.getPosY());
         // If view is null (which means we are in the first hall), create a new one
@@ -212,7 +213,7 @@ public class PlayModeController extends Application {
         // primaryStage.setFullScreen(true);
         // primaryStage.setFullScreenExitHint("");
         primaryStage.show();
-        this.primaryStage = primaryStage;
+        
 
         startGameLoop();
     }
