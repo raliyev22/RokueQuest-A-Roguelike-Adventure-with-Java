@@ -1,9 +1,6 @@
 package main.model;
 
-
-
 import main.controller.PlayModeController;
-
 public class IndecisiveWizardBehavior implements WizardBehavior {
     private long startTime;
 

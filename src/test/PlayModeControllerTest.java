@@ -3,10 +3,8 @@ package test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import java.util.ArrayList;
 
 import main.controller.PlayModeController;
-import main.model.*;
 import main.utils.Grid;
 import main.utils.Tile;
 

@@ -1,8 +1,6 @@
 package main.model;
 
 import javafx.scene.shape.Rectangle;
-import main.controller.PlayModeController;
-
 public abstract class Monster {
     public final int speed = 5;
     public MonsterType type;
@@ -73,7 +71,5 @@ public abstract class Monster {
     public void setLastActTime(long lastActTime) {
         this.lastActTime = lastActTime;
     }
-
-    //public abstract void act(PlayModeController controller);
 }
 

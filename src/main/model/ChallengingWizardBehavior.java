@@ -11,5 +11,4 @@ public class ChallengingWizardBehavior implements WizardBehavior {
         controller.teleportRune();
         soundPlayer.playSoundEffect("wizard");
     }
-
 }

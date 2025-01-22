@@ -10,7 +10,6 @@ import main.model.Enchantment;
 import main.model.Images;
 
 import java.util.List;
-import java.util.Set;
 
 public class InventoryView extends StackPane {
     private final int ICON_SIZE = 30; // Icon size

@@ -8,17 +8,11 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import main.controller.PlayModeController;
 import main.utils.Grid;
 import main.utils.Tile;
 import main.view.PlayModeView;
 
 import java.security.SecureRandom;
-import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Set;
-
 public class Enchantment {
     public enum Type {
         EXTRA_TIME, REVEAL, CLOAK_OF_PROTECTION, LURING_GEM, EXTRA_LIFE
@@ -29,9 +23,6 @@ public class Enchantment {
     private int posY;
     private long spawnTime;
     private boolean isActive;
-    private Set<Tile> extraTimeRunes = new HashSet<>();
-    private static final int MAX_EXTRA_TIME_SECONDS = 5;
-    private int totalExtraTimeGained = 0;
     private Timeline expirationTimeline;
     public Enchantment(Type type, int posX, int posY, long spawnTime) {
         this.type = type;
@@ -125,15 +116,6 @@ public class Enchantment {
 
         return new Enchantment(type, posX, posY, spawnTime);
     }
-
-    // Handle the effects of the enchantment
-//    public static void handleEnchantmentEffect(Enchantment enchantment, Hero hero, PlayModeController controller) {
-//        switch (enchantment.getType()) {
-//            case EXTRA_TIME -> controller.addTime(5);
-//            case EXTRA_LIFE -> hero.increaseLives(1);
-//            case REVEAL, CLOAK_OF_PROTECTION, LURING_GEM -> hero.addToBag(enchantment.getType());
-//        }
-//    }
 
     // Highlight a 4x4 area around the rune tile
     public static void highlightArea(int xPoint, int yPoint, int width, int height, PlayModeView view) {

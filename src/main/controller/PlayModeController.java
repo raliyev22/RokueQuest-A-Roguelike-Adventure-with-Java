@@ -47,7 +47,6 @@ public class PlayModeController extends Application {
     protected MonsterManager monsterManager;
     protected HallType hallType;
     private List<Enchantment> activeEnchantments;
-    private Map<Tile, Integer> runeExtraTimeMap; // Tracks extra time added per rune
     private boolean luringGemActivated = false;
     public int activeExtraTimeEnchantments = 0;
     private boolean revealActive = false;
@@ -57,9 +56,7 @@ public class PlayModeController extends Application {
     private long revealPausedTime = 0; // Cumulative paused duration
     private boolean revealTimerPaused = false; // Is the reveal timer paused?
 
-    private static final long ENCHANTMENT_SPAWN_INTERVAL = 12_000_000_000L; // 12 seconds in nanoseconds
-    private long revealPauseTime = 0;
-    private long revealHighlightDuration = 10_000; // 10 seconds in milliseconds
+    private static final long ENCHANTMENT_SPAWN_INTERVAL = 1_000_000_000L; // 12 seconds in nanoseconds
     private Inventory inventory;
     private InventoryView inventoryView;
     private long lastEnchantmentSpawnTime = 0;
@@ -69,11 +66,7 @@ public class PlayModeController extends Application {
     private double mouseX;
     private double mouseY;
     private long cloakRemainingTime = 0;
-    private long revealRemainingTime = 0;
     private Timer revealTimer = null; // Timer for the reveal effect
-    private long cloakPauseTime = 0;
-    private long revealElapsedPausedTime = 0; // Time the highlight was paused
-    private boolean revealPaused = false; // Is the highlight paused?
 
     private Timer cloakTimer = null;
     public static double time;
@@ -108,13 +101,7 @@ public class PlayModeController extends Application {
 
     private Stage primaryStage;
 
-    // public PlayModeController() {
-    //     initializePlayMode();
-    // }
-
     public void initializePlayMode() {
-        // Initialize hallType if it's nulladdd
-
         if (inventory == null) {
             inventory = new Inventory(); // Ensure inventory persists
         }
@@ -327,31 +314,6 @@ public class PlayModeController extends Application {
         }
     }
 
-    // public void handleMouseClick(double mouseX, double mouseY) {
-    //     for (Map.Entry<Enchantment, Rectangle> entry : view.getEnchantmentViews().entrySet()) {
-    //         Enchantment enchantment = entry.getKey();
-    //         Rectangle enchantmentView = entry.getValue();
-
-    //         if (enchantmentView != null && enchantmentView.contains(mouseX, mouseY)) {
-    //             if (!activeEnchantments.contains(enchantment)) {
-    //                 System.out.println("Enchantment not active: " + enchantment.getType());
-    //                 return; // Avoid double collection
-    //             }
-
-    //             if (enchantment.getType() == Enchantment.Type.EXTRA_LIFE) {
-    //                 hero.increaseLives(1);
-    //                 view.updateHeroLife(hero.getLiveCount());
-    //                 // Remove enchantment after use
-    //                 activeEnchantments.remove(enchantment);
-    //                 view.removeEnchantmentView(enchantment);
-    //             } else {
-    //                 // Handle other enchantments
-    //                 view.collectEnchantment(enchantment, inventory);
-    //             }
-    //             break; // Exit loop after handling
-    //         }
-    //     }
-    // }
     public void addTime(int seconds) {
         time += seconds; // Update the time
         view.updateTime(time); // Reflect the change in the view
@@ -488,9 +450,6 @@ public class PlayModeController extends Application {
         });
     }
 
-
-
-
     private void handleKeyReleased(KeyCode code) {
         switch (code) {
             case UP, W -> upPressed = false;
@@ -617,6 +576,7 @@ public class PlayModeController extends Application {
                                 if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
                                     addTime(5); // Add time
                                     activeExtraTimeEnchantments--; // Decrement active count
+                                    view.removeEnchantmentView(enchantment);
                                     System.out.println("Extra time collected! Current time: " + time + " seconds.");
                                 }
                                 else if (enchantment.getType() == Enchantment.Type.EXTRA_LIFE) {
