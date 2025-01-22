@@ -51,6 +51,7 @@ public class PlayModeController extends Application {
     private boolean luringGemActivated = false;
     public int activeExtraTimeEnchantments = 0;
     private boolean revealActive = false;
+    private boolean gameStarted = false;
     private long revealStartTime = 0;
     private long revealElapsedTime = 0; // Time elapsed while the reveal is active
     private long revealDuration = 10_000; // 10 seconds in milliseconds
@@ -488,10 +489,18 @@ public class PlayModeController extends Application {
                         revealActive = false;
                     }
                 }
-                // if (mouseClicked) {
-                //     handleMouseClick(mouseX, mouseY);
-                //     mouseClicked = false;
-                // }
+
+                if(!gameStarted){
+                    Tile initialMonsterTile = getRandomEmptyTile();
+                    int randomXCoordinate = playModeGrid.findXofTile(initialMonsterTile);
+                    int randomYCoordinate = playModeGrid.findYofTile(initialMonsterTile);
+                    monsterManager.createMonster(randomXCoordinate, randomYCoordinate, adjustedNow);
+                    gameStarted = true;
+                }
+
+                if (lastMonsterSpawnTime == 0) {
+                    lastMonsterSpawnTime = adjustedNow-remainingMonsterSpawnTime;
+                }
 
                 if (time < 0) {
                     view.showGameOverPopup(false);
@@ -1424,6 +1433,7 @@ public class PlayModeController extends Application {
                     }
                 }
             }
+            gameStarted = true;
 
             Scene scene = view.getScene();
             initialize(scene);
@@ -1431,8 +1441,9 @@ public class PlayModeController extends Application {
             primaryStage.setTitle("Play Mode");
             primaryStage.setScene(scene);
             primaryStage.setY(0);
-            // primaryStage.setFullScreen(true);
-            // primaryStage.setFullScreenExitHint("");
+            primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            primaryStage.setFullScreenExitHint("");
+            primaryStage.setFullScreen(true);
             primaryStage.show();
             this.primaryStage = primaryStage;
             view.showCountdownAndStart(() -> {

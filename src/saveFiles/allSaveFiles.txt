@@ -1,16 +1,9 @@
-save10.txt
-save11.txt
-save12.txt
-save13.txt
-save14.txt
-save15.txt
-save16.txt
 
-save17.txt
-save18.txt
-save19.txt
-save20.txt
-save21.txt
-save22.txt
-save23.txt
-save24.txt
+save1.txt
+save2.txt
+save3.txt
+save4.txt
+save5.txt
+save6.txt
+save7.txt
+save8.txt
