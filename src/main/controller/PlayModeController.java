@@ -685,29 +685,35 @@ public class PlayModeController extends Application {
         // Use a Timeline for precise control
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.millis(remainingTime), event -> {
-                    activeEnchantments.remove(enchantment);
-                    playModeGrid.changeTileWithIndex(enchantment.getPosX(), enchantment.getPosY(), 'E');
-                    view.removeEnchantmentView(enchantment);
-
-                    if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
-                        activeExtraTimeEnchantments--;
-                    }
-
-                    enchantmentExpirationMap.remove(enchantment);
+                    removeEnchantment(enchantment);
                 })
         );
 
-        timeline.setOnFinished(event -> enchantmentExpirationMap.remove(enchantment));
         timeline.setCycleCount(1);
 
+        // Pause the timeline if the game is already paused
         if (!isRunning) {
             timeline.pause();
         }
 
-        enchantment.setExpirationTimeline(timeline); // Store timeline for pause/resume control
+        // Store the timeline in the enchantment object for pause/resume control
+        enchantment.setExpirationTimeline(timeline);
+
+        // Start the timeline
         timeline.play();
     }
 
+    private void removeEnchantment(Enchantment enchantment) {
+        activeEnchantments.remove(enchantment);
+        playModeGrid.changeTileWithIndex(enchantment.getPosX(), enchantment.getPosY(), 'E');
+        view.removeEnchantmentView(enchantment);
+
+        if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+            activeExtraTimeEnchantments--;
+        }
+
+        enchantmentExpirationMap.remove(enchantment);
+    }
 
 
     private void stopGameLoop() {
@@ -738,10 +744,13 @@ public class PlayModeController extends Application {
             leftPressed = false;
             rightPressed = false;
 
-            // Pause the reveal timer
-            if (revealActive && !revealTimerPaused) {
-                revealPausedTime += System.currentTimeMillis() - revealStartTime;
-                revealTimerPaused = true;
+            // Pause all active enchantments
+            for (Enchantment enchantment : activeEnchantments) {
+                if (enchantment.getExpirationTimeline() != null) {
+                    long elapsed = System.currentTimeMillis() - enchantmentExpirationMap.get(enchantment);
+                    enchantmentExpirationMap.put(enchantment, elapsed);
+                    enchantment.getExpirationTimeline().pause();
+                }
             }
         } else {
             // Resume the game
@@ -752,13 +761,17 @@ public class PlayModeController extends Application {
 
             view.getScene().getRoot().requestFocus();
 
-            // Resume the reveal timer
-            if (revealActive && revealTimerPaused) {
-                revealTimerPaused = false;
-                revealStartTime = System.currentTimeMillis();
+            // Resume all active enchantments
+            for (Enchantment enchantment : activeEnchantments) {
+                if (enchantment.getExpirationTimeline() != null) {
+                    long remaining = enchantmentExpirationMap.get(enchantment);
+                    enchantmentExpirationMap.put(enchantment, System.currentTimeMillis() - remaining);
+                    enchantment.getExpirationTimeline().play();
+                }
             }
         }
     }
+
 
 
 
