@@ -629,6 +629,7 @@ public class PlayModeController extends Application {
                                 soundPlayer.playSoundEffectInThread("gameWinner");
                                 view.showGameOverPopup(true);
                             } else {
+                                gameStarted = false;
                                 soundPlayer.playSoundEffectInThread("door");
                                 new Timeline(new KeyFrame(Duration.seconds(1.75), e -> {
                                     startGameLoop();
