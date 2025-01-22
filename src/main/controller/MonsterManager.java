@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javafx.scene.image.Image;
-import javax.swing.text.View;
 import main.model.*;
 import main.utils.*;
 import main.view.PlayModeView;
@@ -69,7 +68,6 @@ public class MonsterManager {
         
         return createMonster(xPosition, yPosition, type, now);
     }
-    
     
     /** 
      * Create a monster, add it to the grid and the list, and render it on the screen.
@@ -151,7 +149,6 @@ public class MonsterManager {
             }
         }
     }
-    
 
     public boolean isArcherInRange(ArcherMonster archerMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - archerMonster.posX) + Math.abs(hero.getPosY() - archerMonster.posY);
@@ -185,8 +182,6 @@ public class MonsterManager {
             hero.decreaseLives();
         }
     }
-
-
 
     public boolean isFighterInRange(FighterMonster fighterMonster) {
         int manhattanDistance = Math.abs(hero.getPosX() - fighterMonster.posX) + Math.abs(hero.getPosY() - fighterMonster.posY);
@@ -300,7 +295,6 @@ public class MonsterManager {
         }
     }
     
-    
     public Directions pickMovementDirection(Monster monster) {
         SecureRandom rng = new SecureRandom();
         
@@ -379,24 +373,17 @@ public class MonsterManager {
         return true; // Representation invariant holds
     }
 
-
-
-
     public boolean repOkHeroLife(Hero hero,int initialLifeCount) {
         // Ensure hero life is decreased after a succesfull attack
 
         return hero.getLiveCount()==initialLifeCount-1; 
     }
 
-
-
     public boolean repOkTeleportation(int x,int y,PlayModeController controller) {
         // Check if the teleported location contains an object
-
         Grid grid = controller.getPlayModeGrid();
         Tile targetTile = grid.findTileWithIndex(x, y);
 
         return Grid.isHallObjectTile(targetTile);
     }
-
 }

@@ -1,15 +1,9 @@
 package main.controller;
 
 import main.model.HallType;
-import main.model.Images;
 import main.utils.Grid;
 import main.utils.Tile;
 import main.utils.TiledHall;
-import main.view.BuildModeView;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -19,19 +13,6 @@ public class BuildModeController {
     private HashMap<TiledHall, List<Tile>> tileMap;
     private HashMap<TiledHall, HallType> hallTypeMap;
     private List<Pair<Integer, Integer>> runeLocationList;
-    static final Image tileImage = new Image("/rokue-like_assets/Tile_x2_32_32.png");
-
-    static final Image CHEST_IMAGE = new Image("/rokue-like_assets/Build_Mode_Chest_Full_View.png");
-    static final Image Pillar_IMAGE = new Image("/rokue-like_assets/Pillar_x2_32_64.png");
-    static final Image Ladder_IMAGE = new Image("/rokue-like_assets/TileWithLadder_x2_32_32.png");
-    static final Image BoxOnBox_IMAGE = new Image("/rokue-like_assets/BoxOnTopOfBox_x2_32_64.png");
-    static final Image Cube_IMAGE = new Image("/rokue-like_assets/Cube_x2_32_32.png");
-    static final Image Skull_IMAGE = new Image("/rokue-like_assets/Skull_x2_32_32.png");
-
-    static final Image BOX_IMAGE = new Image("/rokue-like_assets/Box_x2_32_42.png");
-    
-    static final Image CHEST = new Image("/rokue-like_assets/ChestHeart_x2_32_28.png");
-    static final Image Exit_Button = new Image("/rokue-like_assets/ExitButton_x2_32_32.png");
 
     public BuildModeController() {
         tileMap = new HashMap<>();

@@ -242,10 +242,10 @@ public class PlayModeView {
 	}
 	public void addEnchantmentView(Enchantment enchantment, double x, double y) {
 		// Skip rendering for EXTRA_TIME_ENCHANTMENT
-		if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
-			enchantmentViews.put(enchantment, null); // Logical presence without rendering
-			return;
-		}
+		// if (enchantment.getType() == Enchantment.Type.EXTRA_TIME) {
+		// 	enchantmentViews.put(enchantment, null); // Logical presence without rendering
+		// 	return;
+		// }
 
 		Rectangle enchantmentView = new Rectangle(tileSize, tileSize);
 		enchantmentView.setFill(new ImagePattern(enchantment.getImage()));
