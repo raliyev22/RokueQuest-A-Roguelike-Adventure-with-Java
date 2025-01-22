@@ -8,6 +8,7 @@ import java.util.Set;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -29,6 +30,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import main.Main;
@@ -141,8 +143,10 @@ public class PlayModeView {
 	
 
 	public void initialize() {
+		Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+
 		if (scene == null) {
-			scene = new Scene(pane);
+			scene = new Scene(pane, screenBounds.getWidth(), screenBounds.getHeight());
 		}
 
         monsterViews = new ArrayList<>();

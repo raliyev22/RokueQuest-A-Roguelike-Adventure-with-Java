@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -72,7 +73,7 @@ public class PlayModeController extends Application {
     public static double time;
     public static double totalTime;
 
-    protected int hallTimeMultiplier = 500;
+    protected int hallTimeMultiplier = 5;
     private long lastUpdateTime = 0; // Tracks the last time the timer was updated
     private static final long ONE_SECOND_IN_NANOS = 1_000_000_000L; // One second in nanoseconds
 
@@ -177,9 +178,6 @@ public class PlayModeController extends Application {
         monsterManager.setPlayModeView(view);
     }
 
-
-
-
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         initializePlayMode();
@@ -197,13 +195,14 @@ public class PlayModeController extends Application {
 
         primaryStage.setTitle("Play Mode");
         primaryStage.setScene(scene);
-        // primaryStage.setFullScreen(true);
-        // primaryStage.setFullScreenExitHint("");
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        primaryStage.setFullScreenExitHint("");
+        primaryStage.setFullScreen(true);
         primaryStage.show();
-        
 
         startGameLoop();
     }
+
    private Monster findClosestFighterMonster(int heroX, int heroY) {
         Monster closestFighter = null;
         double minDistance = Double.MAX_VALUE;
