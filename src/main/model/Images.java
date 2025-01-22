@@ -35,7 +35,7 @@ public class Images extends Application {
 	public static final Image IMAGE_BACKGROUNDJPG = new Image("/rokue-like_assets/rokue33.jpg");
 
 	public static final Image IMAGE_WALLS_X4 = new Image("/rokue-like_assets/Walls_x4_736_680.png");
-	public static final Image IMAGE_EARTHHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_399_Top_new.png");
+	public static final Image IMAGE_EARTHHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Earth_x4_680_399_Top_new(1).png");
 	public static final Image IMAGE_EARTHHALL_CLOSEDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Close_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_EARTHHALL_OPENDOOR_BOTTOM_X4 = new Image("/rokue-like_assets/Walls_Earth_Open_Door_x4_680_400_Bottom.png");
 	public static final Image IMAGE_AIRHALL_TOP_X4 = new Image("/rokue-like_assets/Walls_Air_x4_680_399_Top_new.png");

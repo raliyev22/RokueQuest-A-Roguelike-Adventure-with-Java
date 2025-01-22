@@ -368,7 +368,7 @@ public class PlayModeController extends Application {
         }
 
         switch (code) {
-            case W:
+            case W,UP:
                 if (luringGemActivated) {
                     useLuringGem("W");
                     luringGemActivated = false; // Reset the activation
@@ -376,7 +376,7 @@ public class PlayModeController extends Application {
                     upPressed = true;
                 }
                 break;
-            case S:
+            case S,DOWN:
                 if (luringGemActivated) {
                     useLuringGem("S");
                     luringGemActivated = false;
@@ -384,7 +384,7 @@ public class PlayModeController extends Application {
                     downPressed = true;
                 }
                 break;
-            case A:
+            case A,LEFT:
                 if (luringGemActivated) {
                     useLuringGem("A");
                     luringGemActivated = false;
@@ -392,7 +392,7 @@ public class PlayModeController extends Application {
                     leftPressed = true;
                 }
                 break;
-            case D:
+            case D,RIGHT:
                 if (luringGemActivated) {
                     useLuringGem("D");
                     luringGemActivated = false;
