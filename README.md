@@ -48,5 +48,3 @@ The goal: **Find the hidden rune in each hall before time runs out**, using logi
 
 ---
 
-## 📁 Project Structure
-
